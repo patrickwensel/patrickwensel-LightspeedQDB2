@@ -8,7 +8,7 @@
 <TelerikGrid Data="@MyData" Height="400px"
              Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
              Resizable="true" 
-             EditMode="Telerik.Blazor.GridEditMode.Popup"
+             EditMode="Telerik.Blazor.GridEditMode.Inline"
              OnUpdate=@UpdateHandler
              OnDelete=@DeleteHandler
              OnCreate=@CreateHandler
@@ -71,8 +71,6 @@
     async Task CancelHandler(GridCommandEventArgs args)
     {
         ProductFamily item = (ProductFamily)args.Item;
-
-        await Task.Delay(1000); //simulate actual long running async operation
     }
 
 

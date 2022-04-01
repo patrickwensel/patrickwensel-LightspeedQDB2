@@ -1,6 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿<!----<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">QBD2</a>
+        <a class="navbar-brand" href=""><img src="images/logo_lightspeed-dark.png" /></a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -46,15 +46,75 @@
         </div>
 
     </nav>
-</div>
+</div>---->
 
-@code {
-    private bool collapseNavMenu = true;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+<!--- custom header ---->
 
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
+<header id="header" class="header fixed-top d-flex align-items-center">
+
+    <div class="d-flex align-items-center justify-content-between">
+        <div class="logo">
+            <a class="navbar-brand" href=""><img src="images/logo_lightspeed-dark.png" /></a>
+        </div>
+        <!---<i class="bi bi-list toggle-sidebar-btn"></i>--->
+    </div><!-- End Logo -->
+   <!------ <button type="button" id="sidebarCollapse" class="btn btn-info" onclick="myFunction()">
+        <i class="fas fa-align-left"></i>
+    </button>----->
+    <ul class="nav navbar-nav ml-auto">
+        <li class="nav-item active">
+            <LoginDisplay />
+            <!----<a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>--->
+        </li>
+    </ul>
+
+</header><!-- End Header -->
+<!-- Sidebar  -->
+<nav id="sidebar">
+<ul class="list-unstyled components">
+
+        <AuthorizeView>
+            <Authorized>
+                <li>
+                  <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                   <span class="oi oi-home" aria-hidden="true"></span> Home
+                  </NavLink>
+
+                   <NavLink class="nav-link" href="workorder">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Work Order
+                  </NavLink>
+
+                  <NavLink class="nav-link" href="inspection">
+                   <span class="oi oi-list-rich" aria-hidden="true"></span> Inspection
+                  </NavLink>
+        
+        
+                 <NavLink class="nav-link" href="repair">
+                  <span class="oi oi-list-rich" aria-hidden="true"></span> Repair
+                 </NavLink>
+        
+        
+                 <NavLink class="nav-link" href="mrb">
+                  <span class="oi oi-list-rich" aria-hidden="true"></span> MRB
+                 </NavLink>
+        
+       
+                 <NavLink class="nav-link" href="scarcar">
+                   <span class="oi oi-list-rich" aria-hidden="true"></span> SCAR/CAR
+                 </NavLink>
+        
+        
+                <NavLink class="nav-link" href="alertsdeviations">
+                 <span class="oi oi-list-rich" aria-hidden="true"></span> Alerts & Deviations
+                </NavLink>
+                </li>
+            </Authorized>
+
+            
+
+       </AuthorizeView>
+        
+    </ul>
+
+</nav>

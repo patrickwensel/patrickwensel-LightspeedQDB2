@@ -13,9 +13,24 @@ namespace QBD2.Services
             _context = context;
         }
 
-        public async Task<List<MasterPart>> GetMasterPartsAsync()
+        public static async Task Create(MasterPart itemToInsert)
+        {
+
+        }
+
+        public async Task<List<MasterPart>> Read()
         {
             return await _context.MasterParts.ToListAsync();
+        }
+
+        public static async Task Update(MasterPart itemToUpdate)
+        {
+
+        }
+
+        public static async Task Delete(MasterPart itemToDelete)
+        {
+
         }
     }
 }

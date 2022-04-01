@@ -26,6 +26,8 @@ builder.Services.AddBlazoredToast();
 #region Services
 
 builder.Services.AddScoped<ProductFamilyService>();
+builder.Services.AddScoped<MasterPartService>();
+builder.Services.AddScoped<StationService>();
 
 #endregion
 

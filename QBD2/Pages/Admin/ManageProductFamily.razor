@@ -1,4 +1,4 @@
-﻿@page "/productfamily"
+﻿@page "/manageproductfamily"
 @using QBD2.Services
 @using QBD2.Entities
 @inject ProductFamilyService ProductFamilyService
@@ -12,7 +12,7 @@
         <GridCommandButton Command="Add" Icon="add">Add a Product Family</GridCommandButton>
     </GridToolBar>
     <GridColumns>
-        <GridColumn Field="@(nameof(QBD2.Entities.ProductFamily.Name))" Title="Name" Groupable="false" />
+        <GridColumn Field="@(nameof(ProductFamily.Name))" Title="Name" Groupable="false" />
                 <GridCommandColumn>
             <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
             <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
@@ -24,7 +24,7 @@
 
 @code {
 
-    List<QBD2.Entities.ProductFamily> MyData { get; set; }
+    List<ProductFamily> MyData { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -38,7 +38,7 @@
 
     async Task UpdateHandler(GridCommandEventArgs args)
     {
-        QBD2.Entities.ProductFamily item = (QBD2.Entities.ProductFamily)args.Item;
+        ProductFamily item = (ProductFamily)args.Item;
 
         await ProductFamilyService.Update(item);
 
@@ -47,7 +47,7 @@
 
     async Task DeleteHandler(GridCommandEventArgs args)
     {
-        QBD2.Entities.ProductFamily item = (QBD2.Entities.ProductFamily)args.Item;
+        ProductFamily item = (ProductFamily)args.Item;
 
         await ProductFamilyService.Delete(item);
 
@@ -56,7 +56,7 @@
 
     async Task CreateHandler(GridCommandEventArgs args)
     {
-        QBD2.Entities.ProductFamily item = (QBD2.Entities.ProductFamily)args.Item;
+        ProductFamily item = (ProductFamily)args.Item;
 
         await ProductFamilyService.Create(item);
 
@@ -65,7 +65,7 @@
 
     async Task CancelHandler(GridCommandEventArgs args)
     {
-        QBD2.Entities.ProductFamily item = (QBD2.Entities.ProductFamily)args.Item;
+        ProductFamily item = (ProductFamily)args.Item;
 
         await Task.Delay(1000); //simulate actual long running async operation
     }

@@ -11,6 +11,7 @@ namespace QBD2.Data
 
         public DbSet<MasterPart> MasterParts { get; set; }
         public DbSet<ProductFamily> ProductFamilies { get; set; }
+        public DbSet<Station> Stations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

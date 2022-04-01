@@ -7,7 +7,12 @@
 
 <TelerikGrid Data="@MyData" Height="400px"
              Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
-             Resizable="true" >
+             Resizable="true" 
+             EditMode="Telerik.Blazor.GridEditMode.Popup"
+             OnUpdate=@UpdateHandler
+             OnDelete=@DeleteHandler
+             OnCreate=@CreateHandler
+                >
                  <GridToolBar>
         <GridCommandButton Command="Add" Icon="add">Add a Product Family</GridCommandButton>
     </GridToolBar>

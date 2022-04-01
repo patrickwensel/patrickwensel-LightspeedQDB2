@@ -1,0 +1,31 @@
+﻿@page "/productfamily"
+@using QBD2.Services
+@using QBD2.Entities
+@inject ProductFamilyService ProductFamilyService
+
+<h3>Product Family</h3>
+
+General grid with its most common features
+
+<TelerikGrid Data="@productFamilies" Height="400px"
+             Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
+             Resizable="true" >
+    <GridColumns>
+        <GridColumn Field="@(nameof(QBD2.Entities.ProductFamily.Name))" Title="Name" Groupable="false" />
+                <GridCommandColumn>
+            <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
+            <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
+            <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
+            <GridCommandButton Command="Cancel" Icon="cancel" ShowInEdit="true">Cancel</GridCommandButton>
+        </GridCommandColumn>
+    </GridColumns>
+</TelerikGrid>
+
+@code {
+    private List<QBD2.Entities.ProductFamily>? productFamilies;
+
+    protected override async Task OnInitializedAsync()
+    {
+        productFamilies = await ProductFamilyService.GetProductFamiliesAsync();
+    }
+}

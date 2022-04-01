@@ -13,9 +13,24 @@ namespace QBD2.Services
             _context = context;
         }
 
-        public async Task<List<ProductFamily>> GetProductFamiliesAsync()
+        public static async Task Create(ProductFamily itemToInsert)
+        {
+
+        }
+
+        public async Task<List<ProductFamily>> Read()
         {
             return await _context.ProductFamilies.ToListAsync();
+        }
+
+        public static async Task Update(ProductFamily itemToUpdate)
+        {
+
+        }
+
+        public static async Task Delete(ProductFamily itemToDelete)
+        {
+
         }
 
     }

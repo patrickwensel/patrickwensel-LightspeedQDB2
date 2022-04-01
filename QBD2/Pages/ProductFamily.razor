@@ -5,11 +5,12 @@
 
 <h3>Product Family</h3>
 
-General grid with its most common features
-
-<TelerikGrid Data="@productFamilies" Height="400px"
+<TelerikGrid Data="@MyData" Height="400px"
              Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
              Resizable="true" >
+                 <GridToolBar>
+        <GridCommandButton Command="Add" Icon="add">Add a Product Family</GridCommandButton>
+    </GridToolBar>
     <GridColumns>
         <GridColumn Field="@(nameof(QBD2.Entities.ProductFamily.Name))" Title="Name" Groupable="false" />
                 <GridCommandColumn>
@@ -22,10 +23,52 @@ General grid with its most common features
 </TelerikGrid>
 
 @code {
-    private List<QBD2.Entities.ProductFamily>? productFamilies;
+
+    List<QBD2.Entities.ProductFamily> MyData { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        productFamilies = await ProductFamilyService.GetProductFamiliesAsync();
+        await GetGridData();
     }
+
+    async Task GetGridData()
+    {
+        MyData = await ProductFamilyService.Read();
+    }
+
+    async Task UpdateHandler(GridCommandEventArgs args)
+    {
+        QBD2.Entities.ProductFamily item = (QBD2.Entities.ProductFamily)args.Item;
+
+        await ProductFamilyService.Update(item);
+
+        await GetGridData();
+    }
+
+    async Task DeleteHandler(GridCommandEventArgs args)
+    {
+        QBD2.Entities.ProductFamily item = (QBD2.Entities.ProductFamily)args.Item;
+
+        await ProductFamilyService.Delete(item);
+
+        await GetGridData();
+    }
+
+    async Task CreateHandler(GridCommandEventArgs args)
+    {
+        QBD2.Entities.ProductFamily item = (QBD2.Entities.ProductFamily)args.Item;
+
+        await ProductFamilyService.Create(item);
+
+        await GetGridData();
+    }
+
+    async Task CancelHandler(GridCommandEventArgs args)
+    {
+        QBD2.Entities.ProductFamily item = (QBD2.Entities.ProductFamily)args.Item;
+
+        await Task.Delay(1000); //simulate actual long running async operation
+    }
+
+
 }

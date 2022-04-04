@@ -27,7 +27,8 @@ namespace QBD2.Services
         public async Task Update(ProductFamily itemToUpdate)
         {
             var productFamily = _context.ProductFamilies.Where(d => d.ProductFamilyId == itemToUpdate.ProductFamilyId).FirstOrDefault();
-            productFamily = itemToUpdate;
+            productFamily.Name = itemToUpdate.Name;
+             _context.Entry(productFamily).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 

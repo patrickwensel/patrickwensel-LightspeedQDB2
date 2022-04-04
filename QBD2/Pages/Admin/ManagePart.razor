@@ -1,0 +1,39 @@
+﻿@page "/managepart"
+@using QBD2.Services
+@using QBD2.Entities
+@inject PartService PartService
+
+<h3>Part</h3>
+
+<TelerikGrid Data="@MyData" 
+             Pageable="true" Sortable="true" 
+             Resizable="true"
+             EditMode="Telerik.Blazor.GridEditMode.Inline">
+    <GridToolBar>
+        <GridCommandButton Command="Add" Icon="add">Add a Product Family</GridCommandButton>
+    </GridToolBar>
+    <GridColumns>
+        <GridColumn Field="@(nameof(Part.MasterPart.Description))" Title="Name" Groupable="false" />
+        <GridColumn Field="@(nameof(Part.MasterPart.PartNumber))" Title="Number" Groupable="false" />
+        <GridColumn Field="@(nameof(Part.SerialNumber))" Title="Serial Number" Groupable="false" />
+        <GridColumn Field="@(nameof(Part.ParentPart.MasterPart.Description))" Title="Parent Name" Groupable="false" />
+        <GridCommandColumn>
+        </GridCommandColumn>
+    </GridColumns>
+</TelerikGrid>
+
+@code {
+
+    List<Part> MyData { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetGridData();
+    }
+
+    async Task GetGridData()
+    {
+        MyData = await PartService.Read();
+    }
+
+}

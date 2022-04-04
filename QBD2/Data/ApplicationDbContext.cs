@@ -12,6 +12,7 @@ namespace QBD2.Data
         public DbSet<MasterPart> MasterParts { get; set; }
         public DbSet<ProductFamily> ProductFamilies { get; set; }
         public DbSet<Station> Stations { get; set; }
+        public DbSet<Part> Parts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +37,24 @@ namespace QBD2.Data
 
             #endregion
 
+            #region Parts
+
+            modelBuilder.Entity<Part>().HasData(new Part { PartId = 1, MasterPartId = 1, SerialNumber = "808000406" });
+            modelBuilder.Entity<Part>().HasData(new Part { PartId = 2, MasterPartId = 2, SerialNumber = "71534*000135", ParentPartId = 1});
+            modelBuilder.Entity<Part>().HasData(new Part { PartId = 3, MasterPartId = 3, SerialNumber = "L51210055", ParentPartId = 1 });
+            modelBuilder.Entity<Part>().HasData(new Part { PartId = 4, MasterPartId = 4, SerialNumber = "71543*000080", ParentPartId = 1 });
+            modelBuilder.Entity<Part>().HasData(new Part { PartId = 5, MasterPartId = 5, SerialNumber = "R50210586", ParentPartId = 1 });
+            modelBuilder.Entity<Part>().HasData(new Part { PartId = 6, MasterPartId = 6, SerialNumber = "71528*000047", ParentPartId = 1 });
+            modelBuilder.Entity<Part>().HasData(new Part { PartId = 7, MasterPartId = 7, SerialNumber = "54658*000908", ParentPartId = 1 });
+            modelBuilder.Entity<Part>().HasData(new Part { PartId = 8, MasterPartId = 8, SerialNumber = "2976833306*20210731037*A209601*2021-12-09*2Y*1*S*++*2801-20211207142***1", ParentPartId = 1 });
+            modelBuilder.Entity<Part>().HasData(new Part { PartId = 9, MasterPartId = 9, SerialNumber = "2972833301*2792-20210413013*A219101*2021-12-20*8", ParentPartId = 1 });
+            modelBuilder.Entity<Part>().HasData(new Part { PartId = 10, MasterPartId = 8, SerialNumber = "2976833306*20210731037*A209601*2021-12-09*2Y*1*S*++*2801-20211207142***1", ParentPartId = 1 });
+            modelBuilder.Entity<Part>().HasData(new Part { PartId = 11, MasterPartId = 9, SerialNumber = "2972833301*2792-20210413013*A219101*2021-12-20*8", ParentPartId = 1 });
+
+
+
+            #endregion
+
             #region Station
 
             modelBuilder.Entity<Station>().HasData(new Station { StationId = 1, Name = "Final Inspection" });
@@ -43,6 +62,7 @@ namespace QBD2.Data
             #endregion
 
             modelBuilder.Entity<MasterPart>().Property(m => m.ProductFamilyId).IsRequired(false);
+            modelBuilder.Entity<Part>().Property(m => m.ParentPartId).IsRequired(false);
 
             base.OnModelCreating(modelBuilder);
         }

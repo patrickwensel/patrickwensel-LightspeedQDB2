@@ -13,5 +13,9 @@ namespace QBD2.Entities
         [ForeignKey("MasterPart")]
         public int MasterPartId { get; set; }
         public virtual MasterPart MasterPart { get; set; }
+
+        [ForeignKey("ParentPart")]
+        public int? ParentPartId { get; set; }
+        public virtual Part ParentPart { get; set; }
     }
 }

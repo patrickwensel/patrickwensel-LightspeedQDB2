@@ -105,6 +105,111 @@ namespace QBD2.Migrations
                         });
                 });
 
+            modelBuilder.Entity("QBD2.Entities.Part", b =>
+                {
+                    b.Property<int>("PartId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PartId"), 1L, 1);
+
+                    b.Property<int>("MasterPartId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParentPartId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SerialNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PartId");
+
+                    b.HasIndex("MasterPartId");
+
+                    b.HasIndex("ParentPartId");
+
+                    b.ToTable("Parts");
+
+                    b.HasData(
+                        new
+                        {
+                            PartId = 1,
+                            MasterPartId = 1,
+                            SerialNumber = "808000406"
+                        },
+                        new
+                        {
+                            PartId = 2,
+                            MasterPartId = 2,
+                            ParentPartId = 1,
+                            SerialNumber = "71534*000135"
+                        },
+                        new
+                        {
+                            PartId = 3,
+                            MasterPartId = 3,
+                            ParentPartId = 1,
+                            SerialNumber = "L51210055"
+                        },
+                        new
+                        {
+                            PartId = 4,
+                            MasterPartId = 4,
+                            ParentPartId = 1,
+                            SerialNumber = "71543*000080"
+                        },
+                        new
+                        {
+                            PartId = 5,
+                            MasterPartId = 5,
+                            ParentPartId = 1,
+                            SerialNumber = "R50210586"
+                        },
+                        new
+                        {
+                            PartId = 6,
+                            MasterPartId = 6,
+                            ParentPartId = 1,
+                            SerialNumber = "71528*000047"
+                        },
+                        new
+                        {
+                            PartId = 7,
+                            MasterPartId = 7,
+                            ParentPartId = 1,
+                            SerialNumber = "54658*000908"
+                        },
+                        new
+                        {
+                            PartId = 8,
+                            MasterPartId = 8,
+                            ParentPartId = 1,
+                            SerialNumber = "2976833306*20210731037*A209601*2021-12-09*2Y*1*S*++*2801-20211207142***1"
+                        },
+                        new
+                        {
+                            PartId = 9,
+                            MasterPartId = 9,
+                            ParentPartId = 1,
+                            SerialNumber = "2972833301*2792-20210413013*A219101*2021-12-20*8"
+                        },
+                        new
+                        {
+                            PartId = 10,
+                            MasterPartId = 8,
+                            ParentPartId = 1,
+                            SerialNumber = "2976833306*20210731037*A209601*2021-12-09*2Y*1*S*++*2801-20211207142***1"
+                        },
+                        new
+                        {
+                            PartId = 11,
+                            MasterPartId = 9,
+                            ParentPartId = 1,
+                            SerialNumber = "2972833301*2792-20210413013*A219101*2021-12-20*8"
+                        });
+                });
+
             modelBuilder.Entity("QBD2.Entities.ProductFamily", b =>
                 {
                     b.Property<int>("ProductFamilyId")
@@ -160,6 +265,23 @@ namespace QBD2.Migrations
                         .HasForeignKey("ProductFamilyId");
 
                     b.Navigation("ProductFamily");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.Part", b =>
+                {
+                    b.HasOne("QBD2.Entities.MasterPart", "MasterPart")
+                        .WithMany()
+                        .HasForeignKey("MasterPartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.Part", "ParentPart")
+                        .WithMany()
+                        .HasForeignKey("ParentPartId");
+
+                    b.Navigation("MasterPart");
+
+                    b.Navigation("ParentPart");
                 });
 #pragma warning restore 612, 618
         }

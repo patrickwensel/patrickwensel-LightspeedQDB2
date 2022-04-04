@@ -54,6 +54,32 @@ namespace QBD2.Migrations
                         principalColumn: "ProductFamilyId");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Parts",
+                columns: table => new
+                {
+                    PartId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MasterPartId = table.Column<int>(type: "int", nullable: false),
+                    ParentPartId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Parts", x => x.PartId);
+                    table.ForeignKey(
+                        name: "FK_Parts_MasterParts_MasterPartId",
+                        column: x => x.MasterPartId,
+                        principalTable: "MasterParts",
+                        principalColumn: "MasterPartId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Parts_Parts_ParentPartId",
+                        column: x => x.ParentPartId,
+                        principalTable: "Parts",
+                        principalColumn: "PartId");
+                });
+
             migrationBuilder.InsertData(
                 table: "MasterParts",
                 columns: new[] { "MasterPartId", "Description", "PartNumber", "ProductFamilyId" },
@@ -84,19 +110,54 @@ namespace QBD2.Migrations
                 columns: new[] { "MasterPartId", "Description", "PartNumber", "ProductFamilyId" },
                 values: new object[] { 1, "Delta Zulu GA", "800-00025-001.2", 1 });
 
+            migrationBuilder.InsertData(
+                table: "Parts",
+                columns: new[] { "PartId", "MasterPartId", "ParentPartId", "SerialNumber" },
+                values: new object[] { 1, 1, null, "808000406" });
+
+            migrationBuilder.InsertData(
+                table: "Parts",
+                columns: new[] { "PartId", "MasterPartId", "ParentPartId", "SerialNumber" },
+                values: new object[,]
+                {
+                    { 2, 2, 1, "71534*000135" },
+                    { 3, 3, 1, "L51210055" },
+                    { 4, 4, 1, "71543*000080" },
+                    { 5, 5, 1, "R50210586" },
+                    { 6, 6, 1, "71528*000047" },
+                    { 7, 7, 1, "54658*000908" },
+                    { 8, 8, 1, "2976833306*20210731037*A209601*2021-12-09*2Y*1*S*++*2801-20211207142***1" },
+                    { 9, 9, 1, "2972833301*2792-20210413013*A219101*2021-12-20*8" },
+                    { 10, 8, 1, "2976833306*20210731037*A209601*2021-12-09*2Y*1*S*++*2801-20211207142***1" },
+                    { 11, 9, 1, "2972833301*2792-20210413013*A219101*2021-12-20*8" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_MasterParts_ProductFamilyId",
                 table: "MasterParts",
                 column: "ProductFamilyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Parts_MasterPartId",
+                table: "Parts",
+                column: "MasterPartId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Parts_ParentPartId",
+                table: "Parts",
+                column: "ParentPartId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "MasterParts");
+                name: "Parts");
 
             migrationBuilder.DropTable(
                 name: "Stations");
+
+            migrationBuilder.DropTable(
+                name: "MasterParts");
 
             migrationBuilder.DropTable(
                 name: "ProductFamilies");

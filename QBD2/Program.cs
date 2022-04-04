@@ -28,6 +28,7 @@ builder.Services.AddBlazoredToast();
 builder.Services.AddScoped<ProductFamilyService>();
 builder.Services.AddScoped<MasterPartService>();
 builder.Services.AddScoped<StationService>();
+builder.Services.AddScoped<ExcelUploadService>();
 
 #endregion
 

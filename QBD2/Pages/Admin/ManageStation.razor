@@ -1,9 +1,77 @@
 ﻿@page "/managestation"
 @using QBD2.Services
 @using QBD2.Entities
+@inject StationService StationService
 
-<h3>ManageStation</h3>
+<h3>Manage Station</h3>
+
+<TelerikGrid Data="@MyData" Height="400px"
+             Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
+             Resizable="true" 
+             EditMode="Telerik.Blazor.GridEditMode.Inline"
+             OnUpdate=@UpdateHandler
+             OnDelete=@DeleteHandler
+             OnCreate=@CreateHandler
+                >
+                 <GridToolBar>
+        <GridCommandButton Command="Add" Icon="add">Add a Station</GridCommandButton>
+    </GridToolBar>
+    <GridColumns>
+        <GridColumn Field="@(nameof(Station.Name))" Title="Name" Groupable="false" />
+                <GridCommandColumn>
+            <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
+            <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
+            <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
+            <GridCommandButton Command="Cancel" Icon="cancel" ShowInEdit="true">Cancel</GridCommandButton>
+        </GridCommandColumn>
+    </GridColumns>
+</TelerikGrid>
 
 @code {
+
+    List<Station> MyData { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetGridData();
+    }
+
+    async Task GetGridData()
+    {
+        MyData = await StationService.Read();
+    }
+
+    async Task UpdateHandler(GridCommandEventArgs args)
+    {
+        Station item = (Station)args.Item;
+
+        await StationService.Update(item);
+
+        await GetGridData();
+    }
+
+    async Task DeleteHandler(GridCommandEventArgs args)
+    {
+        Station item = (Station)args.Item;
+
+        await StationService.Delete(item);
+
+        await GetGridData();
+    }
+
+    async Task CreateHandler(GridCommandEventArgs args)
+    {
+        Station item = (Station)args.Item;
+
+        await StationService.Create(item);
+
+        await GetGridData();
+    }
+
+    async Task CancelHandler(GridCommandEventArgs args)
+    {
+        Station item = (Station)args.Item;
+    }
+
 
 }

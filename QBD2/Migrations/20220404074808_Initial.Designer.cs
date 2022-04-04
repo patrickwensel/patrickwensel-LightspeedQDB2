@@ -12,7 +12,7 @@ using QBD2.Data;
 namespace QBD2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220401110731_Initial")]
+    [Migration("20220404074808_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -145,7 +145,7 @@ namespace QBD2.Migrations
 
                     b.HasKey("StationId");
 
-                    b.ToTable("Station");
+                    b.ToTable("Stations");
 
                     b.HasData(
                         new

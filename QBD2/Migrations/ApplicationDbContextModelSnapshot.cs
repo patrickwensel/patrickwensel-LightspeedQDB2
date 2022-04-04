@@ -143,7 +143,7 @@ namespace QBD2.Migrations
 
                     b.HasKey("StationId");
 
-                    b.ToTable("Station");
+                    b.ToTable("Stations");
 
                     b.HasData(
                         new

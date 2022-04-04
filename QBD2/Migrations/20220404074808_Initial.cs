@@ -22,7 +22,7 @@ namespace QBD2.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Station",
+                name: "Stations",
                 columns: table => new
                 {
                     StationId = table.Column<int>(type: "int", nullable: false)
@@ -31,7 +31,7 @@ namespace QBD2.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Station", x => x.StationId);
+                    table.PrimaryKey("PK_Stations", x => x.StationId);
                 });
 
             migrationBuilder.CreateTable(
@@ -75,7 +75,7 @@ namespace QBD2.Migrations
                 values: new object[] { 1, "Delta Zulu" });
 
             migrationBuilder.InsertData(
-                table: "Station",
+                table: "Stations",
                 columns: new[] { "StationId", "Name" },
                 values: new object[] { 1, "Final Inspection" });
 
@@ -96,7 +96,7 @@ namespace QBD2.Migrations
                 name: "MasterParts");
 
             migrationBuilder.DropTable(
-                name: "Station");
+                name: "Stations");
 
             migrationBuilder.DropTable(
                 name: "ProductFamilies");

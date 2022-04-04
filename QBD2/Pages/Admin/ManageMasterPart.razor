@@ -1,9 +1,79 @@
 ﻿@page "/managemasterpart"
 @using QBD2.Services
 @using QBD2.Entities
+@inject MasterPartService MasterPartService
 
 <h3>ManageMasterPart</h3>
 
+<TelerikGrid Data="@MyData" Height="400px"
+             Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
+             Resizable="true" 
+             EditMode="Telerik.Blazor.GridEditMode.Inline"
+             OnUpdate=@UpdateHandler
+             OnDelete=@DeleteHandler
+             OnCreate=@CreateHandler
+                >
+                 <GridToolBar>
+        <GridCommandButton Command="Add" Icon="add">Add a Master Part</GridCommandButton>
+    </GridToolBar>
+    <GridColumns>
+        <GridColumn Field="@(nameof(MasterPart.PartNumber))" Title="Name" Groupable="false" />
+        <GridColumn Field="@(nameof(MasterPart.Description))" Title="Name" Groupable="false" />
+                <GridCommandColumn>
+            <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
+            <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
+            <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
+            <GridCommandButton Command="Cancel" Icon="cancel" ShowInEdit="true">Cancel</GridCommandButton>
+        </GridCommandColumn>
+    </GridColumns>
+</TelerikGrid>
+
+
+
 @code {
+
+        List<MasterPart> MyData { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetGridData();
+    }
+
+    async Task GetGridData()
+    {
+        MyData = await MasterPartService.Read();
+    }
+
+    async Task UpdateHandler(GridCommandEventArgs args)
+    {
+        MasterPart item = (MasterPart)args.Item;
+
+        await MasterPartService.Update(item);
+
+        await GetGridData();
+    }
+
+    async Task DeleteHandler(GridCommandEventArgs args)
+    {
+        MasterPart item = (MasterPart)args.Item;
+
+        await MasterPartService.Delete(item);
+
+        await GetGridData();
+    }
+
+    async Task CreateHandler(GridCommandEventArgs args)
+    {
+        MasterPart item = (MasterPart)args.Item;
+
+        await MasterPartService.Create(item);
+
+        await GetGridData();
+    }
+
+    async Task CancelHandler(GridCommandEventArgs args)
+    {
+        MasterPart item = (MasterPart)args.Item;
+    }
 
 }

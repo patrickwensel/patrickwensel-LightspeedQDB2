@@ -18,22 +18,22 @@ namespace QBD2.Services
             return await _context.Stations.ToListAsync();
         }
 
-        public static async Task Create(ProductFamily itemToInsert)
+        public static async Task Create(Station itemToInsert)
         {
 
         }
 
-        public async Task<List<ProductFamily>> Read()
+        public async Task<List<Station>> Read()
         {
-            return await _context.ProductFamilies.ToListAsync();
+            return await _context.Stations.ToListAsync();
         }
 
-        public static async Task Update(ProductFamily itemToUpdate)
+        public static async Task Update(Station itemToUpdate)
         {
 
         }
 
-        public static async Task Delete(ProductFamily itemToDelete)
+        public static async Task Delete(Station itemToDelete)
         {
 
         }

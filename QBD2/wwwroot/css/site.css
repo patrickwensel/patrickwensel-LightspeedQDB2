@@ -1,7 +1,12 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
-
+@import url(//db.onlinewebfonts.com/c/2556d7a29ab01dc80b96eb824a049df6?family=Effra);
+@font-face {
+    font-family: "Effra";
+    src: url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.eot");
+    src: url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.woff") format("woff"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.svg#Effra") format("svg");
+}
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Effra', sans-serif;
 }
 
 h1:focus {
@@ -66,16 +71,20 @@ a, .btn-link {
 nav#sidebar {
     min-width: 300px;
     max-width: 300px;
-    background: #11515E;
+    background: #fff;
     color: #fff;
     transition: all 0.3s;
     box-shadow: 0px 0px 20px rgb(1 41 112 / 10%);
     padding: 75px 20px;
     height: 100vh;
 }
+    nav#sidebar span {
+        color: #231F20;
+        font-size: 15px;
+    }
 
 .logo img {
-    width: 260px;
+    width: 206px;
 }
 div#content {
     width: 100%;
@@ -86,15 +95,15 @@ div#content {
 }
 
 .nav-link {
-    color: #ffffff;
+    color: #231F20;
 }
 
 header#header {
     transition: all 0.5s;
     z-index: 997;
-    height: 60px;
+    height: 50px;
     box-shadow: 0px 2px 20px rgb(1 41 112 / 10%);
-    background-color: #fff;
+    background-color: #11515E;
     padding-left: 20px;
 }
 .nav-link:hover {
@@ -108,6 +117,38 @@ ul.nav.navbar-nav.ml-auto {
 }
 .nav-link:focus {
     color: #000;
+}
+
+.logo-left {
+    width: 48%;
+}
+.head-center h4 {
+    color: #fff;
+    font-size: 21px;
+    vertical-align: middle;
+    align-items: center;
+    line-height: 55px;
+}
+
+.head-center {
+    margin-top: 0;
+    background: #29636e;
+    height: 100%;
+    align-items: center;
+    vertical-align: middle;
+    width: 10%;
+    text-align: center;
+}
+
+ul.nav.navbar-nav.ml-auto.login-right li {
+    color: #fff;
+    font-size: 15px;
+}
+
+nav#sidebar ul li i {
+    color: #11515E;
+    width: 10px;
+    margin-right: 20px;
 }
 
 @media (min-width:320px) and (max-width: 767px) {

@@ -1,20 +1,32 @@
 ﻿<header id="header" class="header fixed-top d-flex align-items-center">
-
-    <div class="d-flex align-items-center justify-content-between">
+   
+        
+    <div class="d-flex align-items-center justify-content-between logo-left">
         <div class="logo">
-            <a class="navbar-brand" href=""><img src="images/logo_lightspeed-dark.png" /></a>
+            <a class="navbar-brand" href=""><img src="images/Imagen-logo.png" /></a>
         </div>
         <!---<i class="bi bi-list toggle-sidebar-btn"></i>--->
     </div><!-- End Logo -->
+    
    <!------ <button type="button" id="sidebarCollapse" class="btn btn-info" onclick="myFunction()">
         <i class="fas fa-align-left"></i>
     </button>----->
-    <ul class="nav navbar-nav ml-auto">
+    
+    <div class="head-center">
+        <h4>QDBv2</h4>
+    </div>
+    
+
+    
+    <ul class="nav navbar-nav ml-auto login-right">
         <li class="nav-item active">
             <LoginDisplay />
             <!----<a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>--->
         </li>
     </ul>
+    
+
+    
 
 </header><!-- End Header -->
 <!-- Sidebar  -->
@@ -25,54 +37,56 @@
             <Authorized>
                 <li>
                   <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                   <span class="oi oi-home" aria-hidden="true"></span> Home
+                   <i class="fa-light fa-house"></i> <span>Home</span>
                   </NavLink>
 
                    <NavLink class="nav-link" href="workorder">
-                    <span class="oi oi-list-rich" aria-hidden="true"></span> Work Order
+                  <i class="fa-light fa-file-circle-check"></i> <span>Work Order</span>
                   </NavLink>
 
                   <NavLink class="nav-link" href="inspection">
-                   <span class="oi oi-list-rich" aria-hidden="true"></span> Inspection
+                   <i class="fa-light fa-magnifying-glass"></i> <span>Inspection</span>
                   </NavLink>
         
         
                  <NavLink class="nav-link" href="repair">
-                  <span class="oi oi-list-rich" aria-hidden="true"></span> Repair
+                  <i class="fa-light fa-hammer"></i> <span>Repair</span>
                  </NavLink>
         
         
                  <NavLink class="nav-link" href="mrb">
-                  <span class="oi oi-list-rich" aria-hidden="true"></span> MRB
+                  <i class="fa-light fa-tower-control"></i> <span>MRB</span>
                  </NavLink>
         
        
                  <NavLink class="nav-link" href="scarcar">
-                   <span class="oi oi-list-rich" aria-hidden="true"></span> SCAR/CAR
+                   <i class="fa-light fa-file-chart-column"></i> <span>SCAR/CAR</span>
                  </NavLink>
         
         
                 <NavLink class="nav-link" href="alertsdeviations">
-                 <span class="oi oi-list-rich" aria-hidden="true"></span> Alerts & Deviations
+                 <i class="fa-light fa-bell-exclamation"></i> <span>Alerts & Deviations</span>
                 </NavLink>
-                Admin
+                <!--Admin--->
 
-                                <NavLink class="nav-link" href="manageproductfamily">
-                 <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Product Families
-                </NavLink>
-
-                                <NavLink class="nav-link" href="managestation">
-                 <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Stations
+                <NavLink class="nav-link" href="manageproductfamily">
+                 <i class="fa-light fa-cart-arrow-down"></i> <span>Manage Product Families</span>
                 </NavLink>
 
-                                <NavLink class="nav-link" href="managemasterpart">
-                 <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Master Parts
+                <NavLink class="nav-link" href="managestation">
+                 <i class="fa-light fa-people-roof"></i> <span>Manage Stations</span>
                 </NavLink>
-                                                <NavLink class="nav-link" href="manageexcelupload">
-                 <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Excel Upload
+
+                <NavLink class="nav-link" href="managemasterpart">
+                 <i class="fa-light fa-user-hair-mullet"></i> <span>Manage Master Parts</span>
                 </NavLink>
-                                                                <NavLink class="nav-link" href="managepart">
-                 <span class="oi oi-list-rich" aria-hidden="true"></span> Manage Parts
+
+                <NavLink class="nav-link" href="manageexcelupload">
+                 <i class="fa-light fa-cloud-arrow-up"></i> <span>Manage Excel Upload</span>
+                </NavLink>
+
+                <NavLink class="nav-link" href="managepart">
+                 <i class="fa-light fa-list-check"></i> <span>Manage Parts</span>
                 </NavLink>
                 </li>
             </Authorized>

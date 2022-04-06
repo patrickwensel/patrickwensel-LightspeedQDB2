@@ -9,11 +9,18 @@ namespace QBD2.Data
         {
         }
 
+        public DbSet<AlertDeviation> AlertDeviations { get; set; }
+        public DbSet<InspectionFailure> InspectionFailures { get; set; }
+        public DbSet<Inspection> Inspections { get; set; }
+        public DbSet<FailureTypePrimary> FailureTypePrimaries { get; set; }
+        public DbSet<FailureType> FailureTypes { get; set; }
         public DbSet<MasterPart> MasterParts { get; set; }
+        public DbSet<PartAlertDeviation> PartAlertDeviations { get; set; }
+        public DbSet<Part> Parts { get; set; }
         public DbSet<ProductFamily> ProductFamilies { get; set; }
         public DbSet<Station> Stations { get; set; }
-        public DbSet<Part> Parts { get; set; }
 
+ 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -58,6 +65,31 @@ namespace QBD2.Data
             #region Station
 
             modelBuilder.Entity<Station>().HasData(new Station { StationId = 1, Name = "Final Inspection" });
+
+            #endregion
+
+            #region FailureTypePrimary
+
+            modelBuilder.Entity<FailureTypePrimary>().HasData(new FailureTypePrimary { FailureTypePrimaryId = 1, Name = "Cosmetic" });
+            modelBuilder.Entity<FailureTypePrimary>().HasData(new FailureTypePrimary { FailureTypePrimaryId = 2, Name = "Mechanical" });
+            modelBuilder.Entity<FailureTypePrimary>().HasData(new FailureTypePrimary { FailureTypePrimaryId = 3, Name = "Power" });
+            modelBuilder.Entity<FailureTypePrimary>().HasData(new FailureTypePrimary { FailureTypePrimaryId = 4, Name = "ANR" }); 
+            modelBuilder.Entity<FailureTypePrimary>().HasData(new FailureTypePrimary { FailureTypePrimaryId = 5, Name = "Comms / Audio / BT" });
+
+            #endregion
+
+            #region FailureType
+
+            modelBuilder.Entity<FailureType>().HasData(new FailureType { FailureTypeId = 1, Name = "Color", FailureTypePrimaryId = 1 });
+            // Need to add the rest
+
+            #endregion
+
+            #region FailurAlertDeviationeType
+
+            modelBuilder.Entity<AlertDeviation>().HasData(new AlertDeviation { AlertDeviationId = 1, Name = "Some Alert"});
+            modelBuilder.Entity<AlertDeviation>().HasData(new AlertDeviation { AlertDeviationId = 2, Name = "Some Deviation" });
+            // Need to add the rest
 
             #endregion
 

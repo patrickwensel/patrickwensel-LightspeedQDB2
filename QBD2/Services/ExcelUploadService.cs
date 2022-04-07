@@ -1,11 +1,11 @@
 ﻿using QBD2.Models;
 using System.Globalization;
 using System.IO;
-using OfficeOpenXml;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 using QBD2.Data;
 using ExcelRow = QBD2.Models.ExcelRow;
+using ExcelDataReader;
 
 namespace QBD2.Services
 {
@@ -18,154 +18,151 @@ namespace QBD2.Services
         }
         public async Task ProcessExcelFile(string fileName)
         {
-            FileInfo fileInfo = new FileInfo(fileName);
-
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             List<ExcelRow> excelRows = new List<ExcelRow>();
-            using (ExcelPackage package = new ExcelPackage(fileInfo))
+            if (fileName.EndsWith(".xls"))
             {
-                ExcelWorksheet workSheet = package.Workbook.Worksheets["As_Built"];
-                if (workSheet != null)
+                using (FileStream FileStream = File.OpenRead(fileName))
                 {
-                    TrimLastEmptyRows(workSheet);
-                    int colCount = workSheet.Dimension.End.Column;  //get Column Count
-                    int rowCount = workSheet.Dimension.End.Row;     //get row count
-                    for (int rowIterator = 2; rowIterator <= rowCount; rowIterator++)
+                    System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+                    DataSet dsexcelRecords = new DataSet();
+                    IExcelDataReader reader = null;
+                    //if (fileName.EndsWith(".xls"))
+                    reader = ExcelReaderFactory.CreateBinaryReader(FileStream);
+                    //else if (fileName.EndsWith(".xlsx"))
+                    //    reader = ExcelReaderFactory.CreateOpenXmlReader(FileStream);
+
+                    dsexcelRecords = reader.AsDataSet();
+                    if (reader != null)
                     {
-                        var user = new Models.ExcelRow
-                        {
-                            ProductFamily = workSheet.Cells[rowIterator, 1].Value?.ToString(),
-                            Date = workSheet.Cells[rowIterator, 2].Value?.ToString(),
-                            PN = workSheet.Cells[rowIterator, 3].Value?.ToString(),
-                            SN = workSheet.Cells[rowIterator, 4].Value?.ToString(),
-                            PartDescription = workSheet.Cells[rowIterator, 5].Value?.ToString(),
-                            PartNumber = workSheet.Cells[rowIterator, 6].Value?.ToString(),
-                            SerialNumber = workSheet.Cells[rowIterator, 7].Value?.ToString(),
-                        };
-                        excelRows.Add(user);
+                        reader.Close();
                     }
 
-
-                    List<Entities.MasterPart> masterPartsList = new List<Entities.MasterPart>();
-
-                    var pnProductFamilyList = excelRows.Where(q => q.PN != null && q.ProductFamily != null).Select(m => new { m.PN, m.ProductFamily }).Distinct().ToList();
-                    List<Entities.ProductFamily> productFamiliesList = _context.ProductFamilies.ToList();
-                    foreach (var item in pnProductFamilyList)
+                    if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
                     {
-                        int? productFamilyId = null;
-                        if (!string.IsNullOrWhiteSpace(item.ProductFamily))
+                        DataTable dtRecords = dsexcelRecords.Tables[0];
+                        if (dtRecords.Rows.Count > 1 && dtRecords.TableName == "As_Built")
                         {
-                            var productFamilies = productFamiliesList.Where(q => q.Name.ToLower() == item.ProductFamily.ToLower()).FirstOrDefault();
-                            if (productFamilies != null)
+                            for (int i = 1; i < dtRecords.Rows.Count; i++)
                             {
-                                productFamilyId = productFamilies.ProductFamilyId;
-                            }
-                        }
-                        var isPartNumberAvailabe = _context.MasterParts.Any(p => p.ProductFamilyId == productFamilyId && p.PartNumber.ToLower() == item.PN.ToLower());
-                        if (!isPartNumberAvailabe)
-                        {
-                            Entities.MasterPart masterPart = new Entities.MasterPart
-                            {
-                                PartNumber = item.PN.ToString(),
-                                ProductFamilyId = productFamilyId,
-                                Description = item.ProductFamily ?? String.Empty
-                            };
-                            masterPartsList.Add(masterPart);
-                        }
-                    }
-
-                    var partNumberProductFamilyList = excelRows.Where(q => q.PartNumber != null).Select(m => new { m.PartNumber, m.PartDescription }).Distinct().ToList();
-                    foreach (var item in partNumberProductFamilyList)
-                    {
-                        var isPartNumberAvailabe = _context.MasterParts.Any(p => p.PartNumber.ToLower() == item.PartNumber.ToLower());
-                        if (!isPartNumberAvailabe)
-                        {
-                            Entities.MasterPart masterPart = new Entities.MasterPart
-                            {
-                                PartNumber = item.PartNumber,
-                                ProductFamilyId = null,
-                                Description = item.PartDescription ?? String.Empty
-                            };
-                            masterPartsList.Add(masterPart);
-                        }
-                    }
-                    if (masterPartsList.Count > 0)
-                    {
-                        _context.MasterParts.AddRange(masterPartsList);
-                        await _context.SaveChangesAsync();
-                    }
-                    var masterParts = _context.MasterParts.Include(q => q.ProductFamily).ToList();
-                    foreach (var pnItem in pnProductFamilyList)
-                    {
-                        var pnSNList = excelRows.Where(q => q.SN != null && q.PN == pnItem.PN && q.ProductFamily == pnItem.ProductFamily).Select(q => q.SN).Distinct().ToList();
-                        foreach (var item in pnSNList)
-                        {
-                            var partsList = new List<Entities.Part>();
-                            var masterPart = masterParts.Where(p => p.PartNumber.ToLower() == pnItem.PN.ToLower() && p.ProductFamily != null && p.ProductFamily.Name.ToLower() == pnItem.ProductFamily.ToLower()).FirstOrDefault();
-                            if (masterPart != null)
-                            {
-                                var part = _context.Parts.Where(p => p.SerialNumber.ToLower() == item.ToLower() && p.MasterPartId == masterPart.MasterPartId).FirstOrDefault();
-                                if (part == null)
+                                var user = new Models.ExcelRow
                                 {
-                                    part = new Entities.Part
-                                    {
-                                        SerialNumber = item,
-                                        MasterPartId = masterPart.MasterPartId,
-                                        ParentPartId = null
-                                    };
-                                    _context.Parts.Add(part);
-                                    await _context.SaveChangesAsync();
-                                }
-
-                                var childParts = excelRows.Where(q => q.SN == item && q.PN == pnItem.PN && q.PartNumber != null && q.SerialNumber != null && q.ProductFamily == pnItem.ProductFamily).ToList();
-                                foreach (var childItem in childParts)
-                                {
-                                    var childMasterPart = masterParts.Where(p => p.PartNumber.ToLower() == childItem.PartNumber.ToLower()).FirstOrDefault();
-                                    if (childMasterPart != null)
-                                    {
-                                        var isSerialNumberAvailabe = _context.Parts.Any(p => p.MasterPartId == childMasterPart.MasterPartId && p.ParentPartId == part.PartId && p.SerialNumber.ToLower() == childItem.SerialNumber.ToLower());
-                                        if (!isSerialNumberAvailabe)
-                                        {
-                                            var childPart = new Entities.Part
-                                            {
-                                                SerialNumber = childItem.SerialNumber,
-                                                MasterPartId = childMasterPart.MasterPartId,
-                                                ParentPartId = part.PartId
-                                            };
-
-                                            partsList.Add(childPart);
-                                        }
-                                    }
-                                }
-                                if (partsList.Count > 0)
-                                {
-                                    _context.Parts.AddRange(partsList);
-                                    await _context.SaveChangesAsync();
-                                }
+                                    ProductFamily = Convert.ToString(dtRecords.Rows[i][0]),
+                                    Date = Convert.ToString(dtRecords.Rows[i][1]),
+                                    PN = Convert.ToString(dtRecords.Rows[i][2]),
+                                    SN = Convert.ToString(dtRecords.Rows[i][3]),
+                                    PartDescription = Convert.ToString(dtRecords.Rows[i][4]),
+                                    PartNumber = Convert.ToString(dtRecords.Rows[i][5]),
+                                    SerialNumber = Convert.ToString(dtRecords.Rows[i][6]),
+                                };
+                                excelRows.Add(user);
                             }
                         }
                     }
                 }
             }
-        }
 
-        public void TrimLastEmptyRows(ExcelWorksheet worksheet)
-        {
-            while (IsLastRowEmpty(worksheet))
-                worksheet.DeleteRow(worksheet.Dimension.End.Row);
-        }
-
-        public bool IsLastRowEmpty(ExcelWorksheet worksheet)
-        {
-            var empties = new List<bool>();
-
-            for (int i = 1; i <= worksheet.Dimension.End.Column; i++)
+            if (excelRows.Count > 0)
             {
-                var rowEmpty = worksheet.Cells[worksheet.Dimension.End.Row, i].Value == null ? true : false;
-                empties.Add(rowEmpty);
-            }
+                List<Entities.MasterPart> masterPartsList = new List<Entities.MasterPart>();
 
-            return empties.All(e => e);
+                var pnProductFamilyList = excelRows.Where(q => q.PN != null && q.ProductFamily != null).Select(m => new { m.PN, m.ProductFamily }).Distinct().ToList();
+                List<Entities.ProductFamily> productFamiliesList = _context.ProductFamilies.ToList();
+                foreach (var item in pnProductFamilyList)
+                {
+                    int? productFamilyId = null;
+                    if (!string.IsNullOrWhiteSpace(item.ProductFamily))
+                    {
+                        var productFamilies = productFamiliesList.Where(q => q.Name.ToLower() == item.ProductFamily.ToLower()).FirstOrDefault();
+                        if (productFamilies != null)
+                        {
+                            productFamilyId = productFamilies.ProductFamilyId;
+                        }
+                    }
+                    var isPartNumberAvailabe = _context.MasterParts.Any(p => p.ProductFamilyId == productFamilyId && p.PartNumber.ToLower() == item.PN.ToLower());
+                    if (!isPartNumberAvailabe)
+                    {
+                        Entities.MasterPart masterPart = new Entities.MasterPart
+                        {
+                            PartNumber = item.PN.ToString(),
+                            ProductFamilyId = productFamilyId,
+                            Description = item.ProductFamily ?? String.Empty
+                        };
+                        masterPartsList.Add(masterPart);
+                    }
+                }
+
+                var partNumberProductFamilyList = excelRows.Where(q => q.PartNumber != null).Select(m => new { m.PartNumber, m.PartDescription }).Distinct().ToList();
+                foreach (var item in partNumberProductFamilyList)
+                {
+                    var isPartNumberAvailabe = _context.MasterParts.Any(p => p.PartNumber.ToLower() == item.PartNumber.ToLower());
+                    if (!isPartNumberAvailabe)
+                    {
+                        Entities.MasterPart masterPart = new Entities.MasterPart
+                        {
+                            PartNumber = item.PartNumber,
+                            ProductFamilyId = null,
+                            Description = item.PartDescription ?? String.Empty
+                        };
+                        masterPartsList.Add(masterPart);
+                    }
+                }
+                if (masterPartsList.Count > 0)
+                {
+                    _context.MasterParts.AddRange(masterPartsList);
+                    await _context.SaveChangesAsync();
+                }
+                var masterParts = _context.MasterParts.Include(q => q.ProductFamily).ToList();
+                foreach (var pnItem in pnProductFamilyList)
+                {
+                    var pnSNList = excelRows.Where(q => q.SN != null && q.PN == pnItem.PN && q.ProductFamily == pnItem.ProductFamily).Select(q => q.SN).Distinct().ToList();
+                    foreach (var item in pnSNList)
+                    {
+                        var partsList = new List<Entities.Part>();
+                        var masterPart = masterParts.Where(p => p.PartNumber.ToLower() == pnItem.PN.ToLower() && p.ProductFamily != null && p.ProductFamily.Name.ToLower() == pnItem.ProductFamily.ToLower()).FirstOrDefault();
+                        if (masterPart != null)
+                        {
+                            var part = _context.Parts.Where(p => p.SerialNumber.ToLower() == item.ToLower() && p.MasterPartId == masterPart.MasterPartId).FirstOrDefault();
+                            if (part == null)
+                            {
+                                part = new Entities.Part
+                                {
+                                    SerialNumber = item,
+                                    MasterPartId = masterPart.MasterPartId,
+                                    ParentPartId = null
+                                };
+                                _context.Parts.Add(part);
+                                await _context.SaveChangesAsync();
+                            }
+
+                            var childParts = excelRows.Where(q => q.SN == item && q.PN == pnItem.PN && q.PartNumber != null && q.SerialNumber != null && q.ProductFamily == pnItem.ProductFamily).ToList();
+                            foreach (var childItem in childParts)
+                            {
+                                var childMasterPart = masterParts.Where(p => p.PartNumber.ToLower() == childItem.PartNumber.ToLower()).FirstOrDefault();
+                                if (childMasterPart != null)
+                                {
+                                    var isSerialNumberAvailabe = _context.Parts.Any(p => p.MasterPartId == childMasterPart.MasterPartId && p.ParentPartId == part.PartId && p.SerialNumber.ToLower() == childItem.SerialNumber.ToLower());
+                                    if (!isSerialNumberAvailabe)
+                                    {
+                                        var childPart = new Entities.Part
+                                        {
+                                            SerialNumber = childItem.SerialNumber,
+                                            MasterPartId = childMasterPart.MasterPartId,
+                                            ParentPartId = part.PartId
+                                        };
+
+                                        partsList.Add(childPart);
+                                    }
+                                }
+                            }
+                            if (partsList.Count > 0)
+                            {
+                                _context.Parts.AddRange(partsList);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

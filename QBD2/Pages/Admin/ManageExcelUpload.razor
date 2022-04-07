@@ -31,8 +31,8 @@
     private async void OnSubmit()
     {
         foreach (var file in selectedFiles)
-        {
-            Stream stream = file.OpenReadStream(maxAllowedSize: 2147483648);
+        {       
+            Stream stream = file.OpenReadStream();
             var path = $"{env.WebRootPath}\\upload\\{file.Name}";
             FileStream fs = File.Create(path);
             await stream.CopyToAsync(fs);
@@ -41,7 +41,7 @@
 
             await ExcelUploadService.ProcessExcelFile(path);
 
-    }
+        }
     Message = $"{selectedFiles.Count} file(s) uploaded on server";
     this.StateHasChanged();
 }

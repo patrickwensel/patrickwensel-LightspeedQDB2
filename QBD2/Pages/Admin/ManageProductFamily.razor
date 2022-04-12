@@ -5,10 +5,10 @@
 
 <h3>Product Family</h3>
 
-<TelerikGrid Data="@MyData" Height="400px"
+<TelerikGrid Data="@MyData" 
              Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
              Resizable="true" 
-             EditMode="Telerik.Blazor.GridEditMode.Inline"
+             EditMode="Telerik.Blazor.GridEditMode.Popup"
              OnUpdate=@UpdateHandler
              OnDelete=@DeleteHandler
              OnCreate=@CreateHandler

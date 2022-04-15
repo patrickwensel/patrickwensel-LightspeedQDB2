@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using QBD2.Entities;
 
 namespace QBD2.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -93,10 +94,43 @@ namespace QBD2.Data
 
             #endregion
 
+            #region Role
+            modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = "22b3bff1-cfd2-4075-a90f-827380656873", Name = "User", NormalizedName = "USER".ToUpper() });
+            modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = "e4e7188b-6ecb-4278-aeee-17271f20d7ce", Name = "Admin", NormalizedName = "ADMIN".ToUpper() });
+
+            #endregion
+
+            ApplicationUser ohiduserApplicationUser = new()
+            {
+                Id = "2e97b939-49c0-4e1e-8376-cb98348103bb", // primary key
+                UserName = "pwensel@hotmail.com",
+                NormalizedUserName = "PWENSEL@HOTMAIL.COM",
+                Email = "pwensel@hotmail.com",
+                NormalizedEmail = "PWENSEL@HOTMAIL.COM",
+                EmailConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString("D"),
+                ADLogin = "DESKTOP-1HVSAG6\\pwens"
+            };
+
             modelBuilder.Entity<MasterPart>().Property(m => m.ProductFamilyId).IsRequired(false);
             modelBuilder.Entity<Part>().Property(m => m.ParentPartId).IsRequired(false);
 
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ApplicationUserRole>(userRole =>
+            {
+                // userRole.HasKey(ur => new { ur.UserId, ur.RoleId });
+
+                userRole.HasOne(ur => ur.Role)
+                    .WithMany(r => r.UserRoles)
+                    .HasForeignKey(ur => ur.RoleId)
+                    .IsRequired();
+
+                userRole.HasOne(ur => ur.User)
+                    .WithMany(r => r.UserRoles)
+                    .HasForeignKey(ur => ur.UserId)
+                    .IsRequired();
+            });
         }
 
     }

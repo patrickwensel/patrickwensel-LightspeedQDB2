@@ -1,86 +1,328 @@
 ﻿@page "/inspection"
+
+@using QBD2.Services
+@using QBD2.Entities
+@inject InspectionService InspectionService
+@inject IToastService toastService
+@inject NavigationManager NavigationManager
 <h3>Inspection</h3>
 
-<div>
-    <input type="search" />
-    <button>Find</button>
-</div>
+<div class="form-group row">
+    <div class="col-sm-8">
 
-<br />
-<br />
-<div>
-    <div>Family :</div>
-    <div>Detta zulu</div>
-</div>
-<div>
-    <div>Desc :</div>
-    <div>Detta zulu GA</div>
-</div>
+        <div class="row">
 
-<div>
-    <div>Part Number :</div>
-    <div>200-00062-000</div>
-</div>
+            <div class="col-sm-8">
+                <TelerikTextBox id="txtSerialSearch" Class="form-control col-sm-12" @bind-Value="SerialNumber"></TelerikTextBox>
+            </div>
+            <div class=" col-sm-4">
+                <TelerikButton id="btnSearch" OnClick="@btnFindOnClick" ButtonType="@ButtonType.Submit">Find</TelerikButton>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-2 col-form-label">Family :</label>
+                <label for="lblFamilyValue" class="col-sm-7 col-form-label">@(dataInspectionModel !=null ?dataInspectionModel.Family:string.Empty)</label>
+            </div>
 
-<div>
-    <div>Serial Number :</div>
-    <div>808000406</div>
-</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-2 col-form-label">Desc :</label>
+                <label id="lblDescValue" class="col-sm-7 col-form-label">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty)</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-7">
+                <label class="col-sm-3 col-form-label">Part Number :</label>
+                <label id="lblPartNumberValue" class="col-sm-7 col-form-label">@(dataInspectionModel !=null ? dataInspectionModel.PartNumber:string.Empty)</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-8">
+                <label class="col-sm-3 col-form-label">Serial Number :</label>
+                <label id="lblSerialNumberValue" class="col-sm-7 col-form-label">@(dataInspectionModel !=null ? dataInspectionModel.SerialNumber:string.Empty)</label>
+            </div>
 
-<br />
-<br />
-<br />
+        </div>
 
-<div>
-    <div>Station</div>
-    <div>
-        <select>
-            <option>Final Inspection</option>
-        </select>
-    </div>
-</div>
+        <br />
+        <br />
+        <br />
+        <br />
+        <div class="row">
+            <label class="col-sm-3 col-form-label">Station</label>
 
-<div>
-    <div>Status Pass :</div>
-    <div><input type="radio" /> Pass (Selected) </div>
-    <br>
-    <div><input type="radio" /> Fail</div>
-</div>
+            <div class="col-sm-9">
+                <TelerikDropDownList Data="@dataStationDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                     @bind-Value="@DdlStationValue" DefaultText="Select Status ">
+                </TelerikDropDownList>
+            </div>
 
-<div>
-    <div>
+        </div>
+        <div class="row">
+            <label class="col-sm-3 col-form-label">Status</label>
+            <div class="col-sm-9">
+                <TelerikRadioGroup Data="@dataStatusOptions"
+                                   @bind-Value="@RdoStatusValue"
+                                   ValueField="@nameof(Models.DropDownBind.DropValue)"
+                                   TextField="@nameof(Models.DropDownBind.DropText)">
+                </TelerikRadioGroup>
 
-        <div>Parimary</div>
-        <div>
-            <select>
-                <option>Cosmatic</option>
-                <option>Power</option>
-            </select>
+            </div>
+        </div>
+        @{
+            if (@RdoStatusValue == 0)
+            {
+
+                <div class="row">
+                    <label class="col-sm-3 col-form-label">Primary</label>
+                    <label class="col-sm-3 col-form-label">Secondary</label>
+                    <label class="col-sm-5 col-form-label">Comment</label>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <TelerikDropDownList Data="@dataFailurePrimaryDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                         @bind-Value="@DdlFailurePrimaryValue" DefaultText="Select Failure Primary" OnChange="@MyOnChangeHandler">
+                        </TelerikDropDownList>
+                    </div>
+                    <div class="col-sm-3">
+                        <TelerikDropDownList Data="@dataFailureDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                         @bind-Value="@DdlFailureValue" DefaultText="Select Failure ">
+                        </TelerikDropDownList>
+                    </div>
+                    <div class="col-sm-5">
+                        <TelerikTextBox Class="form-control col-sm-11" @bind-Value="@FailureCommentValue"></TelerikTextBox>
+                    </div>
+                    <div class="col-sm-1">
+                        <TelerikButton id="btnSearch" ButtonType="@ButtonType.Submit" OnClick="@btnAddOnClick">+</TelerikButton>
+
+                    </div>
+                </div>
+                <br />
+
+                <TelerikGrid Data="@dataFailureGrid"
+                     Sortable="true"
+                     Resizable="true"
+                     EditMode="Telerik.Blazor.GridEditMode.Inline"
+                     OnDelete=@DeleteHandler>
+                    <GridColumns>
+                        <GridColumn Field="FailurePrimaryName" Title="Primary" Groupable="false" />
+                        <GridColumn Field="FailureName" Title="Secondary" Groupable="false" />
+                        <GridColumn Field="Comment" Title="Comments" Groupable="false" />
+                        <GridCommandColumn>
+                            <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
+                        </GridCommandColumn>
+                    </GridColumns>
+                </TelerikGrid>
+                <br />
+
+            }
+        }
+        <div class="row">
+            <label class="col-sm-3 col-form-label">General Comments</label>
+            <br />
+            @{
+                if (dataInspection == null)
+                    dataInspection = new Models.Inspection();
+            }
+            <TelerikTextArea Id="txtGenerelComment" @bind-Value="@dataInspection.GeneralComments">
+            </TelerikTextArea>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-3 offset-sm-9">
+                <TelerikButton ButtonType="@ButtonType.Submit" OnClick="@btnSaveOnClick">Save</TelerikButton>
+                <br />
+                <br />
+            </div>
         </div>
     </div>
+    <div class=" col-sm-4">
+        <TelerikGrid Data="@MyData"
+                     Pageable="true" Sortable="true"
+                     Resizable="true"
+                     EditMode="Telerik.Blazor.GridEditMode.Inline">
+            <GridColumns>
 
-    <div>
+                <GridColumn Field="Part.SerialNumber" Title="Serial Number" Groupable="false" />
+                <GridColumn Field="@(nameof(Entities.Inspection.UpdateDate))" Title="Update Date" Groupable="false" />
+                <GridCommandColumn>
 
-        <div>Secondary</div>
-        <div>
-            <select>
-                <option>Color</option>
-                <option>etc</option>
-            </select>
-        </div>
+                </GridCommandColumn>
+            </GridColumns>
+        </TelerikGrid>
     </div>
-    <div>
-
-        <div>Comment</div>
-        <div>
-            <input type="text" />
-        </div>
-    </div>
-    <br>
-    <div><button ><b>+</b></button></div>
 </div>
+
+
 @code {
+    List<Entities.Inspection> MyData { get; set; }
+    List<Models.InspectionFailed> dataFailureGrid { get; set; }
+
+    List<Models.DropDownBind> dataFailurePrimaryDropdown { get; set; }
+    List<Models.DropDownBind> dataFailureDropdown { get; set; }
+    List<Models.DropDownBind> dataStatusOptions { get; set; }
+    List<Models.DropDownBind> dataStationDropdown { get; set; }
+    Models.InspectionModel dataInspectionModel { get; set; }
+    Models.Inspection dataInspection { get; set; }
 
 
+    int DdlFailurePrimaryValue { get; set; }
+    int DdlFailureValue { get; set; }
+    int RdoStatusValue { get; set; }
+    int DdlStationValue { get; set; }
+    string SerialNumber { get; set; }
+    string FailureCommentValue { get; set; }
 
-}
+    protected override async Task OnInitializedAsync()
+    {
+
+        await GetGridData();
+        GetDropDownData();
+
+        RdoStatusValue = 1;
+
+    }
+
+    async Task GetGridData()
+    {
+        MyData = await InspectionService.Read();
+    }
+
+    void GetDropDownData()
+    {
+        dataFailurePrimaryDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureTypePrimary, null);
+        dataStationDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.Station, null);
+
+        dataStatusOptions = new List<Models.DropDownBind>();
+        dataStatusOptions.Add(new Models.DropDownBind { DropText = "Pass", DropValue = 1 });
+        dataStatusOptions.Add(new Models.DropDownBind { DropText = "Fail", DropValue = 0 });
+
+
+    }
+    void MyOnChangeHandler()
+    {
+        dataFailureDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureType, DdlFailurePrimaryValue);
+
+    }
+    async Task btnAddOnClick()
+    {
+        if (dataFailureGrid == null)
+        {
+            dataFailureGrid = new List<Models.InspectionFailed>();
+        }
+        if (DdlFailurePrimaryValue <= 0)
+        {
+            toastService.ShowError("Please Select Failure Primary Type", "Error");
+            return;
+        }
+        if (DdlFailureValue <= 0)
+        {
+            toastService.ShowError("Please Select Failure Type", "Error");
+            return;
+        }
+        if (string.IsNullOrEmpty(FailureCommentValue))
+        {
+            toastService.ShowError("Please Enter Comment", "Error");
+            return;
+        }
+        if (dataFailureGrid.Count > 0)
+        {
+            if (dataFailureGrid.Any(p => p.FailureTypeId == DdlFailureValue && p.FailurePrimaryTypeId == DdlFailurePrimaryValue))
+            {
+                toastService.ShowError("Record Already there !", "Error");
+                return;
+            }
+
+        }
+        dataFailureGrid.Add(new Models.InspectionFailed
+            {
+                Comment = FailureCommentValue,
+                FailurePrimaryTypeId = DdlFailurePrimaryValue,
+                FailureTypeId = DdlFailureValue,
+                FailurePrimaryName = dataFailurePrimaryDropdown.FirstOrDefault(p => p.DropValue == DdlFailurePrimaryValue).DropText,
+                FailureName = dataFailureDropdown.FirstOrDefault(p => p.DropValue == DdlFailureValue).DropText,
+
+            });
+        FailureCommentValue = string.Empty;
+        DdlFailurePrimaryValue = 0;
+        DdlFailureValue = 0;
+        MyOnChangeHandler();
+        dataFailureGrid = new List<Models.InspectionFailed>(dataFailureGrid);
+
+
+    }
+    async Task DeleteHandler(GridCommandEventArgs args)
+    {
+        Models.InspectionFailed item = (Models.InspectionFailed)args.Item;
+        dataFailureGrid.Remove(item);
+
+    }
+    async Task btnFindOnClick()
+    {
+        if (string.IsNullOrEmpty(SerialNumber))
+        {
+            toastService.ShowError("Please Enter Serial Number", "Error");
+            return;
+        }
+
+        dataInspectionModel = await InspectionService.GetDataBySerialNumber(SerialNumber.Trim());
+        if (dataInspectionModel == null)
+        {
+            toastService.ShowError("No Record Found ! Please Enter Valid Serial Number", "Error");
+            return;
+        }
+        if (dataInspectionModel.Inspection != null)
+        {
+            dataInspection = dataInspectionModel.Inspection;
+            RdoStatusValue = dataInspection.Pass ? 1 : 0;
+            DdlStationValue = dataInspection.StationId;
+            if (dataInspectionModel.InspectionFailedList.Count > 0)
+            {
+                dataFailureGrid = dataInspectionModel.InspectionFailedList;
+            }
+        }
+
+    }
+
+
+    async Task btnSaveOnClick()
+    {
+        if (string.IsNullOrEmpty(SerialNumber))
+        {
+            toastService.ShowError("Please Enter Serial Number", "Error");
+            return;
+        }
+        if (dataInspectionModel.PartId <= 0)
+        {
+            toastService.ShowError("Please Bind Serial Data", "Error");
+            return;
+        }
+        if (DdlStationValue <= 0)
+        {
+            toastService.ShowError("Please Select Station", "Error");
+            return;
+        }
+        if (string.IsNullOrEmpty(dataInspection.GeneralComments))
+        {
+            toastService.ShowError("Please Enter General Comments", "Error");
+            return;
+        }
+        dataInspection.Pass = (RdoStatusValue == 1 ? true : false);
+        dataInspection.StationId = DdlStationValue;
+        dataInspection.PartId = dataInspectionModel.PartId;
+        dataInspectionModel.Inspection = dataInspection;
+        dataInspectionModel.InspectionFailedList = dataFailureGrid;
+        if (await InspectionService.Save(dataInspectionModel))
+        {
+            toastService.ShowInfo("Record Saved Successfully", "Info");
+            NavigationManager.NavigateTo("Inspection", true);
+        }
+        else
+        {
+            toastService.ShowError("Record Not Saved ! Somwthing Worng", "Error");
+        }
+    }
+    }

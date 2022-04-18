@@ -21,5 +21,7 @@ namespace QBD2.Entities
         [ForeignKey("Station")]
         public int StationId { get; set; }
         public virtual Station Station { get; set; }
+        public DateTime UpdateDate { get; set; }
+
     }
 }

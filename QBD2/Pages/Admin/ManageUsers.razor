@@ -1,0 +1,91 @@
+﻿@page "/manageusers"
+@using QBD2.Services
+@using Telerik.Blazor.Components
+@using QBD2.Entities
+@inject UserService UserService
+
+<PageTitle>Users</PageTitle>
+<h3 class="text-white">Users</h3>
+    <TelerikGrid Data=@MyData
+                 Sortable="true"
+                 Pageable="true"
+                 FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
+                 EditMode="Telerik.Blazor.GridEditMode.Popup"
+             OnUpdate=@UpdateHandler
+             OnDelete=@DeleteHandler
+             OnCreate=@CreateHandler>
+        <GridToolBar>
+            <GridCommandButton Command="Add" Icon="add">Add</GridCommandButton>
+        </GridToolBar>
+        <GridColumns>
+            <GridColumn Field=@nameof(ApplicationUser.Email) Title="Email" Width="230px" />
+@*            <GridColumn Field=@nameof(ApplicationUser.UserRoles?.FirstOrDefault()?.Role?.Name) Title="Role" Width="100px">
+                <EditorTemplate>
+                    @{
+                        CurrentlyEditedUser = context as UserModel;
+                        <TelerikDropDownList @bind-Value="CurrentlyEditedUser.RoleId"
+                                             DefaultText="Choose a role"
+                                             Data="@RoleSelectListData"
+                                             ValueField="Value"
+                                             TextField="Text" Class="form-control">
+                        </TelerikDropDownList>
+                    }
+                </EditorTemplate>
+            </GridColumn>*@
+            <GridCommandColumn Width="120px">
+                <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
+            </GridCommandColumn>
+        </GridColumns>
+        <NoDataTemplate>
+            <text>No Records Available</text>
+        </NoDataTemplate>
+    </TelerikGrid>
+
+    @code {
+
+    List<ApplicationUser> MyData { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetGridData();
+    }
+
+    async Task GetGridData()
+    {
+        MyData = await UserService.Read();
+    }
+
+    async Task UpdateHandler(GridCommandEventArgs args)
+    {
+        ApplicationUser item = (ApplicationUser)args.Item;
+
+        await UserService.Update(item);
+
+        await GetGridData();
+    }
+
+    async Task DeleteHandler(GridCommandEventArgs args)
+    {
+        ApplicationUser item = (ApplicationUser)args.Item;
+
+        await UserService.Delete(item);
+
+        await GetGridData();
+    }
+
+    async Task CreateHandler(GridCommandEventArgs args)
+    {
+        ApplicationUser item = (ApplicationUser)args.Item;
+
+        await UserService.Create(item);
+
+        await GetGridData();
+    }
+
+    async Task CancelHandler(GridCommandEventArgs args)
+    {
+        Station item = (Station)args.Item;
+    }
+
+
+}

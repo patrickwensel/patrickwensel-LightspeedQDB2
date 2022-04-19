@@ -31,7 +31,7 @@ builder.Services.AddScoped<StationService>();
 builder.Services.AddScoped<ExcelUploadService>();
 builder.Services.AddScoped<PartService>();
 builder.Services.AddScoped<InspectionService>();
-builder.Services.AddScoped<UserService>();
+//builder.Services.AddScoped<UserService>();
 
 #endregion
 

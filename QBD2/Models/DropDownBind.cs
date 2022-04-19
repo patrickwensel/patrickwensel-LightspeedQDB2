@@ -6,4 +6,11 @@
 
         public string DropText { get; set; }
     }
+
+    public class DropDownBindString
+    {
+        public string DropValue { get; set; }
+
+        public string DropText { get; set; }
+    }
 }

@@ -1,4 +1,5 @@
 ﻿@page "/manageusers"
+@using QBD2.Models
 @using QBD2.Services
 @using Telerik.Blazor.Components
 @using QBD2.Entities
@@ -19,13 +20,15 @@
         </GridToolBar>
         <GridColumns>
             <GridColumn Field=@nameof(ApplicationUser.Email) Title="Email" Width="230px" />
-@*            <GridColumn Field=@nameof(ApplicationUser.UserRoles?.FirstOrDefault()?.Role?.Name) Title="Role" Width="100px">
+            <GridColumn Field=@nameof(ApplicationUser.UserName) Title="UserName" Width="230px" />
+            @*<GridColumn Field=@nameof(ApplicationUser.ADLogin) Title="ADLogin" Width="230px" />*@
+            @*<GridColumn Field=@nameof(ApplicationUser.UserRoles.FirstOrDefault().Role.Name) Title="Role" Width="100px">
                 <EditorTemplate>
                     @{
-                        CurrentlyEditedUser = context as UserModel;
-                        <TelerikDropDownList @bind-Value="CurrentlyEditedUser.RoleId"
+                        var CurrentlyEditedUser = context as ApplicationUser;
+                        <TelerikDropDownList @bind-Value="CurrentlyEditedUser.UserRoles?.FirstOrDefault()?.RoleId"
                                              DefaultText="Choose a role"
-                                             Data="@RoleSelectListData"
+                                             Data="@roles"
                                              ValueField="Value"
                                              TextField="Text" Class="form-control">
                         </TelerikDropDownList>
@@ -41,9 +44,10 @@
         </NoDataTemplate>
     </TelerikGrid>
 
-    @code {
+@code {
 
     List<ApplicationUser> MyData { get; set; }
+    List<DropDownBindString> roles {get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,6 +57,11 @@
     async Task GetGridData()
     {
         MyData = await UserService.Read();
+    }
+
+    async Task GetRoles()
+    {
+        roles = (await UserService.GetRoleSelectList())?.ToList();
     }
 
     async Task UpdateHandler(GridCommandEventArgs args)

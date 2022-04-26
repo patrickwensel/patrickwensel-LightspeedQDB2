@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using QBD2.Data;
 using Blazored.Toast;
 using QBD2.Services;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,7 @@ builder.Services.AddScoped<ExcelUploadService>();
 builder.Services.AddScoped<PartService>();
 builder.Services.AddScoped<InspectionService>();
 //builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformer>();
 
 #endregion
 

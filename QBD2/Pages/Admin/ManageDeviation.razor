@@ -1,0 +1,296 @@
+﻿@page "/deviations"
+@using QBD2.Services
+@using QBD2.Entities
+@using QBD2.Models
+
+<style>
+    table, th, td {
+        border: 2px solid;
+    }
+
+    .RightButton {
+        height: 38px;
+        width: 75px;
+        margin-left: -32px;
+    }
+
+    .Width200 {
+        width: 200px;
+        left: 117px;
+    }
+
+    .SaveButton {
+        float: right;
+        width: 100px;
+        left: 72%;
+    }
+</style>
+
+
+<h3>Deviations</h3>
+@if (AddEditDeviation == null)
+{
+    <TelerikGrid Data="@GridData"
+             Pageable="true"
+             Sortable="true"
+             FilterMode="@GridFilterMode.FilterRow">
+        <GridToolBar>
+            <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Deviation</TelerikButton>
+        </GridToolBar>
+        <GridColumns>
+            <GridColumn Field="@(nameof(Deviation.DateCreated))" Title="Date Created" />
+            <GridColumn Field="@(nameof(Deviation.Item))" Title="Item" />
+            <GridColumn Field="@(nameof(Deviation.Originator))" Title="Originator" />
+            <GridCommandColumn Width="150px">
+                <GridCommandButton Command="Save" Icon="eye"></GridCommandButton>
+                <GridCommandButton Command="Edit" Icon="edit"></GridCommandButton>
+                <GridCommandButton Command="Delete" Icon="print"></GridCommandButton>
+            </GridCommandColumn>
+        </GridColumns>
+    </TelerikGrid>
+}
+
+@if (AddEditDeviation != null)
+{
+    <br />
+    @* <div class="row">
+        <div class="col-md-12">
+        <h5><i class="fa-regular fa-plus"></i> Manage Deviation</h5><br />
+        </div>
+        </div>*@
+
+    <EditForm EditContext="@ECAddEditDeviation">
+        <DataAnnotationsValidator />
+
+        <div class="form-group row">
+            <label for="ItemPortNumber" class="col-sm-2 col-form-label">Item Port Number</label>
+            <div class="col-md-11">
+                <TelerikTextBox @bind-Value="@AddEditDeviation.ItemPortNumber" Class="form-control"></TelerikTextBox>
+                <ValidationMessage For="@(() => AddEditDeviation.ItemPortNumber)"></ValidationMessage>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="PortDescription" class="col-sm-2 col-form-label">Port Description</label>
+            <div class="col-md-10">
+                <label>Zulu 4 Upper PCBA</label>
+                <ValidationMessage For="@(() => AddEditDeviation.PortDescription)"></ValidationMessage>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="row">
+                <label for="ReasonforManufacturingDeviation" class="col-sm-8 col-form-label">Reason for Manufacturing Deviation</label>
+            </div>
+            <div class="row">
+                <div class="col-md-11">
+                    <textarea @bind-value="AddEditDeviation.ReasonforManufacturingDeviation" class="form-control" rows="8" @bind-value:event="oninput"></textarea>
+                    <ValidationMessage For="@(() => AddEditDeviation.ReasonforManufacturingDeviation)"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="row">
+                <label class="col-md-6 col-form-label">Location</label>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-12">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="25%"></th>
+                                <th width="15%">SVRART</th>
+                                <th width="15%">SEVE</th>
+                                <th width="15%">2</th>
+                                <th width="15%">WIP</th>
+                                <th width="15%">3(FGI)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Vendor</td>
+                                <td><input type="text" class="form-control" /></td>
+                                <td><input type="text" class="form-control" /></td>
+                                <td><input type="text" class="form-control" /></td>
+                                <td><input type="text" class="form-control" /></td>
+                                <td><input type="text" class="form-control" /></td>
+                            </tr>
+                            <tr>
+                                <td>LSA</td>
+                                <td><input type="text" class="form-control" /></td>
+                                <td><input type="text" class="form-control" /></td>
+                                <td><input type="text" class="form-control" /></td>
+                                <td><input type="text" class="form-control" /></td>
+                                <td><input type="text" class="form-control" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="form-group row">
+            <label for="ECORequired" class="col-sm-2 col-form-label">ECO Required</label>
+            <div class="col-sm-7">
+                <InputRadioGroup Name="ECORequired" @bind-Value="AddEditDeviation.ECORequired">
+                    <InputRadio Name="ECORequired" Value="@(true)" /> Yes
+                    <InputRadio Name="ECORequired" Value="@(false)" /> No
+                </InputRadioGroup>
+                <ValidationMessage For="@(() => AddEditDeviation.ECORequired)"></ValidationMessage>
+            </div>
+        </div>
+
+        @if (AddEditDeviation.ECORequired)
+        {
+            <div class="form-group row">
+                <label for="ECONumber" class="col-sm-2 col-form-label">ECO Number</label>
+                <div class="col-md-11">
+                    <TelerikTextBox @bind-Value="@AddEditDeviation.ECONumber" Class="form-control"></TelerikTextBox>
+                    <ValidationMessage For="@(() => AddEditDeviation.ECONumber)"></ValidationMessage>
+                </div>
+            </div>
+        }
+
+        <div class="form-group row">
+            <div class="col-md-11">
+                <label for="ReasonforManufacturingDeviation">Comment Corrective Action</label><br>
+                <textarea @bind-value="AddEditDeviation.CommentCorrectiveAction" class="form-control" rows="4" @bind-value:event="oninput"></textarea>
+                <ValidationMessage For="@(() => AddEditDeviation.CommentCorrectiveAction)"></ValidationMessage>
+            </div>
+            
+        </div>
+
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+                <h5>Affected Serial Numbers</h5>
+                <hr>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <div class="row">
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" style="width:170px;" />
+                    </div>
+                    <div class="col-md-2">
+                        <TelerikButton Class="RightButton">Add</TelerikButton>
+                    </div>
+                </div><br />
+                <div class="form-group row" style="margin-left: 0px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Serial Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="height:25px;background-color:lightgray">
+                                <td></td>
+                            </tr>
+                            <tr style="height:25px;">
+                                <td></td>
+                            </tr>
+                            <tr style="height:25px;background-color:lightgray">
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-1" style="text-align:center;margin-top:82px;">OR</div>
+            <div class="col-md-3">
+                <div class="row">
+                    <label class="form-label">Range</label>
+                </div>
+                <div class="form-group row">
+                    <label for="startSerialNumber" class="col-md-5 col-form-label">Start Serial Number</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="startSerialNumber" />
+                    </div>
+                </div>
+                <div class="form-group row" style="margin-top:15px;">
+                    <label for="endSerialNumber" class="col-md-5 col-form-label">End Serial Number</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="endSerialNumber" />
+                    </div>
+                </div>
+                <div class="form-group row" style="margin-top:15px;">
+                    <TelerikButton Class="Width200">Add Serial Numbers</TelerikButton>
+                </div>
+            </div>
+            <div class="col-md-1" style="text-align:center;margin-top:82px;">OR</div>
+            <div class="col-md-3">
+                <div class="row">
+                    <label class="form-label">Upload Excel file with Serial Number List</label>
+                </div>
+                <br />
+                <div class="row">
+                    <InputFile OnChange="OnInputFileChange" />
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <TelerikButton Class="SaveButton">Save</TelerikButton>
+        </div>
+        <br />
+    </EditForm>
+}
+
+@code {
+
+    List<Deviation> GridData { get; set; }
+
+    Deviation OriginalRecord { get; set; }
+
+    Deviation AddEditDeviation { get; set; }
+
+    EditContext ECAddEditDeviation { get; set; }
+
+    protected override void OnInitialized()
+    {
+        GridData = Enumerable.Range(1, 30).Select(x => new Deviation
+            {
+                Id = x,
+                Item = "Zulu 4 Upper PCBA",
+                DateCreated = DateTime.Now.Date,
+                Originator = "James Giltner"
+            }).ToList();
+
+        base.OnInitialized();
+    }
+
+    public async Task SelectRecord(Deviation deviation)
+    {
+        OriginalRecord = null;
+        if (deviation != null)
+        {
+            OriginalRecord = deviation;
+            AddEditDeviation = new Deviation()
+                {
+                    Id = OriginalRecord.Id,
+                    DateCreated = OriginalRecord.DateCreated,
+                    Item = OriginalRecord.Item,
+                    Originator = OriginalRecord.Originator
+                };
+        }
+        else
+        {
+            AddEditDeviation = new Deviation();
+        }
+
+        if (AddEditDeviation != null)
+        {
+            ECAddEditDeviation = new EditContext(AddEditDeviation);
+        }
+        StateHasChanged();
+    }
+
+    private void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        this.StateHasChanged();
+    }
+}

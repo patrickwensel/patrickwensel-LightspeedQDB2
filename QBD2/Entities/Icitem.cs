@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace QBD2.Entities
 {
     public partial class Icitem
     {
+        [Key]
         public string Itemno { get; set; } = null!;
         public decimal Audtdate { get; set; }
         public decimal Audttime { get; set; }

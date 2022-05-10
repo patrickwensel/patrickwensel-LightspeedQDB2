@@ -4,6 +4,8 @@ using QBD2.Data;
 using Blazored.Toast;
 using QBD2.Services;
 using Microsoft.AspNetCore.Authentication;
+using Hangfire;
+using Hangfire.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,10 +37,27 @@ builder.Services.AddScoped<ExcelUploadService>();
 builder.Services.AddScoped<PartService>();
 builder.Services.AddScoped<InspectionService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<DeviationService>();
+builder.Services.AddScoped<ItemService>();
+builder.Services.AddScoped<SerialNumberService>();
 builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformer>();
 
 #endregion
 
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("HangfireConnection"), new SqlServerStorageOptions
+    {
+        CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+        SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+        QueuePollInterval = TimeSpan.Zero,
+        UseRecommendedIsolationLevel = true,
+        DisableGlobalLocks = true
+    }));
+
+builder.Services.AddHangfireServer();
 
 var app = builder.Build();
 
@@ -60,5 +79,15 @@ app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+app.UseHangfireDashboard("/hangfire");
+
+using (var serviceScope = app.Services.CreateScope())
+{
+    var services = serviceScope.ServiceProvider;
+
+    var myDependency = services.GetRequiredService<ItemService>();
+    RecurringJob.AddOrUpdate("Sync Service : Runs Every 1 Min", () => myDependency.UpdateMasterParts(), "*/1 * * * *");
+}
 
 app.Run();

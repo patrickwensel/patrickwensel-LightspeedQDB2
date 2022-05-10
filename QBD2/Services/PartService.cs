@@ -8,10 +8,12 @@ namespace QBD2.Services
     public class PartService
     {
         private readonly ApplicationDbContext _context;
+        private readonly SerialNumberService _serialNumberService;
 
-        public PartService(ApplicationDbContext context)
+        public PartService(ApplicationDbContext context, SerialNumberService serialNumberService)
         {
             _context = context;
+            _serialNumberService = serialNumberService;
         }
 
         public async Task<List<Parts>> Read()
@@ -53,5 +55,41 @@ namespace QBD2.Services
             }
             return x;
         }
+
+        public async Task<List<AddPartsToDeviationError>> AddPartsToDeviation(int deviationId, string itemId, int startSerialNumber, int endSerialNumber)
+        {
+            List<AddPartsToDeviationError> addPartsToDeviationErrors = new List<AddPartsToDeviationError>();
+            List<SerialNumberSearchResult> serialNumberSearchResults = await _serialNumberService.GetSerialNumbersFromSage(itemId, startSerialNumber, endSerialNumber);
+
+            foreach(SerialNumberSearchResult serialNumberSearchResult in serialNumberSearchResults)
+            {
+                if(serialNumberSearchResult.IsInSage == false)
+                {
+                    AddPartsToDeviationError addPartsToDeviationError = new AddPartsToDeviationError
+                    {
+                        Error = "Serial Number: " + serialNumberSearchResult.SerialNumber + " was not listed in Stage"
+                    };
+                    addPartsToDeviationErrors.Add(addPartsToDeviationError);
+                }
+                else
+                {
+
+
+                    PartDeviation partDeviation = new PartDeviation
+                    {
+                        DeviationId = deviationId,
+                        //PartId 
+                    };
+                }
+            }
+
+            return addPartsToDeviationErrors;
+        }
+
+
+    }
+    public class AddPartsToDeviationError
+    {
+        public string Error { get; set; }
     }
 }

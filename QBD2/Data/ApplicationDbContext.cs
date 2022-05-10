@@ -10,13 +10,13 @@ namespace QBD2.Data
         {
         }
 
-        public DbSet<AlertDeviation> AlertDeviations { get; set; }
+        public DbSet<Deviation> Deviations { get; set; }
         public DbSet<InspectionFailure> InspectionFailures { get; set; }
         public DbSet<Inspection> Inspections { get; set; }
         public DbSet<FailureTypePrimary> FailureTypePrimaries { get; set; }
         public DbSet<FailureType> FailureTypes { get; set; }
         public DbSet<MasterPart> MasterParts { get; set; }
-        public DbSet<PartAlertDeviation> PartAlertDeviations { get; set; }
+        public DbSet<PartDeviation> PartDeviations { get; set; }
         public DbSet<Part> Parts { get; set; }
         public DbSet<ProductFamily> ProductFamilies { get; set; }
         public DbSet<Station> Stations { get; set; }
@@ -33,7 +33,7 @@ namespace QBD2.Data
 
             #region MasterPart
 
-            modelBuilder.Entity<MasterPart>().HasData(new MasterPart { MasterPartId = 1, Description = "Delta Zulu GA", PartNumber = "800-00025-001.2", ProductFamilyId = 1 });
+            modelBuilder.Entity<MasterPart>().HasData(new MasterPart { MasterPartId = 1, Description = "Delta Zulu GA", PartNumber = "800-00025-001.2", ProductFamilyId = 1, Itemno = "800000250012" });
             modelBuilder.Entity<MasterPart>().HasData(new MasterPart { MasterPartId = 2, Description = "ASSY, PCB, ANR, LEFT", PartNumber = "200-00062-000" });
             modelBuilder.Entity<MasterPart>().HasData(new MasterPart { MasterPartId = 3, Description = "Faceplate, Left", PartNumber = "303-00059-100" });
             modelBuilder.Entity<MasterPart>().HasData(new MasterPart { MasterPartId = 4, Description = "ASSY, PCB, ANR, RIGHT", PartNumber = "200-00048-000" });
@@ -86,14 +86,6 @@ namespace QBD2.Data
 
             #endregion
 
-            #region FailurAlertDeviationeType
-
-            modelBuilder.Entity<AlertDeviation>().HasData(new AlertDeviation { AlertDeviationId = 1, Name = "Some Alert"});
-            modelBuilder.Entity<AlertDeviation>().HasData(new AlertDeviation { AlertDeviationId = 2, Name = "Some Deviation" });
-            // Need to add the rest
-
-            #endregion
-
             #region Role
             modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = "22b3bff1-cfd2-4075-a90f-827380656873", Name = "User", NormalizedName = "USER".ToUpper() });
             modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = "e4e7188b-6ecb-4278-aeee-17271f20d7ce", Name = "Admin", NormalizedName = "ADMIN".ToUpper() });
@@ -114,6 +106,7 @@ namespace QBD2.Data
 
             modelBuilder.Entity<MasterPart>().Property(m => m.ProductFamilyId).IsRequired(false);
             modelBuilder.Entity<Part>().Property(m => m.ParentPartId).IsRequired(false);
+            modelBuilder.Entity<MasterPart>().HasMany(x=>x.Deviations).WithOne(x => x.MasterPart).OnDelete(DeleteBehavior.NoAction);
 
             base.OnModelCreating(modelBuilder);
 

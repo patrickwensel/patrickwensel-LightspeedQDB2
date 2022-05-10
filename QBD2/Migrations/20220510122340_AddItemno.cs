@@ -1,55 +1,57 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace QBD2.Migrations
 {
-    public partial class AddUpdateDateColumnInspection : Migration
+    public partial class AddItemno : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<DateTime>(
-                name: "UpdateDate",
-                table: "Inspections",
-                type: "datetime2",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "22b3bff1-cfd2-4075-a90f-827380656873",
                 column: "ConcurrencyStamp",
-                value: "8d4e7248-d1ff-40b1-9121-d81a2c609abe");
+                value: "728b902f-675b-4f42-aa8f-7d5953cb2332");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "e4e7188b-6ecb-4278-aeee-17271f20d7ce",
                 column: "ConcurrencyStamp",
-                value: "f1aa1ea3-f0c8-44a3-8b7f-284a276b13c3");
+                value: "03c7d9e2-891d-4722-9876-32d391dbc216");
+
+            migrationBuilder.UpdateData(
+                table: "MasterParts",
+                keyColumn: "MasterPartId",
+                keyValue: 1,
+                column: "Itemno",
+                value: "800000250012");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "UpdateDate",
-                table: "Inspections");
-
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "22b3bff1-cfd2-4075-a90f-827380656873",
                 column: "ConcurrencyStamp",
-                value: "477bc6db-ffae-4e27-97e8-6eba75c300ce");
+                value: "74af231e-a933-43a3-a4db-ba2e6f8a1264");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "e4e7188b-6ecb-4278-aeee-17271f20d7ce",
                 column: "ConcurrencyStamp",
-                value: "7ab30284-3dd3-4317-8c66-2b07d5e1435c");
+                value: "236ca829-0745-4803-a77d-512c0e25a53e");
+
+            migrationBuilder.UpdateData(
+                table: "MasterParts",
+                keyColumn: "MasterPartId",
+                keyValue: 1,
+                column: "Itemno",
+                value: null);
         }
     }
 }

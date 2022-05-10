@@ -238,33 +238,56 @@ namespace QBD2.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("QBD2.Entities.AlertDeviation", b =>
+            modelBuilder.Entity("QBD2.Entities.Deviation", b =>
                 {
-                    b.Property<int>("AlertDeviationId")
+                    b.Property<int>("DeviationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AlertDeviationId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeviationId"), 1L, 1);
 
-                    b.Property<string>("Name")
+                    b.Property<string>("CommentCorrectiveAction")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("AlertDeviationId");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
 
-                    b.ToTable("AlertDeviations");
+                    b.Property<string>("ECONumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasData(
-                        new
-                        {
-                            AlertDeviationId = 1,
-                            Name = "Some Alert"
-                        },
-                        new
-                        {
-                            AlertDeviationId = 2,
-                            Name = "Some Deviation"
-                        });
+                    b.Property<bool>("ECORequired")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Item")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ItemPartNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MasterPartId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Originator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PartDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReasonforManufacturingDeviation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DeviationId");
+
+                    b.HasIndex("MasterPartId");
+
+                    b.ToTable("Deviations");
                 });
 
             modelBuilder.Entity("QBD2.Entities.FailureType", b =>
@@ -413,6 +436,9 @@ namespace QBD2.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Itemno")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PartNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -431,6 +457,7 @@ namespace QBD2.Migrations
                         {
                             MasterPartId = 1,
                             Description = "Delta Zulu GA",
+                            Itemno = "800000250012",
                             PartNumber = "800-00025-001.2",
                             ProductFamilyId = 1
                         },
@@ -589,27 +616,27 @@ namespace QBD2.Migrations
                         });
                 });
 
-            modelBuilder.Entity("QBD2.Entities.PartAlertDeviation", b =>
+            modelBuilder.Entity("QBD2.Entities.PartDeviation", b =>
                 {
-                    b.Property<int>("PartAlertDeviationId")
+                    b.Property<int>("PartDeviationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PartAlertDeviationId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PartDeviationId"), 1L, 1);
 
-                    b.Property<int>("AlertDeviationId")
+                    b.Property<int>("DeviationId")
                         .HasColumnType("int");
 
                     b.Property<int>("PartId")
                         .HasColumnType("int");
 
-                    b.HasKey("PartAlertDeviationId");
+                    b.HasKey("PartDeviationId");
 
-                    b.HasIndex("AlertDeviationId");
+                    b.HasIndex("DeviationId");
 
                     b.HasIndex("PartId");
 
-                    b.ToTable("PartAlertDeviations");
+                    b.ToTable("PartDeviations");
                 });
 
             modelBuilder.Entity("QBD2.Entities.ProductFamily", b =>
@@ -670,14 +697,14 @@ namespace QBD2.Migrations
                         new
                         {
                             Id = "22b3bff1-cfd2-4075-a90f-827380656873",
-                            ConcurrencyStamp = "8d4e7248-d1ff-40b1-9121-d81a2c609abe",
+                            ConcurrencyStamp = "728b902f-675b-4f42-aa8f-7d5953cb2332",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "e4e7188b-6ecb-4278-aeee-17271f20d7ce",
-                            ConcurrencyStamp = "f1aa1ea3-f0c8-44a3-8b7f-284a276b13c3",
+                            ConcurrencyStamp = "03c7d9e2-891d-4722-9876-32d391dbc216",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -749,6 +776,17 @@ namespace QBD2.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("QBD2.Entities.Deviation", b =>
+                {
+                    b.HasOne("QBD2.Entities.MasterPart", "MasterPart")
+                        .WithMany("Deviations")
+                        .HasForeignKey("MasterPartId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("MasterPart");
                 });
 
             modelBuilder.Entity("QBD2.Entities.FailureType", b =>
@@ -826,11 +864,11 @@ namespace QBD2.Migrations
                     b.Navigation("ParentPart");
                 });
 
-            modelBuilder.Entity("QBD2.Entities.PartAlertDeviation", b =>
+            modelBuilder.Entity("QBD2.Entities.PartDeviation", b =>
                 {
-                    b.HasOne("QBD2.Entities.AlertDeviation", "AlertDeviation")
+                    b.HasOne("QBD2.Entities.Deviation", "Deviation")
                         .WithMany()
-                        .HasForeignKey("AlertDeviationId")
+                        .HasForeignKey("DeviationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -840,7 +878,7 @@ namespace QBD2.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AlertDeviation");
+                    b.Navigation("Deviation");
 
                     b.Navigation("Part");
                 });
@@ -867,6 +905,11 @@ namespace QBD2.Migrations
             modelBuilder.Entity("QBD2.Entities.Inspection", b =>
                 {
                     b.Navigation("InspectionFailures");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.MasterPart", b =>
+                {
+                    b.Navigation("Deviations");
                 });
 
             modelBuilder.Entity("QBD2.Entities.ApplicationRole", b =>

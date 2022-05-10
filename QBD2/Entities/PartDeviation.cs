@@ -3,18 +3,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QBD2.Entities
 {
-    public class PartAlertDeviation
+    public class PartDeviation
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int PartAlertDeviationId { get; set; }
+        public int PartDeviationId { get; set; }
 
         [ForeignKey("Part")]
         public int PartId { get; set; }
         public virtual Part Part { get; set; }
 
-        [ForeignKey("AlertDeviation")]
-        public int AlertDeviationId { get; set; }
-        public virtual AlertDeviation AlertDeviation { get; set; }
+        [ForeignKey("Deviation")]
+        public int DeviationId { get; set; }
+        public virtual Deviation Deviation { get; set; }
     }
 }

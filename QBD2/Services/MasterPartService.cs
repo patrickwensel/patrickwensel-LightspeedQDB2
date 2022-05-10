@@ -7,10 +7,12 @@ namespace QBD2.Services
     public class MasterPartService
     {
         private readonly ApplicationDbContext _context;
+        private readonly Sage300Context _sage300Context;
 
-        public MasterPartService(ApplicationDbContext context)
+        public MasterPartService(ApplicationDbContext context, Sage300Context sage300Context)
         {
             _context = context;
+            _sage300Context = sage300Context;
         }
 
         public static async Task Create(MasterPart itemToInsert)
@@ -31,6 +33,12 @@ namespace QBD2.Services
         public static async Task Delete(MasterPart itemToDelete)
         {
 
+        }
+
+        public List<MasterPart> GetAllMasterParts()
+        {
+            var x = _context.MasterParts.ToList();
+            return x;
         }
     }
 }

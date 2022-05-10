@@ -1,0 +1,78 @@
+﻿@page "/partdeviationtest"
+@using QBD2.Services
+@using QBD2.Entities
+@inject DeviationService DeviationService
+@inject MasterPartService MasterPartService
+
+<h3>PartDeviationTest</h3>
+
+<TelerikGrid Data="@PartDeviationGridData" Height="400px"
+             Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
+             Resizable="true" 
+             EditMode="Telerik.Blazor.GridEditMode.Inline"
+             OnUpdate=@PartDeviationUpdateHandler
+             OnDelete=@PartDeviationDeleteHandler
+             OnCreate=@PartDeviationCreateHandler
+                >
+                 <GridToolBar>
+        <GridCommandButton Command="Add" Icon="add">Add a Master Part</GridCommandButton>
+    </GridToolBar>
+    <GridColumns>
+        <GridColumn Field="@(nameof(PartDeviation.PartDeviationId))" Title="Name" Groupable="false" />
+                <GridCommandColumn>
+            <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
+            <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
+            <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
+            <GridCommandButton Command="Cancel" Icon="cancel" ShowInEdit="true">Cancel</GridCommandButton>
+        </GridCommandColumn>
+    </GridColumns>
+</TelerikGrid>
+
+
+@code {
+
+            List<PartDeviation> PartDeviationGridData { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetGridData();
+    }
+
+    async Task GetGridData()
+    {
+        PartDeviationGridData = await DeviationService.ReadPartDeviation();
+    }
+
+    async Task PartDeviationUpdateHandler(GridCommandEventArgs args)
+    {
+        PartDeviation item = (PartDeviation)args.Item;
+
+        await DeviationService.UpdatePartDeviation(item);
+
+        await GetGridData();
+    }
+
+    async Task PartDeviationDeleteHandler(GridCommandEventArgs args)
+    {
+        PartDeviation item = (PartDeviation)args.Item;
+
+        await DeviationService.DeletePartDeviation(item);
+
+        await GetGridData();
+    }
+
+    async Task PartDeviationCreateHandler(GridCommandEventArgs args)
+    {
+        PartDeviation item = (PartDeviation)args.Item;
+        
+        await DeviationService.CreatePartDeviation(item);
+
+        await GetGridData();
+    }
+
+    async Task PartDeviationCancelHandler(GridCommandEventArgs args)
+    {
+        PartDeviation item = (PartDeviation)args.Item;
+    }
+
+}

@@ -1,0 +1,39 @@
+﻿@page "/test"
+@using QBD2.Entities
+@using QBD2.Services
+@inject MasterPartService MasterPartService
+
+Selected value: @selectedValue
+<br />
+
+<TelerikDropDownList Data="@myDdlData" TextField="MyTextField" ValueField="MyValueField" @bind-Value="selectedValue">
+</TelerikDropDownList>
+
+@code {
+    public class MyDdlModel
+    {
+        public int MyValueField { get; set; }
+        public string MyTextField { get; set; }
+    }
+
+    int selectedValue { get; set; }
+    public IEnumerable<MyDdlModel> myDdlData  { get; set; }
+    public IEnumerable<MasterPart> MasterParts { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetGridData();
+    }
+
+    async Task GetGridData()
+    {
+        //myDdlData = Enumerable.Range(1, 20).Select(x => new MyDdlModel { MyTextField = "item " + x, MyValueField = x });
+        MasterParts = MasterPartService.GetAllMasterParts();
+        myDdlData = MasterParts.Select(s => new MyDdlModel
+        {
+            MyTextField = s.PartNumber,
+            MyValueField = s.MasterPartId
+        });
+    }
+}

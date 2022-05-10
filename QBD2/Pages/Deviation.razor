@@ -2,6 +2,8 @@
 @using QBD2.Services
 @using QBD2.Entities
 @using QBD2.Models
+@inject MasterPartService MasterPartService
+@inject DeviationService DeviationService
 
 <style>
     table, th, td {
@@ -38,9 +40,9 @@
             <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Deviation</TelerikButton>
         </GridToolBar>
         <GridColumns>
-            <GridColumn Field="@(nameof(Deviation.DateCreated))" Title="Date Created" />
-            <GridColumn Field="@(nameof(Deviation.Item))" Title="Item" />
-            <GridColumn Field="@(nameof(Deviation.Originator))" Title="Originator" />
+            <GridColumn Field="@(nameof(QBD2.Entities.Deviation.DateCreated))" Title="Date Created" />
+            <GridColumn Field="@(nameof(QBD2.Entities.Deviation.Item))" Title="Item" />
+            <GridColumn Field="@(nameof(QBD2.Entities.Deviation.Originator))" Title="Originator" />
             <GridCommandColumn Width="150px">
                 <GridCommandButton Command="Save" Icon="eye"></GridCommandButton>
                 <GridCommandButton Command="Edit" Icon="edit"></GridCommandButton>
@@ -63,18 +65,36 @@
         <DataAnnotationsValidator />
 
         <div class="form-group row">
-            <label for="ItemPortNumber" class="col-sm-2 col-form-label">Item Port Number</label>
+            <label for="ItemPortNumber" class="col-sm-2 col-form-label">Item Number</label>
             <div class="col-md-11">
-                <TelerikTextBox @bind-Value="@AddEditDeviation.ItemPortNumber" Class="form-control"></TelerikTextBox>
-                <ValidationMessage For="@(() => AddEditDeviation.ItemPortNumber)"></ValidationMessage>
+@*                <TelerikDropDownList Data="@MasterParts"
+                                 @bind-Value="SelectedMasterPartId"
+                                 TextField="PartNumber"
+                                 ValueField="MasterPartId"
+                                 DefaultText=""
+                                 Id="masterPart"
+                                 Width="100%">
+                    <DropDownListSettings>
+                        <DropDownListPopupSettings Height="auto"></DropDownListPopupSettings>
+                    </DropDownListSettings>
+                </TelerikDropDownList>*@
+
+Selected value: @selectedValue
+<br />
+@*
+<TelerikDropDownList Data="@masterPartsList" TextField="PartNumber" ValueField="MasterPartId" @bind-Value="selectedValue">
+</TelerikDropDownList>*@
+
+
             </div>
         </div>
 
         <div class="form-group row">
-            <label for="PortDescription" class="col-sm-2 col-form-label">Port Description</label>
+            <label for="PortDescription" class="col-sm-2 col-form-label">Part Description</label>
             <div class="col-md-10">
-                <label>Zulu 4 Upper PCBA</label>
-                <ValidationMessage For="@(() => AddEditDeviation.PortDescription)"></ValidationMessage>
+                @if(@SelectedMasterPart != null){
+                    <label>@SelectedMasterPart.Description</label>
+                }
             </div>
         </div>
 
@@ -158,7 +178,7 @@
                 <textarea @bind-value="AddEditDeviation.CommentCorrectiveAction" class="form-control" rows="4" @bind-value:event="oninput"></textarea>
                 <ValidationMessage For="@(() => AddEditDeviation.CommentCorrectiveAction)"></ValidationMessage>
             </div>
-            
+
         </div>
 
         <br />
@@ -171,34 +191,31 @@
 
         <div class="row">
             <div class="col-md-2">
-                <div class="row">
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" style="width:170px;" />
-                    </div>
-                    <div class="col-md-2">
-                        <TelerikButton Class="RightButton">Add</TelerikButton>
-                    </div>
-                </div><br />
-                <div class="form-group row" style="margin-left: 0px;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Serial Number</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="height:25px;background-color:lightgray">
-                                <td></td>
-                            </tr>
-                            <tr style="height:25px;">
-                                <td></td>
-                            </tr>
-                            <tr style="height:25px;background-color:lightgray">
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+<TelerikGrid Data="@PartDeviationGridData" Height="400px"
+             Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
+             Resizable="true" 
+             EditMode="Telerik.Blazor.GridEditMode.Inline"
+             OnUpdate=@PartDeviationUpdateHandler
+             OnDelete=@PartDeviationDeleteHandler
+             OnCreate=@PartDeviationCreateHandler
+                >
+                 <GridToolBar>
+        <GridCommandButton Command="Add" Icon="add">Add a Serial Number</GridCommandButton>
+    </GridToolBar>
+    <GridColumns>
+        <GridColumn Field="@(nameof(PartDeviation.PartDeviationId))" Title="Name" Groupable="false" />
+@*                <GridCommandColumn>
+            <GridCommandButton Command="SavePartDeviation" Icon="save" ShowInEdit="true">Update</GridCommandButton>
+            <GridCommandButton Command="EditPartDeviation" Icon="edit">Edit</GridCommandButton>
+            <GridCommandButton Command="DeletePartDeviation" Icon="delete">Delete</GridCommandButton>
+            <GridCommandButton Command="CancelPartDeviation" Icon="cancel" ShowInEdit="true">Cancel</GridCommandButton>
+        </GridCommandColumn>*@
+    </GridColumns>
+</TelerikGrid>
+
+
+
+
             </div>
             <div class="col-md-1" style="text-align:center;margin-top:82px;">OR</div>
             <div class="col-md-3">
@@ -242,44 +259,66 @@
 
 @code {
 
-    List<Deviation> GridData { get; set; }
 
-    Deviation OriginalRecord { get; set; }
+    public class MyDdlModel
+    {
+        public int MyValueField { get; set; }
+        public string MyTextField { get; set; }
+    }
 
-    Deviation AddEditDeviation { get; set; }
+    int selectedValue { get; set; }
+
+    IEnumerable<MyDdlModel> myDdlData = Enumerable.Range(1, 20).Select(x => new MyDdlModel { MyTextField = "item " + x, MyValueField = x });
+
+    //IEnumerable<MasterPart> masterPartsList = MasterPartService.GetAllMasterParts();
+
+    public MasterPart SelectedMasterPart { get; set; }
+
+    public IEnumerable<MasterPart> MasterParts { get; set; }
+
+    List<QBD2.Entities.Deviation> GridData { get; set; }
+    List<PartDeviation> PartDeviationGridData { get; set; }
+
+    QBD2.Entities.Deviation OriginalRecord { get; set; }
+
+    QBD2.Entities.Deviation AddEditDeviation { get; set; }
 
     EditContext ECAddEditDeviation { get; set; }
 
-    protected override void OnInitialized()
+
+
+    protected override async void OnInitialized()
     {
-        GridData = Enumerable.Range(1, 30).Select(x => new Deviation
-            {
-                Id = x,
-                Item = "Zulu 4 Upper PCBA",
-                DateCreated = DateTime.Now.Date,
-                Originator = "James Giltner"
-            }).ToList();
+        await GetGridData();
+        //await GetPartDeviationGridData();
+
+        
 
         base.OnInitialized();
     }
 
-    public async Task SelectRecord(Deviation deviation)
+    async Task GetGridData()
+    {
+        GridData = await DeviationService.ReadDeviations();
+    }
+
+    public async Task SelectRecord(QBD2.Entities.Deviation deviation)
     {
         OriginalRecord = null;
         if (deviation != null)
         {
             OriginalRecord = deviation;
-            AddEditDeviation = new Deviation()
-                {
-                    Id = OriginalRecord.Id,
-                    DateCreated = OriginalRecord.DateCreated,
-                    Item = OriginalRecord.Item,
-                    Originator = OriginalRecord.Originator
-                };
+            AddEditDeviation = new QBD2.Entities.Deviation()
+            {
+                //Id = OriginalRecord.Id,
+                //DateCreated = OriginalRecord.DateCreated,
+                //Item = OriginalRecord.Item,
+                //Originator = OriginalRecord.Originator
+            };
         }
         else
         {
-            AddEditDeviation = new Deviation();
+            AddEditDeviation = new QBD2.Entities.Deviation();
         }
 
         if (AddEditDeviation != null)
@@ -289,8 +328,66 @@
         StateHasChanged();
     }
 
+        private void MyOnChangeHandler(object theUserInput)
+    {
+        // the handler receives an object that you may need to cast to the type of the component
+        // if you do not provide a Value, you must provide the Type parameter to the component
+
+
+    }
+
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
         this.StateHasChanged();
+    }
+    int _selectedMasterPartId;
+    int SelectedMasterPartId
+    {
+        get
+        {
+            return _selectedMasterPartId;
+        }
+        set
+        {
+            _selectedMasterPartId = value;
+            SelectedMasterPart = MasterParts.FirstOrDefault(o => o.MasterPartId == value);
+        }
+    }
+
+    async Task GetPartDeviationGridData()
+    {
+        PartDeviationGridData = await DeviationService.ReadPartDeviation();
+    }
+
+    async Task PartDeviationUpdateHandler(GridCommandEventArgs args)
+    {
+        PartDeviation item = (PartDeviation)args.Item;
+
+        await DeviationService.UpdatePartDeviation(item);
+
+        await GetGridData();
+    }
+
+    async Task PartDeviationDeleteHandler(GridCommandEventArgs args)
+    {
+        PartDeviation item = (PartDeviation)args.Item;
+
+        await DeviationService.DeletePartDeviation(item);
+
+        await GetGridData();
+    }
+
+    async Task PartDeviationCreateHandler(GridCommandEventArgs args)
+    {
+        PartDeviation item = (PartDeviation)args.Item;
+        
+        await DeviationService.CreatePartDeviation(item);
+
+        await GetGridData();
+    }
+
+    async Task PartDeviationCancelHandler(GridCommandEventArgs args)
+    {
+        PartDeviation item = (PartDeviation)args.Item;
     }
 }

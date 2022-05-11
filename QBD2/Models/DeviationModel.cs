@@ -1,12 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace QBD2.Entities
+﻿namespace QBD2.Models
 {
-    public class Deviation
+    public class DeviationModel
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int DeviationId { get; set; }
         public DateTime DateCreated { get; set; }
         public string Originator { get; set; }
@@ -24,11 +19,5 @@ namespace QBD2.Entities
         public string LSA2 { get; set; }
         public string LSAWIP { get; set; }
         public string LSAFGI { get; set; }
-
-        public virtual List<PartDeviation> PartDeviations { get; set; }
-
-        [ForeignKey("MasterPart")]
-        public int MasterPartId { get; set; }
-        public virtual MasterPart MasterPart { get; set; }
     }
 }

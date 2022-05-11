@@ -10,6 +10,8 @@ namespace QBD2.Entities
         public int PartId { get; set; }
         public string SerialNumber { get; set; }
 
+        public virtual List<Deviation> Deviations { get; set; }
+
         [ForeignKey("MasterPart")]
         public int MasterPartId { get; set; }
         public virtual MasterPart MasterPart { get; set; }

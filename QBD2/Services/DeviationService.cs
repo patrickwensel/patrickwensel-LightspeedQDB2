@@ -31,10 +31,17 @@ namespace QBD2.Services
             return await _context.PartDeviations.ToListAsync();
         }
 
-        public async Task<Deviation> CreateDeviation(Deviation itemToInsert)
+        public async Task<Deviation> CreateDeviationAsync(Deviation itemToInsert)
         {
             _context.Deviations.Add(itemToInsert);
             await _context.SaveChangesAsync();
+            return itemToInsert;
+        }
+
+        public Deviation CreateDeviation(Deviation itemToInsert)
+        {
+            _context.Deviations.Add(itemToInsert);
+            _context.SaveChanges();
             return itemToInsert;
         }
 

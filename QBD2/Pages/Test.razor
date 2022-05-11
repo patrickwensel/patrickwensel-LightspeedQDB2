@@ -1,39 +1,45 @@
 ﻿@page "/test"
 @using QBD2.Entities
 @using QBD2.Services
+@using QBD2.Models
 @inject MasterPartService MasterPartService
 
-Selected value: @selectedValue
-<br />
 
-<TelerikDropDownList Data="@myDdlData" TextField="MyTextField" ValueField="MyValueField" @bind-Value="selectedValue">
-</TelerikDropDownList>
+@* On the first keystroke, there will be no suggestions, then you will only get "Developer" and "Designer" as you write "de" *@
+<TelerikAutoComplete Data="@MasterParts" @bind-Value="@selectedMasterPart"
+                     ValueField="@( nameof(MasterPart.PartNumber) )"
+                     Filterable="true" MinLength="3"
+                     Placeholder="Write 'de' to see the filtering" ClearButton="true" />
 
+<EditForm EditContext="@ECAddEditDeviation">
+        <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText id="name" @bind-Value="DeviationModel.CommentCorrectiveAction " />
+
+    <button type="submit">Submit</button>
+
+</EditForm>
 @code {
-    public class MyDdlModel
-    {
-        public int MyValueField { get; set; }
-        public string MyTextField { get; set; }
-    }
 
-    int selectedValue { get; set; }
-    public IEnumerable<MyDdlModel> myDdlData  { get; set; }
+    string selectedMasterPart { get; set; }
     public IEnumerable<MasterPart> MasterParts { get; set; }
-
+    public DeviationModel DeviationModel { get; set; }
+    EditContext ECAddEditDeviation { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        MasterParts = MasterPartService.GetAllMasterParts();
         await GetGridData();
     }
 
     async Task GetGridData()
     {
-        //myDdlData = Enumerable.Range(1, 20).Select(x => new MyDdlModel { MyTextField = "item " + x, MyValueField = x });
-        MasterParts = MasterPartService.GetAllMasterParts();
-        myDdlData = MasterParts.Select(s => new MyDdlModel
-        {
-            MyTextField = s.PartNumber,
-            MyValueField = s.MasterPartId
-        });
+
+    }
+
+    private void HandleValidSubmit()
+    {
+        var x = "test";
     }
 }

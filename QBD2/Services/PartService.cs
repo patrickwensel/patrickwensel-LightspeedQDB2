@@ -118,6 +118,18 @@ namespace QBD2.Services
             return addPartsToDeviationErrors;
         }
 
+        public async Task<Part> GetPartBySerialNumberAndMasterPart(string serialNumber, int masterPartId)
+        {
+            var part = await (from p in _context.Parts
+                              join mp in _context.MasterParts
+                              on p.MasterPartId equals mp.MasterPartId
+                              where p.SerialNumber.Trim() == serialNumber.Trim()
+                              && p.MasterPartId == masterPartId
+                              select p).FirstOrDefaultAsync();
+
+            return part;
+        }
+
         private async Task<Part> GetPartBySerialNumber(string serialNumber)
         {
             return await _context.Parts.Where(x => x.SerialNumber == serialNumber).FirstOrDefaultAsync();

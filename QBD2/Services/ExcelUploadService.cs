@@ -6,16 +6,54 @@ using Microsoft.EntityFrameworkCore;
 using QBD2.Data;
 using ExcelRow = QBD2.Models.ExcelRow;
 using ExcelDataReader;
+using QBD2.Entities;
 
 namespace QBD2.Services
 {
     public class ExcelUploadService
     {
         private readonly ApplicationDbContext _context;
-        public ExcelUploadService(ApplicationDbContext context)
+        private readonly PartService _partService;
+        public ExcelUploadService(ApplicationDbContext context, PartService partService)
         {
             _context = context;
+            _partService = partService;
         }
+
+        public async Task<List<AddPartsToDeviationError>> ProcessSerialNumberExcelFile(string fileName, Deviation deviation)
+        {
+            List<AddPartsToDeviationError> addPartsToDeviationErrors = new List<AddPartsToDeviationError>();
+            List<string> excelRows = new List<string>();
+            using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read))
+            {
+                DataSet dsexcelRecords = new DataSet();
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    dsexcelRecords = reader.AsDataSet();
+
+                    if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
+                    {
+                        DataTable dtRecords = dsexcelRecords.Tables[0];
+                        if (dtRecords.Rows.Count > 1)
+                        {
+                            for (int i = 1; i < dtRecords.Rows.Count; i++)
+                            {
+                                excelRows.Add(Convert.ToString(dtRecords.Rows[i][0]));
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (excelRows.Count > 0)
+            {
+                addPartsToDeviationErrors = await _partService.AddPartsToDeviationByList(deviation, excelRows);
+            }
+
+            return addPartsToDeviationErrors;
+
+        }
+
         public async Task ProcessExcelFile(string fileName)
         {
             List<ExcelRow> excelRows = new List<ExcelRow>();

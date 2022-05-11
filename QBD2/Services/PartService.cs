@@ -56,14 +56,27 @@ namespace QBD2.Services
             return x;
         }
 
-        public async Task<List<AddPartsToDeviationError>> AddPartsToDeviation(int deviationId, string itemId, int startSerialNumber, int endSerialNumber)
+        public async Task<List<AddPartsToDeviationError>> AddPartsToDeviationByList(Deviation deviation, List<string> serialNumbers)
         {
             List<AddPartsToDeviationError> addPartsToDeviationErrors = new List<AddPartsToDeviationError>();
-            List<SerialNumberSearchResult> serialNumberSearchResults = await _serialNumberService.GetSerialNumbersFromSage(itemId, startSerialNumber, endSerialNumber);
+            List<SerialNumberSearchResult> serialNumberSearchResults = await _serialNumberService.GetSerialNumbersFromSageFromList(deviation.MasterPart.Itemno, serialNumbers);
 
-            foreach(SerialNumberSearchResult serialNumberSearchResult in serialNumberSearchResults)
+            return await AddPartsToDeviation(deviation, addPartsToDeviationErrors, serialNumberSearchResults);
+        }
+
+        public async Task<List<AddPartsToDeviationError>> AddPartsToDeviationByStartEnd(Deviation deviation, int startSerialNumber, int endSerialNumber)
+        {
+            List<AddPartsToDeviationError> addPartsToDeviationErrors = new List<AddPartsToDeviationError>();
+            List<SerialNumberSearchResult> serialNumberSearchResults = await _serialNumberService.GetSerialNumbersFromSage(deviation.MasterPart.Itemno, startSerialNumber, endSerialNumber);
+
+            return await AddPartsToDeviation(deviation, addPartsToDeviationErrors, serialNumberSearchResults);
+        }
+
+        private async Task<List<AddPartsToDeviationError>> AddPartsToDeviation(Deviation deviation, List<AddPartsToDeviationError> addPartsToDeviationErrors, List<SerialNumberSearchResult> serialNumberSearchResults)
+        {
+            foreach (SerialNumberSearchResult serialNumberSearchResult in serialNumberSearchResults)
             {
-                if(serialNumberSearchResult.IsInSage == false)
+                if (serialNumberSearchResult.IsInSage == false)
                 {
                     AddPartsToDeviationError addPartsToDeviationError = new AddPartsToDeviationError
                     {
@@ -73,20 +86,42 @@ namespace QBD2.Services
                 }
                 else
                 {
+                    Part part;
+                    //Check if serial number is in Parts table
+                    part = await GetPartBySerialNumber(serialNumberSearchResult.SerialNumber);
 
+
+                    if (part == null)
+                    {
+                        Part newPart = new Part
+                        {
+                            MasterPartId = deviation.MasterPartId,
+                            SerialNumber = serialNumberSearchResult.SerialNumber
+
+                        };
+                        _context.Parts.Add(newPart);
+                        await _context.SaveChangesAsync();
+                        part = newPart;
+                    }
 
                     PartDeviation partDeviation = new PartDeviation
                     {
-                        DeviationId = deviationId,
-                        //PartId 
+                        DeviationId = deviation.DeviationId,
+                        PartId = part.PartId
                     };
+
+                    _context.PartDeviations.Add(partDeviation);
+                    await _context.SaveChangesAsync();
                 }
             }
 
             return addPartsToDeviationErrors;
         }
 
-
+        private async Task<Part> GetPartBySerialNumber(string serialNumber)
+        {
+            return await _context.Parts.Where(x => x.SerialNumber == serialNumber).FirstOrDefaultAsync();
+        }
     }
     public class AddPartsToDeviationError
     {

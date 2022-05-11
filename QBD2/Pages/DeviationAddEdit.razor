@@ -4,7 +4,9 @@
 @using QBD2.Models
 @inject DeviationService DeviationService
 @inject MasterPartService MasterPartService
+@inject PartService PartService
 @inject IWebHostEnvironment env
+@inject ExcelUploadService ExcelUploadService
 
 <style>
     table, th, td {
@@ -66,11 +68,11 @@
                      OnChange="@MyOnChangeHandler"
                      ClearButton="true" />
 
-    <EditForm EditContext="@ECAddEditDeviation" OnValidSubmit="@HandleValidSubmit" >
+    <EditForm EditContext="@ECAddEditDeviation" OnValidSubmit="@HandleValidSubmit">
         <DataAnnotationsValidator />
-       
 
-@*                <div class="form-group row">
+
+        @*                <div class="form-group row">
             <label for="ItemPortNumber" class="col-sm-2 col-form-label">Item Number</label>
             <div class="col-md-11">
             <TelerikTextBox @bind-Value="@AddEditDeviation.MasterPart." Class="form-control"></TelerikTextBox>
@@ -78,12 +80,12 @@
             </div>
             </div>*@
 
-                <div class="form-group row">
+        <div class="form-group row">
             <label for="PortDescription" class="col-sm-2 col-form-label">Part Description</label>
             <div class="col-md-10">
-            <label>@selectedMasterPartDescription</label>
+                <label>@selectedMasterPartDescription</label>
             </div>
-            </div>
+        </div>
 
         <div class="form-group row">
             <div class="row">
@@ -209,24 +211,29 @@
             </div>
             <div class="col-md-1" style="text-align:center;margin-top:82px;">OR</div>
             <div class="col-md-3">
-                <div class="row">
-                    <label class="form-label">Range</label>
-                </div>
-                <div class="form-group row">
-                    <label for="startSerialNumber" class="col-md-5 col-form-label">Start Serial Number</label>
-                    <div class="col-sm-5">
-                        <input type="text" class="form-control" id="startSerialNumber" />
+                <form Model="@serialNumberRange" @onsubmit="OnSubmitRange">
+                    <div class="row">
+                        <label class="form-label">Range</label>
                     </div>
-                </div>
-                <div class="form-group row" style="margin-top:15px;">
-                    <label for="endSerialNumber" class="col-md-5 col-form-label">End Serial Number</label>
-                    <div class="col-sm-5">
-                        <input type="text" class="form-control" id="endSerialNumber" />
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="form-group row">
+                        <label for="startSerialNumber" class="col-md-5 col-form-label">Start Serial Number</label>
+                        <div class="col-sm-5">
+                            <TelerikTextBox @bind-Value="@serialNumberRange.StartSerialNumber" Class="form-control"></TelerikTextBox>
+
+                        </div>
                     </div>
-                </div>
-                <div class="form-group row" style="margin-top:15px;">
-                    <TelerikButton Class="Width200">Add Serial Numbers</TelerikButton>
-                </div>
+                    <div class="form-group row" style="margin-top:15px;">
+                        <label for="endSerialNumber" class="col-md-5 col-form-label">End Serial Number</label>
+                        <div class="col-sm-5">
+                            <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control"></TelerikTextBox>
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-top:15px;">
+                        <TelerikButton Class="SaveButton">Add Range</TelerikButton>
+                    </div>
+                </form>
             </div>
             <div class="col-md-1" style="text-align:center;margin-top:82px;">OR</div>
             <div class="col-md-3">
@@ -235,11 +242,11 @@
                 </div>
                 <br />
                 <div class="row">
-                    <form @onsubmit="OnSubmit">
-    <InputFile OnChange="OnInputFileChange" />
-    <br /><br />
-    <button type="submit">Upload Selected File(s)</button>
-</form>
+                    <form @onsubmit="OnSubmitExcelFile">
+                        <InputFile OnChange="OnInputFileChange" />
+                        <br /><br />
+                        <TelerikButton Class="SaveButton">Upload Selected File(s)</TelerikButton>
+                    </form>
                 </div>
             </div>
         </div>
@@ -303,20 +310,20 @@
         }
         StateHasChanged();
     }
-        string Message = "No file(s) selected";
+    string Message = "No file(s) selected";
     IReadOnlyList<IBrowserFile> selectedFiles;
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
-                selectedFiles = e.GetMultipleFiles();
+        selectedFiles = e.GetMultipleFiles();
         Message = $"{selectedFiles.Count} file(s) selected";
         this.StateHasChanged();
     }
 
-        private async void OnSubmit()
+    private async void OnSubmitExcelFile()
     {
         foreach (var file in selectedFiles)
-        {       
+        {
             Stream stream = file.OpenReadStream();
             var path = $"{env.WebRootPath}\\upload\\{file.Name}";
             FileStream fs = File.Create(path);
@@ -324,12 +331,37 @@
             stream.Close();
             fs.Close();
 
-            //await ExcelUploadService.ProcessExcelFile(path);
+            //Test Deviation
+
+            Deviation testDeviation = new Deviation
+                {
+                    ECORequired = false,
+                    MasterPartId = 1796
+                };
+
+            testDeviation = DeviationService.CreateDeviation(testDeviation);
+
+            var errors = await ExcelUploadService.ProcessSerialNumberExcelFile(path, testDeviation);
 
         }
-    Message = $"{selectedFiles.Count} file(s) uploaded on server";
-    this.StateHasChanged();
-}
+        Message = $"{selectedFiles.Count} file(s) uploaded on server";
+        this.StateHasChanged();
+    }
+    SerialNumberRange serialNumberRange = new();
+    private async void OnSubmitRange()
+    {
+        var x = serialNumberRange;
+
+        Deviation testDeviation = new Deviation
+            {
+                ECORequired = false,
+                MasterPartId = 1796
+            };
+
+        testDeviation = DeviationService.CreateDeviation(testDeviation);
+
+        var errors = await PartService.AddPartsToDeviationByStartEnd(testDeviation, Convert.ToInt32(serialNumberRange.StartSerialNumber), Convert.ToInt32(serialNumberRange.EndSerialNumber));
+    }
 
     private void HandleValidSubmit()
     {
@@ -340,14 +372,14 @@
 
     private void MyOnChangeHandler(object theUserChoice)
     {
-        var result = string.Format("The user confirmed: {0}", (string)theUserChoice);
+        //var result = string.Format("The user confirmed: {0}", (string)theUserChoice);
 
-        MasterPart selectedMasterPart = MasterParts.Where(x => x.PartNumber == (string)theUserChoice).FirstOrDefault();
-        selectedMasterPartDescription = selectedMasterPart.Description;
-        AddEditDeviation = new Deviation();
-        AddEditDeviation.MasterPart = selectedMasterPart;
-        AddEditDeviation.MasterPartId = selectedMasterPart.MasterPartId;
-        HandleValidSubmit();
+        //MasterPart selectedMasterPart = MasterParts.Where(x => x.PartNumber == (string)theUserChoice).FirstOrDefault();
+        //selectedMasterPartDescription = selectedMasterPart.Description;
+        //AddEditDeviation = new Deviation();
+        //AddEditDeviation.MasterPart = selectedMasterPart;
+        //AddEditDeviation.MasterPartId = selectedMasterPart.MasterPartId;
+        //HandleValidSubmit();
 
         //AddEditDeviation = DeviationService.CreateDeviation(AddEditDeviation);
 

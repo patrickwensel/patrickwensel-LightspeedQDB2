@@ -4,6 +4,7 @@
 @using QBD2.Models
 @inject DeviationService DeviationService
 @inject MasterPartService MasterPartService
+@inject IWebHostEnvironment env
 
 <style>
     table, th, td {
@@ -234,7 +235,11 @@
                 </div>
                 <br />
                 <div class="row">
-                    <InputFile OnChange="OnInputFileChange" />
+                    <form @onsubmit="OnSubmit">
+    <InputFile OnChange="OnInputFileChange" />
+    <br /><br />
+    <button type="submit">Upload Selected File(s)</button>
+</form>
                 </div>
             </div>
         </div>
@@ -298,11 +303,33 @@
         }
         StateHasChanged();
     }
+        string Message = "No file(s) selected";
+    IReadOnlyList<IBrowserFile> selectedFiles;
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
+                selectedFiles = e.GetMultipleFiles();
+        Message = $"{selectedFiles.Count} file(s) selected";
         this.StateHasChanged();
     }
+
+        private async void OnSubmit()
+    {
+        foreach (var file in selectedFiles)
+        {       
+            Stream stream = file.OpenReadStream();
+            var path = $"{env.WebRootPath}\\upload\\{file.Name}";
+            FileStream fs = File.Create(path);
+            await stream.CopyToAsync(fs);
+            stream.Close();
+            fs.Close();
+
+            //await ExcelUploadService.ProcessExcelFile(path);
+
+        }
+    Message = $"{selectedFiles.Count} file(s) uploaded on server";
+    this.StateHasChanged();
+}
 
     private void HandleValidSubmit()
     {

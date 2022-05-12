@@ -46,10 +46,12 @@
         </GridToolBar>
         <GridColumns>
             <GridColumn Field="@(nameof(Deviation.DateCreated))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}"/>
+            <GridColumn Field="@(nameof(Deviation.MasterPartNumber))" Title="Part Number" Filterable="false"/>
+            <GridColumn Field="@(nameof(Deviation.MasterPartDescription))" Title="Description" Filterable="false"/>
             <GridCommandColumn Width="150px">
-                @*                <GridCommandButton Command="Save" Icon="eye"></GridCommandButton>
-                    <GridCommandButton Command="Edit" Icon="edit"></GridCommandButton>
-                    <GridCommandButton Command="Delete" Icon="print"></GridCommandButton>*@
+                    @*<GridCommandButton Command="Save" Icon="eye"></GridCommandButton>*@
+                    <GridCommandButton Icon="edit" OnClick="@((args)=> SelectRecord(args.Item as Deviation))"></GridCommandButton>
+                    <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
             </GridCommandColumn>
         </GridColumns>
     </TelerikGrid>
@@ -229,6 +231,15 @@
                     <div class="row">
                         <label class="form-label">Range</label>
                     </div>
+                    @if (RangeAddPartsToDeviationError != null && RangeAddPartsToDeviationError.Count() > 0)
+                    {
+                        <div class="row">
+                            @foreach(var item in RangeAddPartsToDeviationError)
+                            {
+                                <label class="text-danger">@item.Error</label><br />
+                            }
+                        </div>
+                     }
                     <DataAnnotationsValidator />
                     <ValidationSummary />
                     <div class="form-group row">
@@ -254,6 +265,15 @@
                 <div class="row">
                     <label class="form-label">Upload Excel file with Serial Number List</label>
                 </div>
+                @if (ExcelAddPartsToDeviationError != null && ExcelAddPartsToDeviationError.Count() > 0)
+                {
+                    <div class="row">
+                        @foreach(var item in ExcelAddPartsToDeviationError)
+                        {
+                            <label class="text-danger">@item.Error</label><br />
+                        }
+                    </div>
+                }
                 <br />
                 <div class="row">
                     <form @onsubmit="OnSubmitExcelFile">
@@ -290,6 +310,10 @@
 
     string SerialNumber { get; set; }
 
+    List<AddPartsToDeviationError> RangeAddPartsToDeviationError { get; set; }
+
+    List<AddPartsToDeviationError> ExcelAddPartsToDeviationError { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         //GridData = Enumerable.Range(1, 30).Select(x => new Deviation
@@ -312,14 +336,33 @@
         {
             OriginalRecord = deviation;
             AddEditDeviation = new Deviation()
-                {
-                    DeviationId = OriginalRecord.DeviationId,
-                    DateCreated = OriginalRecord.DateCreated
-                };
+            {
+                DeviationId = OriginalRecord.DeviationId,
+                DateCreated = OriginalRecord.DateCreated,
+                MasterPartId =  OriginalRecord.MasterPartId,
+                Originator = OriginalRecord.Originator,
+                ReasonforManufacturingDeviation = OriginalRecord.ReasonforManufacturingDeviation,
+                ECORequired = OriginalRecord.ECORequired,
+                ECONumber = OriginalRecord.ECONumber,
+                CommentCorrectiveAction = OriginalRecord.CommentCorrectiveAction,
+                VendorSVPART = OriginalRecord.VendorSVPART,
+                VendorSEVE = OriginalRecord.VendorSEVE,
+                Vendor2 = OriginalRecord.Vendor2,
+                VendorWIP = OriginalRecord.VendorWIP,
+                Vendor3FGI = OriginalRecord.Vendor3FGI,
+                LSASVPART = OriginalRecord.LSASVPART,
+                LSASEVE = OriginalRecord.LSASEVE,
+                LSA2 = OriginalRecord.LSA2,
+                LSAWIP = OriginalRecord.LSAWIP,
+                LSAFGI = OriginalRecord.LSAFGI
+            };
+            selectedMasterPartDescription = OriginalRecord.MasterPart.Description;
+            selectedMasterPart = OriginalRecord.MasterPart.PartNumber;
         }
         else
         {
             AddEditDeviation = new Deviation();
+            AddEditDeviation.DeviationId = 0;
         }
 
         if (AddEditDeviation != null)
@@ -357,10 +400,31 @@
                     MasterPartId = 1796
                 };
 
-            testDeviation = DeviationService.CreateDeviation(testDeviation);
+            //testDeviation = DeviationService.CreateDeviation(testDeviation);
 
-            var errors = await ExcelUploadService.ProcessSerialNumberExcelFile(path, testDeviation);
+            if (AddEditDeviation.MasterPartId == 0)
+            {
+                toastService.ShowError("Please Select Master Part", "Error");
+                return;
+            }
 
+            MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
+
+            var errors = await ExcelUploadService.ProcessSerialNumberExcelFile(path, selectedMasterPart);
+            if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
+            {
+                GridParts.AddRange(errors.Parts);
+                GridParts = new List<Part>(GridParts);
+            }
+
+            if (errors != null && errors.AddPartsToDeviationError != null && errors.AddPartsToDeviationError.Count() > 0)
+            {
+                ExcelAddPartsToDeviationError = errors.AddPartsToDeviationError;
+            }
+            else
+            {
+                ExcelAddPartsToDeviationError = null;
+            }
         }
         Message = $"{selectedFiles.Count} file(s) uploaded on server";
         this.StateHasChanged();
@@ -368,6 +432,14 @@
     SerialNumberRange serialNumberRange = new();
     private async void OnSubmitRange()
     {
+        if (AddEditDeviation.MasterPartId == 0)
+        {
+            toastService.ShowError("Please Select Master Part", "Error");
+            return;
+        }
+
+        MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
+
         var x = serialNumberRange;
 
         Deviation testDeviation = new Deviation
@@ -376,9 +448,26 @@
                 MasterPartId = 1796
             };
 
-        testDeviation = DeviationService.CreateDeviation(testDeviation);
+        //testDeviation = DeviationService.CreateDeviation(testDeviation);
 
-        var errors = await PartService.AddPartsToDeviationByStartEnd(testDeviation, Convert.ToInt32(serialNumberRange.StartSerialNumber), Convert.ToInt32(serialNumberRange.EndSerialNumber));
+        var errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, Convert.ToInt32(serialNumberRange.StartSerialNumber), Convert.ToInt32(serialNumberRange.EndSerialNumber));
+        if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
+        {
+            GridParts.AddRange(errors.Parts);
+            GridParts = new List<Part>(GridParts);
+        }
+
+        if (errors != null && errors.AddPartsToDeviationError != null && errors.AddPartsToDeviationError.Count() > 0)
+        {
+            RangeAddPartsToDeviationError = errors.AddPartsToDeviationError;
+
+        }
+        else
+        {
+            RangeAddPartsToDeviationError = null;
+        }
+
+        StateHasChanged();
     }
 
     private async Task HandleValidSubmit()
@@ -432,7 +521,10 @@
         if(selectedMasterPart != null)
         {
             selectedMasterPartDescription = selectedMasterPart.Description;
-            AddEditDeviation = new Deviation();
+            if (AddEditDeviation == null)
+            {
+                 AddEditDeviation = new Deviation();
+            }
             AddEditDeviation.MasterPart = selectedMasterPart;
             AddEditDeviation.MasterPartId = selectedMasterPart.MasterPartId;
             StateHasChanged();

@@ -56,23 +56,29 @@ namespace QBD2.Services
             return x;
         }
 
-        public async Task<List<AddPartsToDeviationError>> AddPartsToDeviationByList(Deviation deviation, List<string> serialNumbers)
+        public async Task<AddPartsToDeviationModel> AddPartsToDeviationByList(MasterPart masterPart, List<string> serialNumbers)
         {
-            List<AddPartsToDeviationError> addPartsToDeviationErrors = new List<AddPartsToDeviationError>();
-            List<SerialNumberSearchResult> serialNumberSearchResults = await _serialNumberService.GetSerialNumbersFromSageFromList(deviation.MasterPart.Itemno, serialNumbers);
+            AddPartsToDeviationModel addPartsToDeviationModel = new AddPartsToDeviationModel();
+            addPartsToDeviationModel.AddPartsToDeviationError = new List<AddPartsToDeviationError>();
+            addPartsToDeviationModel.Parts = new List<Part>();
 
-            return await AddPartsToDeviation(deviation, addPartsToDeviationErrors, serialNumberSearchResults);
+            List<SerialNumberSearchResult> serialNumberSearchResults = await _serialNumberService.GetSerialNumbersFromSageFromList(masterPart.Itemno, serialNumbers);
+
+            return await AddPartsToDeviation(masterPart, addPartsToDeviationModel, serialNumberSearchResults);
         }
 
-        public async Task<List<AddPartsToDeviationError>> AddPartsToDeviationByStartEnd(Deviation deviation, int startSerialNumber, int endSerialNumber)
+        public async Task<AddPartsToDeviationModel> AddPartsToDeviationByStartEnd(MasterPart masterPart, int startSerialNumber, int endSerialNumber)
         {
-            List<AddPartsToDeviationError> addPartsToDeviationErrors = new List<AddPartsToDeviationError>();
-            List<SerialNumberSearchResult> serialNumberSearchResults = await _serialNumberService.GetSerialNumbersFromSage(deviation.MasterPart.Itemno, startSerialNumber, endSerialNumber);
+            AddPartsToDeviationModel addPartsToDeviationModel = new AddPartsToDeviationModel();
+            addPartsToDeviationModel.AddPartsToDeviationError = new List<AddPartsToDeviationError>();
+            addPartsToDeviationModel.Parts = new List<Part>();
 
-            return await AddPartsToDeviation(deviation, addPartsToDeviationErrors, serialNumberSearchResults);
+            List<SerialNumberSearchResult> serialNumberSearchResults = await _serialNumberService.GetSerialNumbersFromSage(masterPart.Itemno, startSerialNumber, endSerialNumber);
+
+            return await AddPartsToDeviation(masterPart, addPartsToDeviationModel, serialNumberSearchResults);
         }
 
-        private async Task<List<AddPartsToDeviationError>> AddPartsToDeviation(Deviation deviation, List<AddPartsToDeviationError> addPartsToDeviationErrors, List<SerialNumberSearchResult> serialNumberSearchResults)
+        private async Task<AddPartsToDeviationModel> AddPartsToDeviation(MasterPart masterPart, AddPartsToDeviationModel addPartsToDeviationModel, List<SerialNumberSearchResult> serialNumberSearchResults)
         {
             foreach (SerialNumberSearchResult serialNumberSearchResult in serialNumberSearchResults)
             {
@@ -82,7 +88,7 @@ namespace QBD2.Services
                     {
                         Error = "Serial Number: " + serialNumberSearchResult.SerialNumber + " was not listed in Stage"
                     };
-                    addPartsToDeviationErrors.Add(addPartsToDeviationError);
+                    addPartsToDeviationModel.AddPartsToDeviationError.Add(addPartsToDeviationError);
                 }
                 else
                 {
@@ -95,7 +101,7 @@ namespace QBD2.Services
                     {
                         Part newPart = new Part
                         {
-                            MasterPartId = deviation.MasterPartId,
+                            MasterPartId = masterPart.MasterPartId,
                             SerialNumber = serialNumberSearchResult.SerialNumber
 
                         };
@@ -104,18 +110,11 @@ namespace QBD2.Services
                         part = newPart;
                     }
 
-                    PartDeviation partDeviation = new PartDeviation
-                    {
-                        DeviationId = deviation.DeviationId,
-                        PartId = part.PartId
-                    };
-
-                    _context.PartDeviations.Add(partDeviation);
-                    await _context.SaveChangesAsync();
+                    addPartsToDeviationModel.Parts.Add(part);
                 }
             }
 
-            return addPartsToDeviationErrors;
+            return addPartsToDeviationModel;
         }
 
         public async Task<Part> GetPartBySerialNumberAndMasterPart(string serialNumber, int masterPartId)
@@ -145,5 +144,11 @@ namespace QBD2.Services
     public class AddPartsToDeviationError
     {
         public string Error { get; set; }
+    }
+
+    public class AddPartsToDeviationModel
+    {
+        public List<AddPartsToDeviationError> AddPartsToDeviationError { get; set; }
+        public List<Part> Parts { get; set; }
     }
 }

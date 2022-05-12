@@ -20,9 +20,9 @@ namespace QBD2.Services
             _partService = partService;
         }
 
-        public async Task<List<AddPartsToDeviationError>> ProcessSerialNumberExcelFile(string fileName, Deviation deviation)
+        public async Task<AddPartsToDeviationModel> ProcessSerialNumberExcelFile(string fileName, MasterPart masterPart)
         {
-            List<AddPartsToDeviationError> addPartsToDeviationErrors = new List<AddPartsToDeviationError>();
+            AddPartsToDeviationModel addPartsToDeviationModel = new AddPartsToDeviationModel();
             List<string> excelRows = new List<string>();
             using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read))
             {
@@ -47,10 +47,10 @@ namespace QBD2.Services
 
             if (excelRows.Count > 0)
             {
-                addPartsToDeviationErrors = await _partService.AddPartsToDeviationByList(deviation, excelRows);
+                addPartsToDeviationModel = await _partService.AddPartsToDeviationByList(masterPart, excelRows);
             }
 
-            return addPartsToDeviationErrors;
+            return addPartsToDeviationModel;
 
         }
 

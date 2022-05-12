@@ -22,7 +22,7 @@ namespace QBD2.Services
 
         public async Task<List<Deviation>> ReadDeviations()
         {
-            var x = await _context.Deviations.ToListAsync();
+            var x = await _context.Deviations.Include(a=>a.MasterPart).ToListAsync();
             return x;
         }
 
@@ -33,9 +33,34 @@ namespace QBD2.Services
 
         public async Task<Deviation> CreateDeviationAsync(Deviation itemToInsert)
         {
-            itemToInsert.DateCreated = DateTime.UtcNow;
-            _context.Deviations.Add(itemToInsert);
-            await _context.SaveChangesAsync();
+            if (itemToInsert.DeviationId > 0)
+            {
+                var objDeviation = _context.Deviations.Where(d => d.DeviationId == itemToInsert.DeviationId).FirstOrDefault();
+                objDeviation.MasterPartId = itemToInsert.MasterPartId;
+                objDeviation.Originator = itemToInsert.Originator;
+                objDeviation.ReasonforManufacturingDeviation = itemToInsert.ReasonforManufacturingDeviation;
+                objDeviation.ECORequired = itemToInsert.ECORequired;
+                objDeviation.ECONumber = itemToInsert.ECONumber;
+                objDeviation.CommentCorrectiveAction = itemToInsert.CommentCorrectiveAction;
+                objDeviation.VendorSVPART = itemToInsert.VendorSVPART;
+                objDeviation.VendorSEVE = itemToInsert.VendorSEVE;
+                objDeviation.Vendor2 = itemToInsert.Vendor2;
+                objDeviation.VendorWIP = itemToInsert.VendorWIP;
+                objDeviation.Vendor3FGI = itemToInsert.Vendor3FGI;
+                objDeviation.LSASVPART = itemToInsert.LSASVPART;
+                objDeviation.LSASEVE = itemToInsert.LSASEVE;
+                objDeviation.LSA2 = itemToInsert.LSA2;
+                objDeviation.LSAWIP = itemToInsert.LSAWIP;
+                objDeviation.LSAFGI = itemToInsert.LSAFGI;
+                _context.Entry(objDeviation).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                itemToInsert.DateCreated = DateTime.UtcNow;
+                _context.Deviations.Add(itemToInsert);
+                await _context.SaveChangesAsync();
+            }
 
             if (itemToInsert.DeviationId > 0 && itemToInsert.PartDeviations != null && itemToInsert.PartDeviations.Count() > 0)
             {

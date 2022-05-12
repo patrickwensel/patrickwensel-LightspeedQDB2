@@ -30,5 +30,35 @@ namespace QBD2.Entities
         [ForeignKey("MasterPart")]
         public int MasterPartId { get; set; }
         public virtual MasterPart MasterPart { get; set; }
+
+        public string MasterPartNumber
+        {
+            get
+            {
+                if (MasterPart != null)
+                {
+                    return MasterPart.PartNumber;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+        }
+
+        public string MasterPartDescription
+        {
+            get
+            {
+                if (MasterPart != null)
+                {
+                    return MasterPart.Description;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using QBD2.Data;
 using QBD2.Entities;
 using QBD2.Models;
@@ -8,10 +9,12 @@ namespace QBD2.Services
     public class SerialNumberService
     {
         private readonly Sage300Context _sage300Context;
+        private readonly IOptions<ApplicationSettings> _appSettings;
 
-        public SerialNumberService(Sage300Context sage300Context)
+        public SerialNumberService(Sage300Context sage300Context, IOptions<ApplicationSettings> appSettings)
         {
             _sage300Context = sage300Context;
+            _appSettings = appSettings;
         }
 
         public async Task<List<SerialNumberSearchResult>> GetSerialNumbersFromSage(string itemId, int startSerialNumber, int endSerialNumber)

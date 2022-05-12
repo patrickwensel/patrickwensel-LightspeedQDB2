@@ -18,7 +18,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 var sageConnection = builder.Configuration.GetConnectionString("Sage300Connection");
 builder.Services.AddDbContext<Sage300Context>(options => options.UseSqlServer(sageConnection));
 
-builder.Services.Configure<ApplicationSettings>(configuration.GetSection(nameof("Settings")));
+builder.Services.Configure<ApplicationSettings>(configuration.GetSection("Settings"));
 
 builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
    .AddNegotiate();

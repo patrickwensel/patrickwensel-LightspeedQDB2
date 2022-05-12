@@ -45,7 +45,7 @@
             <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Deviation</TelerikButton>
         </GridToolBar>
         <GridColumns>
-            <GridColumn Field="@(nameof(Deviation.DateCreated))" Title="Date Created" />
+            <GridColumn Field="@(nameof(Deviation.DateCreated))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}"/>
             <GridCommandColumn Width="150px">
                 @*                <GridCommandButton Command="Save" Icon="eye"></GridCommandButton>
                     <GridCommandButton Command="Edit" Icon="edit"></GridCommandButton>
@@ -300,7 +300,7 @@
         //        Originator = "James Giltner"
         //    }).ToList();
 
-        //GridData = await DeviationService.ReadDeviations();
+        GridData = await DeviationService.ReadDeviations();
         MasterParts = MasterPartService.GetAllMasterParts();
         base.OnInitialized();
     }
@@ -429,11 +429,14 @@
         var result = string.Format("The user confirmed: {0}", (string)theUserChoice);
 
         MasterPart selectedMasterPart = MasterParts.Where(x => x.PartNumber == (string)theUserChoice).FirstOrDefault();
-        selectedMasterPartDescription = selectedMasterPart.Description;
-        AddEditDeviation = new Deviation();
-        AddEditDeviation.MasterPart = selectedMasterPart;
-        AddEditDeviation.MasterPartId = selectedMasterPart.MasterPartId;
-        StateHasChanged();
+        if(selectedMasterPart != null)
+        {
+            selectedMasterPartDescription = selectedMasterPart.Description;
+            AddEditDeviation = new Deviation();
+            AddEditDeviation.MasterPart = selectedMasterPart;
+            AddEditDeviation.MasterPartId = selectedMasterPart.MasterPartId;
+            StateHasChanged();
+        }
         //HandleValidSubmit();
 
         //AddEditDeviation = DeviationService.CreateDeviation(AddEditDeviation);
@@ -450,7 +453,7 @@
         if(AddEditDeviation != null && AddEditDeviation.MasterPartId > 0 && !string.IsNullOrWhiteSpace(SerialNumber))
         {
             var resultPart = await PartService.GetPartBySerialNumberAndMasterPart(SerialNumber.Trim(),AddEditDeviation.MasterPartId);
-            if (resultPart == null)
+            if (resultPart == null || resultPart.PartId == 0)
             {
                 toastService.ShowError("No Record Found ! Please Enter Valid Serial Number", "Error");
                 return;

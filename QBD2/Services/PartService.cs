@@ -120,12 +120,19 @@ namespace QBD2.Services
 
         public async Task<Part> GetPartBySerialNumberAndMasterPart(string serialNumber, int masterPartId)
         {
-            var part = await (from p in _context.Parts
+            Part part = null;
+            var parentPart = await _context.Parts.Where(x => x.MasterPartId == masterPartId).Select(x => x.PartId).ToListAsync();
+            var parts = await (from p in _context.Parts
                               join mp in _context.MasterParts
                               on p.MasterPartId equals mp.MasterPartId
-                              where p.SerialNumber.Trim() == serialNumber.Trim()
-                              && p.MasterPartId == masterPartId
-                              select p).FirstOrDefaultAsync();
+                              where 
+                              p.MasterPartId == masterPartId || parentPart.Contains(p.ParentPartId.Value)
+                              select p).ToListAsync();
+
+            if(parts != null && parts.Count() > 0)
+            {
+                part = parts.Where(x => x.SerialNumber.Trim() == serialNumber.Trim()).FirstOrDefault();
+            }
 
             return part;
         }

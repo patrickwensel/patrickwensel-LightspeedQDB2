@@ -6,14 +6,19 @@ using QBD2.Services;
 using Microsoft.AspNetCore.Authentication;
 using Hangfire;
 using Hangfire.SqlServer;
+using QBD2.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+var provider = builder.Services.BuildServiceProvider();
+var configuration = provider.GetService<IConfiguration>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
 var sageConnection = builder.Configuration.GetConnectionString("Sage300Connection");
 builder.Services.AddDbContext<Sage300Context>(options => options.UseSqlServer(sageConnection));
+
+builder.Services.Configure<ApplicationSettings>(configuration.GetSection(nameof("Settings")));
 
 builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
    .AddNegotiate();

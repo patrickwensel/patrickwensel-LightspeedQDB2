@@ -9,6 +9,7 @@
 @inject ExcelUploadService ExcelUploadService
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
+@inject BlobService BlobService
 
 <style>
     table, th, td {
@@ -383,30 +384,32 @@
 
     private async void OnSubmitExcelFile()
     {
+        if (AddEditDeviation.MasterPartId == 0)
+        {
+            toastService.ShowError("Please Select Master Part", "Error");
+            return;
+        }
+
         foreach (var file in selectedFiles)
         {
-            Stream stream = file.OpenReadStream();
-            var path = $"{env.WebRootPath}\\upload\\{file.Name}";
-            FileStream fs = File.Create(path);
-            await stream.CopyToAsync(fs);
-            stream.Close();
-            fs.Close();
+            //Stream stream = file.OpenReadStream();
+            //var path = $"{env.WebRootPath}\\upload\\{file.Name}";
+            //FileStream fs = File.Create(path);
+            //await stream.CopyToAsync(fs);
+            //stream.Close();
+            //fs.Close();
+
+            var path = await BlobService.UploadBlob(file);
 
             //Test Deviation
 
-            Deviation testDeviation = new Deviation
-                {
-                    ECORequired = false,
-                    MasterPartId = 1796
-                };
+            //Deviation testDeviation = new Deviation
+            //    {
+            //        ECORequired = false,
+            //        MasterPartId = 1796
+            //    };
 
             //testDeviation = DeviationService.CreateDeviation(testDeviation);
-
-            if (AddEditDeviation.MasterPartId == 0)
-            {
-                toastService.ShowError("Please Select Master Part", "Error");
-                return;
-            }
 
             MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
 
@@ -442,11 +445,11 @@
 
         var x = serialNumberRange;
 
-        Deviation testDeviation = new Deviation
-            {
-                ECORequired = false,
-                MasterPartId = 1796
-            };
+        //Deviation testDeviation = new Deviation
+        //    {
+        //        ECORequired = false,
+        //        MasterPartId = 1796
+        //    };
 
         //testDeviation = DeviationService.CreateDeviation(testDeviation);
 

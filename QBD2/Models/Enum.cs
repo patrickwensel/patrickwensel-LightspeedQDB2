@@ -8,5 +8,11 @@
             FailureType,
             Station
         }
+
+        public enum FileUploadType
+        {
+            Local,
+            Azure,
+        }
     }
 }

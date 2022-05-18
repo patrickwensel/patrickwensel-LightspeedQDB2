@@ -46,13 +46,13 @@
             <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Deviation</TelerikButton>
         </GridToolBar>
         <GridColumns>
-            <GridColumn Field="@(nameof(Deviation.DateCreated))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}"/>
-            <GridColumn Field="@(nameof(Deviation.MasterPartNumber))" Title="Part Number" Filterable="false"/>
-            <GridColumn Field="@(nameof(Deviation.MasterPartDescription))" Title="Description" Filterable="false"/>
+            <GridColumn Field="@(nameof(Deviation.DateCreated))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}" />
+            <GridColumn Field="@(nameof(Deviation.MasterPartNumber))" Title="Part Number" Filterable="false" />
+            <GridColumn Field="@(nameof(Deviation.MasterPartDescription))" Title="Description" Filterable="false" />
             <GridCommandColumn Width="150px">
-                    @*<GridCommandButton Command="Save" Icon="eye"></GridCommandButton>*@
-                    <GridCommandButton Icon="edit" OnClick="@((args)=> SelectRecord(args.Item as Deviation))"></GridCommandButton>
-                    <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
+                @*<GridCommandButton Command="Save" Icon="eye"></GridCommandButton>*@
+                <GridCommandButton Icon="edit" OnClick="@((args)=> SelectRecord(args.Item as Deviation))"></GridCommandButton>
+                <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
             </GridCommandColumn>
         </GridColumns>
     </TelerikGrid>
@@ -124,19 +124,19 @@
                         <tbody>
                             <tr>
                                 <td>Vendor</td>
-                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.VendorSVPART"/></td>
-                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.VendorSEVE"/></td>
-                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.Vendor2"/></td>
-                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.VendorWIP"/></td>
-                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.Vendor3FGI"/></td>
+                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.VendorSVPART" /></td>
+                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.VendorSEVE" /></td>
+                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.Vendor2" /></td>
+                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.VendorWIP" /></td>
+                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.Vendor3FGI" /></td>
                             </tr>
                             <tr>
                                 <td>LSA</td>
-                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.LSASVPART"/></td>
+                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.LSASVPART" /></td>
                                 <td><input type="text" class="form-control" @bind-value="AddEditDeviation.LSASEVE" /></td>
-                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.LSA2"/></td>
-                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.LSAWIP"/></td>
-                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.LSAFGI"/></td>
+                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.LSA2" /></td>
+                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.LSAWIP" /></td>
+                                <td><input type="text" class="form-control" @bind-value="AddEditDeviation.LSAFGI" /></td>
                             </tr>
                         </tbody>
                     </table>
@@ -187,7 +187,7 @@
             <div class="col-md-2">
                 <div class="row">
                     <div class="col-md-10">
-                        <input type="text" class="form-control" style="width:170px;" @bind-value="@SerialNumber"/>
+                        <input type="text" class="form-control" style="width:170px;" @bind-value="@SerialNumber" />
                     </div>
                     <div class="col-md-2">
                         <TelerikButton Class="RightButton" @onclick="(()=> btnAddFindSerailNumberOnClick())">Add</TelerikButton>
@@ -197,31 +197,31 @@
 
                     @*<table>
                         <thead>
-                            <tr>
-                                <th>Serial Number</th>
-                            </tr>
+                        <tr>
+                        <th>Serial Number</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            <tr style="height:25px;background-color:lightgray">
-                                <td></td>
-                            </tr>
-                            <tr style="height:25px;">
-                                <td></td>
-                            </tr>
-                            <tr style="height:25px;background-color:lightgray">
-                                <td></td>
-                            </tr>
+                        <tr style="height:25px;background-color:lightgray">
+                        <td></td>
+                        </tr>
+                        <tr style="height:25px;">
+                        <td></td>
+                        </tr>
+                        <tr style="height:25px;background-color:lightgray">
+                        <td></td>
+                        </tr>
                         </tbody>
-                    </table>*@
+                        </table>*@
 
                     <TelerikGrid Data=@GridParts Sortable="true" Pageable="false">
-                         <GridColumns>
-                             <GridColumn Field=@nameof(Part.SerialNumber) Title="Serial Number" Filterable="false">
-                             </GridColumn>
-                         </GridColumns>
-                         <NoDataTemplate>
-                             <text>No Records Available</text>
-                         </NoDataTemplate>
+                        <GridColumns>
+                            <GridColumn Field=@nameof(Part.SerialNumber) Title="Serial Number" Filterable="false">
+                            </GridColumn>
+                        </GridColumns>
+                        <NoDataTemplate>
+                            <text>No Records Available</text>
+                        </NoDataTemplate>
                     </TelerikGrid>
 
                 </div>
@@ -235,12 +235,14 @@
                     @if (RangeAddPartsToDeviationError != null && RangeAddPartsToDeviationError.Count() > 0)
                     {
                         <div class="row">
-                            @foreach(var item in RangeAddPartsToDeviationError)
+                            @foreach (var item in RangeAddPartsToDeviationError)
                             {
-                                <label class="text-danger">@item.Error</label><br />
+                                <label class="text-danger">@item.Error</label>
+
+                                <br />
                             }
                         </div>
-                     }
+                    }
                     <DataAnnotationsValidator />
                     <ValidationSummary />
                     <div class="form-group row">
@@ -269,9 +271,11 @@
                 @if (ExcelAddPartsToDeviationError != null && ExcelAddPartsToDeviationError.Count() > 0)
                 {
                     <div class="row">
-                        @foreach(var item in ExcelAddPartsToDeviationError)
+                        @foreach (var item in ExcelAddPartsToDeviationError)
                         {
-                            <label class="text-danger">@item.Error</label><br />
+                            <label class="text-danger">@item.Error</label>
+
+                            <br />
                         }
                     </div>
                 }
@@ -298,33 +302,18 @@
     string selectedMasterPart { get; set; }
     string selectedMasterPartDescription { get; set; }
     public IEnumerable<MasterPart> MasterParts { get; set; }
-
     List<Deviation> GridData { get; set; }
-
     Deviation OriginalRecord { get; set; }
-
     Deviation AddEditDeviation { get; set; }
-
     EditContext ECAddEditDeviation { get; set; }
-
     List<Part> GridParts { get; set; } = new List<Part>();
-
     string SerialNumber { get; set; }
-
     List<AddPartsToDeviationError> RangeAddPartsToDeviationError { get; set; }
-
     List<AddPartsToDeviationError> ExcelAddPartsToDeviationError { get; set; }
+    SerialNumberRange serialNumberRange = new();
 
     protected override async Task OnInitializedAsync()
     {
-        //GridData = Enumerable.Range(1, 30).Select(x => new Deviation
-        //    {
-        //        Id = x,
-        //        Item = "Zulu 4 Upper PCBA",
-        //        DateCreated = DateTime.Now.Date,
-        //        Originator = "James Giltner"
-        //    }).ToList();
-
         GridData = await DeviationService.ReadDeviations();
         MasterParts = MasterPartService.GetAllMasterParts();
         base.OnInitialized();
@@ -337,26 +326,26 @@
         {
             OriginalRecord = deviation;
             AddEditDeviation = new Deviation()
-            {
-                DeviationId = OriginalRecord.DeviationId,
-                DateCreated = OriginalRecord.DateCreated,
-                MasterPartId =  OriginalRecord.MasterPartId,
-                Originator = OriginalRecord.Originator,
-                ReasonforManufacturingDeviation = OriginalRecord.ReasonforManufacturingDeviation,
-                ECORequired = OriginalRecord.ECORequired,
-                ECONumber = OriginalRecord.ECONumber,
-                CommentCorrectiveAction = OriginalRecord.CommentCorrectiveAction,
-                VendorSVPART = OriginalRecord.VendorSVPART,
-                VendorSEVE = OriginalRecord.VendorSEVE,
-                Vendor2 = OriginalRecord.Vendor2,
-                VendorWIP = OriginalRecord.VendorWIP,
-                Vendor3FGI = OriginalRecord.Vendor3FGI,
-                LSASVPART = OriginalRecord.LSASVPART,
-                LSASEVE = OriginalRecord.LSASEVE,
-                LSA2 = OriginalRecord.LSA2,
-                LSAWIP = OriginalRecord.LSAWIP,
-                LSAFGI = OriginalRecord.LSAFGI
-            };
+                {
+                    DeviationId = OriginalRecord.DeviationId,
+                    DateCreated = OriginalRecord.DateCreated,
+                    MasterPartId = OriginalRecord.MasterPartId,
+                    Originator = OriginalRecord.Originator,
+                    ReasonforManufacturingDeviation = OriginalRecord.ReasonforManufacturingDeviation,
+                    ECORequired = OriginalRecord.ECORequired,
+                    ECONumber = OriginalRecord.ECONumber,
+                    CommentCorrectiveAction = OriginalRecord.CommentCorrectiveAction,
+                    VendorSVPART = OriginalRecord.VendorSVPART,
+                    VendorSEVE = OriginalRecord.VendorSEVE,
+                    Vendor2 = OriginalRecord.Vendor2,
+                    VendorWIP = OriginalRecord.VendorWIP,
+                    Vendor3FGI = OriginalRecord.Vendor3FGI,
+                    LSASVPART = OriginalRecord.LSASVPART,
+                    LSASEVE = OriginalRecord.LSASEVE,
+                    LSA2 = OriginalRecord.LSA2,
+                    LSAWIP = OriginalRecord.LSAWIP,
+                    LSAFGI = OriginalRecord.LSAFGI
+                };
             selectedMasterPartDescription = OriginalRecord.MasterPart.Description;
             selectedMasterPart = OriginalRecord.MasterPart.PartNumber;
         }
@@ -392,24 +381,7 @@
 
         foreach (var file in selectedFiles)
         {
-            //Stream stream = file.OpenReadStream();
-            //var path = $"{env.WebRootPath}\\upload\\{file.Name}";
-            //FileStream fs = File.Create(path);
-            //await stream.CopyToAsync(fs);
-            //stream.Close();
-            //fs.Close();
-
             var path = await BlobService.UploadBlob(file);
-
-            //Test Deviation
-
-            //Deviation testDeviation = new Deviation
-            //    {
-            //        ECORequired = false,
-            //        MasterPartId = 1796
-            //    };
-
-            //testDeviation = DeviationService.CreateDeviation(testDeviation);
 
             MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
 
@@ -432,7 +404,7 @@
         Message = $"{selectedFiles.Count} file(s) uploaded on server";
         this.StateHasChanged();
     }
-    SerialNumberRange serialNumberRange = new();
+
     private async void OnSubmitRange()
     {
         if (AddEditDeviation.MasterPartId == 0)
@@ -442,16 +414,6 @@
         }
 
         MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
-
-        var x = serialNumberRange;
-
-        //Deviation testDeviation = new Deviation
-        //    {
-        //        ECORequired = false,
-        //        MasterPartId = 1796
-        //    };
-
-        //testDeviation = DeviationService.CreateDeviation(testDeviation);
 
         var errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, Convert.ToInt32(serialNumberRange.StartSerialNumber), Convert.ToInt32(serialNumberRange.EndSerialNumber));
         if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
@@ -473,12 +435,47 @@
         StateHasChanged();
     }
 
+    private async Task btnAddFindSerailNumberOnClick()
+    {
+        if (string.IsNullOrEmpty(SerialNumber))
+        {
+            toastService.ShowError("Please Enter Serial Number", "Error");
+            return;
+        }
+
+                if (AddEditDeviation.MasterPartId == 0)
+        {
+            toastService.ShowError("Please Select Master Part", "Error");
+            return;
+        }
+
+        MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
+
+        var errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, Convert.ToInt32(SerialNumber), Convert.ToInt32(SerialNumber));
+        if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
+        {
+            GridParts.AddRange(errors.Parts);
+            GridParts = new List<Part>(GridParts.Distinct().ToList());
+        }
+
+        if (errors != null && errors.AddPartsToDeviationError != null && errors.AddPartsToDeviationError.Count() > 0)
+        {
+            RangeAddPartsToDeviationError = errors.AddPartsToDeviationError;
+
+        }
+        else
+        {
+            RangeAddPartsToDeviationError = null;
+        }
+
+        StateHasChanged();
+    }
+
     private async Task HandleValidSubmit()
     {
-        var x = "test";
         // Process the valid form
         if (AddEditDeviation != null)
-        { 
+        {
             if (AddEditDeviation.MasterPartId == 0)
             {
                 toastService.ShowError("Please Select Master Part", "Error");
@@ -487,10 +484,10 @@
 
             if (GridParts != null && GridParts.Count() > 0)
             {
-                List<PartDeviation> PartDeviations = new List<PartDeviation>();  
-                foreach(var part in GridParts)
+                List<PartDeviation> PartDeviations = new List<PartDeviation>();
+                foreach (var part in GridParts)
                 {
-                    if (part.PartId > 0 && !PartDeviations.Any(x=>x.PartId == part.PartId))
+                    if (part.PartId > 0 && !PartDeviations.Any(x => x.PartId == part.PartId))
                     {
                         PartDeviation partDeviation = new PartDeviation();
                         partDeviation.PartId = part.PartId;
@@ -506,7 +503,7 @@
                 toastService.ShowInfo("Record Saved Successfully", "Info");
                 SerialNumber = string.Empty;
                 GridParts.Clear();
-                NavigationManager.NavigateTo("deviation",true);
+                NavigationManager.NavigateTo("deviation", true);
                 StateHasChanged();
             }
             else
@@ -521,50 +518,18 @@
         var result = string.Format("The user confirmed: {0}", (string)theUserChoice);
 
         MasterPart selectedMasterPart = MasterParts.Where(x => x.PartNumber == (string)theUserChoice).FirstOrDefault();
-        if(selectedMasterPart != null)
+        if (selectedMasterPart != null)
         {
             selectedMasterPartDescription = selectedMasterPart.Description;
             if (AddEditDeviation == null)
             {
-                 AddEditDeviation = new Deviation();
+                AddEditDeviation = new Deviation();
             }
             AddEditDeviation.MasterPart = selectedMasterPart;
             AddEditDeviation.MasterPartId = selectedMasterPart.MasterPartId;
             StateHasChanged();
         }
-        //HandleValidSubmit();
-
-        //AddEditDeviation = DeviationService.CreateDeviation(AddEditDeviation);
     }
 
-    private async Task btnAddFindSerailNumberOnClick()
-    {
-        if (string.IsNullOrEmpty(SerialNumber))
-        {
-            toastService.ShowError("Please Enter Serial Number", "Error");
-            return;
-        }
 
-        if(AddEditDeviation != null && AddEditDeviation.MasterPartId > 0 && !string.IsNullOrWhiteSpace(SerialNumber))
-        {
-            var resultPart = await PartService.GetPartBySerialNumberAndMasterPart(SerialNumber.Trim(),AddEditDeviation.MasterPartId);
-            if (resultPart == null || resultPart.PartId == 0)
-            {
-                toastService.ShowError("No Record Found ! Please Enter Valid Serial Number", "Error");
-                return;
-            }
-
-            if (resultPart != null && resultPart.PartId > 0)
-            {
-                if(GridParts != null && GridParts.Count() > 0 && GridParts.Any(x => x.PartId == resultPart.PartId))
-                {
-                    toastService.ShowError("Serial Number already exists.");
-                    return;
-                }
-
-                GridParts.Add(resultPart);
-                GridParts = new List<Part>(GridParts.Distinct().ToList());
-            }
-        }
-    }
 }

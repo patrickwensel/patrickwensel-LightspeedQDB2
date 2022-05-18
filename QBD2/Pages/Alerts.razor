@@ -415,32 +415,33 @@
 
     private async Task btnAddFindSerailNumberOnClick()
     {
-        if (string.IsNullOrEmpty(SerialNumber))
+        if (AddEditAlert.MasterPartId == 0)
         {
-            toastService.ShowError("Please Enter Serial Number", "Error");
+            toastService.ShowError("Please Select Master Part", "Error");
             return;
         }
 
-        if(AddEditAlert != null && AddEditAlert.MasterPartId > 0 && !string.IsNullOrWhiteSpace(SerialNumber))
+        MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditAlert.MasterPartId).FirstOrDefault();
+
+        var x = serialNumberRange;
+        var errors = await PartService.AddPartsToAlertByStartEnd(selectedMasterPart, Convert.ToInt32(SerialNumber), Convert.ToInt32(SerialNumber));
+
+        if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
         {
-            var resultPart = await PartService.GetPartBySerialNumberAndMasterPart(SerialNumber.Trim(),AddEditAlert.MasterPartId);
-            if (resultPart == null || resultPart.PartId == 0)
-            {
-                toastService.ShowError("No Record Found ! Please Enter Valid Serial Number", "Error");
-                return;
-            }
-
-            if (resultPart != null && resultPart.PartId > 0)
-            {
-                if(GridParts != null && GridParts.Count() > 0 && GridParts.Any(x => x.PartId == resultPart.PartId))
-                {
-                    toastService.ShowError("Serial Number already exists.");
-                    return;
-                }
-
-                GridParts.Add(resultPart);
-                GridParts = new List<Part>(GridParts.Distinct().ToList());
-            }
+            GridParts.AddRange(errors.Parts);
+            GridParts = new List<Part>(GridParts.Distinct().ToList());
         }
+
+        if (errors != null && errors.AddPartsToAlertError != null && errors.AddPartsToAlertError.Count() > 0)
+        {
+            RangeAddPartsToAlertError = errors.AddPartsToAlertError;
+
+        }
+        else
+        {
+            RangeAddPartsToAlertError = null;
+        }
+
+        StateHasChanged();
     }
 }

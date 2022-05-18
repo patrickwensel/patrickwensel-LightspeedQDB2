@@ -1,10 +1,12 @@
 ﻿@page "/manageexcelupload"
-@*@inherits ManageCSVUploadBase*@
+@inherits ManageExcelUploadBase
 @using QBD2.Services
 @using QBD2.Entities
+@using QBD2.Models
 @using System.IO
 @inject IWebHostEnvironment env
 @inject ExcelUploadService ExcelUploadService
+@inject ApplicationSettings ApplicationSettings
 
 
 <h3>Upload CSV File</h3>
@@ -17,33 +19,3 @@
     <button type="submit">Upload Selected File(s)</button>
 </form>
 
-@code {
-    string Message = "No file(s) selected";
-    IReadOnlyList<IBrowserFile> selectedFiles;
-
-    private void OnInputFileChange(InputFileChangeEventArgs e)
-    {
-        selectedFiles = e.GetMultipleFiles();
-        Message = $"{selectedFiles.Count} file(s) selected";
-        this.StateHasChanged();
-    }
-
-    private async void OnSubmit()
-    {
-        foreach (var file in selectedFiles)
-        {       
-            Stream stream = file.OpenReadStream();
-            var path = $"{env.WebRootPath}\\upload\\{file.Name}";
-            FileStream fs = File.Create(path);
-            await stream.CopyToAsync(fs);
-            stream.Close();
-            fs.Close();
-
-            await ExcelUploadService.ProcessExcelFile(path);
-
-        }
-    Message = $"{selectedFiles.Count} file(s) uploaded on server";
-    this.StateHasChanged();
-}
-
-}

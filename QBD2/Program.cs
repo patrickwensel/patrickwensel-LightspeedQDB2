@@ -47,6 +47,7 @@ builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<SerialNumberService>();
 builder.Services.AddScoped<BlobService>();
 builder.Services.AddScoped<AlertService>();
+builder.Services.AddScoped<ApplicationSettings>();
 builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformer>();
 
 #endregion

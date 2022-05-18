@@ -20,8 +20,10 @@ namespace QBD2.Data
         public DbSet<Part> Parts { get; set; }
         public DbSet<ProductFamily> ProductFamilies { get; set; }
         public DbSet<Station> Stations { get; set; }
+        public DbSet<Alert> Alerts { get; set; }
+        public DbSet<PartAlert> PartAlerts { get; set; }
 
- 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -107,6 +109,7 @@ namespace QBD2.Data
             modelBuilder.Entity<MasterPart>().Property(m => m.ProductFamilyId).IsRequired(false);
             modelBuilder.Entity<Part>().Property(m => m.ParentPartId).IsRequired(false);
             modelBuilder.Entity<MasterPart>().HasMany(x=>x.Deviations).WithOne(x => x.MasterPart).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<MasterPart>().HasMany(x => x.Alerts).WithOne(x => x.MasterPart).OnDelete(DeleteBehavior.NoAction);
 
             base.OnModelCreating(modelBuilder);
 

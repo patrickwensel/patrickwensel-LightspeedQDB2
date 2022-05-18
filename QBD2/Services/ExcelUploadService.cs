@@ -94,6 +94,70 @@ namespace QBD2.Services
 
         }
 
+        public async Task<AddPartsToAlertModel> AlertProcessSerialNumberExcelFile(string fileName, MasterPart masterPart)
+        {
+            AddPartsToAlertModel addPartsToAlertModel = new AddPartsToAlertModel();
+            List<string> excelRows = new List<string>();
+
+            if (this._appSettings.Value.FileUploadType.ToLower() == FileUploadType.Azure.ToString().ToLower())
+            {
+                CloudBlob file = await this._blobService.DownloadFile(fileName, this._appSettings.Value.FileUploadContainer);
+
+                if (await file.ExistsAsync())
+                {
+                    MemoryStream ms = new MemoryStream();
+                    await file.DownloadToStreamAsync(ms);
+
+                    DataSet dsexcelRecords = new DataSet();
+                    using (var reader = ExcelReaderFactory.CreateReader(file.OpenReadAsync().Result))
+                    {
+                        dsexcelRecords = reader.AsDataSet();
+
+                        if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
+                        {
+                            DataTable dtRecords = dsexcelRecords.Tables[0];
+                            if (dtRecords.Rows.Count > 1)
+                            {
+                                for (int i = 1; i < dtRecords.Rows.Count; i++)
+                                {
+                                    excelRows.Add(Convert.ToString(dtRecords.Rows[i][0]));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read))
+                {
+                    DataSet dsexcelRecords = new DataSet();
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        dsexcelRecords = reader.AsDataSet();
+
+                        if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
+                        {
+                            DataTable dtRecords = dsexcelRecords.Tables[0];
+                            if (dtRecords.Rows.Count > 1)
+                            {
+                                for (int i = 1; i < dtRecords.Rows.Count; i++)
+                                {
+                                    excelRows.Add(Convert.ToString(dtRecords.Rows[i][0]));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (excelRows.Count > 0)
+            {
+                addPartsToAlertModel = await _partService.AddPartsToAlertByList(masterPart, excelRows);
+            }
+            return addPartsToAlertModel;
+        }
+
         public async Task ProcessExcelFile(string fileName)
         {
             List<ExcelRow> excelRows = new List<ExcelRow>();

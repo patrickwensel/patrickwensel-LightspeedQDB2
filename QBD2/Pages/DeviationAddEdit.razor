@@ -417,7 +417,7 @@
             if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
             {
                 GridParts.AddRange(errors.Parts);
-                GridParts = new List<Part>(GridParts);
+                GridParts = new List<Part>(GridParts.Distinct().ToList());
             }
 
             if (errors != null && errors.AddPartsToDeviationError != null && errors.AddPartsToDeviationError.Count() > 0)
@@ -457,7 +457,7 @@
         if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
         {
             GridParts.AddRange(errors.Parts);
-            GridParts = new List<Part>(GridParts);
+            GridParts = new List<Part>(GridParts.Distinct().ToList());
         }
 
         if (errors != null && errors.AddPartsToDeviationError != null && errors.AddPartsToDeviationError.Count() > 0)
@@ -511,7 +511,7 @@
             }
             else
             {
-                toastService.ShowError("Record Not Saved ! Somwthing Worng", "Error");
+                toastService.ShowError("Record Not Saved ! Something Worng", "Error");
             }
         }
     }
@@ -563,7 +563,7 @@
                 }
 
                 GridParts.Add(resultPart);
-                GridParts = new List<Part>(GridParts);
+                GridParts = new List<Part>(GridParts.Distinct().ToList());
             }
         }
     }

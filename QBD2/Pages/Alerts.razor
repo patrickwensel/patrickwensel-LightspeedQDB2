@@ -1,7 +1,446 @@
 ﻿@page "/alerts"
+@using QBD2.Services
+@using QBD2.Entities
+@using QBD2.Models
+@inject AlertService AlertService
+@inject MasterPartService MasterPartService
+@inject PartService PartService
+@inject ExcelUploadService ExcelUploadService
+@inject IToastService toastService
+@inject NavigationManager NavigationManager
+@inject BlobService BlobService
+
+<style>
+    table, th, td {
+        border: 2px solid;
+    }
+
+    .RightButton {
+        height: 38px;
+        width: 75px;
+        margin-left: -32px;
+    }
+
+    .Width200 {
+        width: 200px;
+        left: 117px;
+    }
+
+    .SaveButton {
+        float: right;
+        width: 100px;
+        left: 72%;
+    }
+</style>
 
 <h3>Alerts</h3>
+@if (AddEditAlert == null)
+{
+    <TelerikGrid Data="@GridData"
+             Pageable="true"
+             Sortable="true"
+             FilterMode="@GridFilterMode.FilterRow">
+        <GridToolBar>
+            <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Alert</TelerikButton>
+        </GridToolBar>
+        <GridColumns>
+            <GridColumn Field="@(nameof(Alert.DateCreated))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}"/>
+            <GridColumn Field="@(nameof(Alert.Title))" Title="Title" Filterable="false"/>
+            <GridColumn Field="@(nameof(Alert.MasterPartNumber))" Title="Part Number" Filterable="false"/>
+            <GridColumn Field="@(nameof(Alert.MasterPartDescription))" Title="Description" Filterable="false"/>
+            <GridCommandColumn Width="150px">
+                 <GridCommandButton Icon="edit" OnClick="@((args)=> SelectRecord(args.Item as Alert))"></GridCommandButton>
+                 <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
+            </GridCommandColumn>
+        </GridColumns>
+    </TelerikGrid>
+}
+
+@if (AddEditAlert != null)
+{
+    <br />
+    <TelerikAutoComplete Data="@MasterParts" @bind-Value="@selectedMasterPart"
+                     ValueField="@( nameof(MasterPart.PartNumber) )"
+                     Filterable="true" MinLength="3"
+                     OnChange="@MyOnChangeHandler"
+                     ClearButton="true" />
+
+    <EditForm EditContext="@ECAddEditAlert">
+        <DataAnnotationsValidator />
+
+        <div class="form-group row">
+            <label for="PortDescription" class="col-sm-2 col-form-label">Part Description</label>
+            <div class="col-md-10">
+                <label style="padding-top:10px;">@selectedMasterPartDescription</label>
+            </div>
+        </div>
+
+         <div class="form-group row">
+            <div class="row">
+                <label for="Title" class="col-sm-8 col-form-label">Title</label>
+            </div>
+            <div class="row">
+                <div class="col-md-11">
+                    <TelerikTextBox @bind-Value="@AddEditAlert.Title" Class="form-control"></TelerikTextBox>
+                    <ValidationMessage For="@(() => AddEditAlert.Title)"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="row">
+                <label for="ExpirationDate" class="col-sm-8 col-form-label">Expiration Date</label>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <TelerikDatePicker @bind-Value="@AddEditAlert.ExpirationDate" Class="form-control" @ref="theDatePickerExpirationDate" Format="dd/MM/yyyy"></TelerikDatePicker>
+                    <ValidationMessage For="@(() => AddEditAlert.ExpirationDate)"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="row">
+                <label for="ReasonforManufacturingDeviation" class="col-sm-8 col-form-label">Reason for Manufacturing Deviation</label>
+            </div>
+            <div class="row">
+                <div class="col-md-11">
+                    <textarea @bind-value="AddEditAlert.ReasonforManufacturingDeviation" class="form-control" rows="8" @bind-value:event="oninput"></textarea>
+                    <ValidationMessage For="@(() => AddEditAlert.ReasonforManufacturingDeviation)"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+                <h5>Affected Serial Numbers</h5>
+                <hr>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <div class="row">
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" style="width:170px;" @bind-value="@SerialNumber"/>
+                    </div>
+                    <div class="col-md-2">
+                        <TelerikButton Class="RightButton" @onclick="(()=> btnAddFindSerailNumberOnClick())">Add</TelerikButton>
+                    </div>
+                </div><br />
+                <div class="form-group row" style="margin-left: 0px;">
+                    <TelerikGrid Data=@GridParts Sortable="true" Pageable="false">
+                         <GridColumns>
+                             <GridColumn Field=@nameof(Part.SerialNumber) Title="Serial Number" Filterable="false">
+                             </GridColumn>
+                         </GridColumns>
+                         <NoDataTemplate>
+                             <text>No Records Available</text>
+                         </NoDataTemplate>
+                    </TelerikGrid>
+                </div>
+            </div>
+            <div class="col-md-1" style="text-align:center;margin-top:82px;">OR</div>
+            <div class="col-md-3">
+                <form Model="@serialNumberRange" @onsubmit="OnSubmitRange">
+                    <div class="row">
+                        <label class="form-label">Range</label>
+                    </div>
+                    @if (RangeAddPartsToAlertError != null && RangeAddPartsToAlertError.Count() > 0)
+                    {
+                        <div class="row">
+                            @foreach(var item in RangeAddPartsToAlertError)
+                            {
+                                <label class="text-danger">@item.Error</label><br />
+                            }
+                        </div>
+                     }
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="form-group row">
+                        <label for="startSerialNumber" class="col-md-5 col-form-label">Start Serial Number</label>
+                        <div class="col-sm-5">
+                            <TelerikTextBox @bind-Value="@serialNumberRange.StartSerialNumber" Class="form-control"></TelerikTextBox>
+
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-top:15px;">
+                        <label for="endSerialNumber" class="col-md-5 col-form-label">End Serial Number</label>
+                        <div class="col-sm-5">
+                            <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control"></TelerikTextBox>
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-top:15px;">
+                        <TelerikButton Class="SaveButton">Add Range</TelerikButton>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-1" style="text-align:center;margin-top:82px;">OR</div>
+            <div class="col-md-3">
+                <div class="row">
+                    <label class="form-label">Upload Excel file with Serial Number List</label>
+                </div>
+                @if (ExcelAddPartsToAlertError != null && ExcelAddPartsToAlertError.Count() > 0)
+                {
+                    <div class="row">
+                        @foreach(var item in ExcelAddPartsToAlertError)
+                        {
+                            <label class="text-danger">@item.Error</label><br />
+                        }
+                    </div>
+                }
+                <br />
+                <div class="row">
+                    <form @onsubmit="OnSubmitExcelFile">
+                        <InputFile OnChange="OnInputFileChange" />
+                        <br /><br />
+                        <TelerikButton Class="SaveButton">Upload Selected File(s)</TelerikButton>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <TelerikButton Class="SaveButton" OnClick="(()=>HandleValidSubmit())">Save</TelerikButton>
+        </div>
+        <br />
+    </EditForm>
+}
 
 @code {
 
+    string selectedMasterPart { get; set; }
+
+    string selectedMasterPartDescription { get; set; }
+
+    string SerialNumber { get; set; }
+
+    public IEnumerable<MasterPart> MasterParts { get; set; }
+
+    List<Alert> GridData { get; set; }
+
+    Alert OriginalRecord { get; set; }
+
+    Alert AddEditAlert { get; set; }
+
+    EditContext ECAddEditAlert { get; set; }
+
+    List<Part> GridParts { get; set; } = new List<Part>();
+
+    List<AddPartsToAlertError> RangeAddPartsToAlertError { get; set; }
+
+    List<AddPartsToAlertError> ExcelAddPartsToAlertError { get; set; }
+
+    public Telerik.Blazor.Components.TelerikDatePicker<DateTime?> theDatePickerExpirationDate;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GridData = await AlertService.ReadAlerts();
+        MasterParts = MasterPartService.GetAllMasterParts();
+        base.OnInitialized();
+    }
+
+    public async Task SelectRecord(Alert alert)
+    {
+        OriginalRecord = null;
+        if (alert != null)
+        {
+            OriginalRecord = alert;
+            AddEditAlert = new Alert()
+            {
+                AlertId = OriginalRecord.AlertId,
+                DateCreated = OriginalRecord.DateCreated,
+                MasterPartId =  OriginalRecord.MasterPartId,
+                ReasonforManufacturingDeviation = OriginalRecord.ReasonforManufacturingDeviation,
+                Title = OriginalRecord.Title,
+                ExpirationDate = OriginalRecord.ExpirationDate
+            };
+
+            if (AddEditAlert.ExpirationDate.Equals(DateTime.MinValue))
+            {
+                    AddEditAlert.ExpirationDate = null;
+            }
+
+            selectedMasterPartDescription = OriginalRecord.MasterPart.Description;
+            selectedMasterPart = OriginalRecord.MasterPart.PartNumber;
+        }
+        else
+        {
+            AddEditAlert = new Alert();
+            AddEditAlert.AlertId = 0;
+        }
+
+        if (AddEditAlert != null)
+        {
+            ECAddEditAlert = new EditContext(AddEditAlert);
+        }
+        StateHasChanged();
+    }
+
+    string Message = "No file(s) selected";
+    IReadOnlyList<IBrowserFile> selectedFiles;
+
+    private void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFiles = e.GetMultipleFiles();
+        Message = $"{selectedFiles.Count} file(s) selected";
+        this.StateHasChanged();
+    }
+
+    private async void OnSubmitExcelFile()
+    {
+        if (AddEditAlert.MasterPartId == 0)
+        {
+            toastService.ShowError("Please Select Master Part", "Error");
+            return;
+        }
+
+        foreach (var file in selectedFiles)
+        {
+            var path = await BlobService.UploadBlob(file);
+            MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditAlert.MasterPartId).FirstOrDefault();
+
+            var errors = await ExcelUploadService.AlertProcessSerialNumberExcelFile(path, selectedMasterPart);
+            if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
+            {
+                GridParts.AddRange(errors.Parts);
+                GridParts = new List<Part>(GridParts.Distinct().ToList());
+            }
+
+            if (errors != null && errors.AddPartsToAlertError != null && errors.AddPartsToAlertError.Count() > 0)
+            {
+                ExcelAddPartsToAlertError = errors.AddPartsToAlertError;
+            }
+            else
+            {
+                ExcelAddPartsToAlertError = null;
+            }
+        }
+        Message = $"{selectedFiles.Count} file(s) uploaded on server";
+        this.StateHasChanged();
+    }
+
+    SerialNumberRange serialNumberRange = new();
+    private async void OnSubmitRange()
+    {
+        if (AddEditAlert.MasterPartId == 0)
+        {
+            toastService.ShowError("Please Select Master Part", "Error");
+            return;
+        }
+
+        MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditAlert.MasterPartId).FirstOrDefault();
+
+        var x = serialNumberRange;
+        var errors = await PartService.AddPartsToAlertByStartEnd(selectedMasterPart, Convert.ToInt32(serialNumberRange.StartSerialNumber), Convert.ToInt32(serialNumberRange.EndSerialNumber));
+
+        if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
+        {
+            GridParts.AddRange(errors.Parts);
+            GridParts = new List<Part>(GridParts.Distinct().ToList());
+        }
+
+        if (errors != null && errors.AddPartsToAlertError != null && errors.AddPartsToAlertError.Count() > 0)
+        {
+            RangeAddPartsToAlertError = errors.AddPartsToAlertError;
+
+        }
+        else
+        {
+            RangeAddPartsToAlertError = null;
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (AddEditAlert != null)
+        { 
+            if (AddEditAlert.MasterPartId == 0)
+            {
+                toastService.ShowError("Please Select Master Part", "Error");
+                return;
+            }
+
+            if (GridParts != null && GridParts.Count() > 0)
+            {
+                List<PartAlert> partAlerts = new List<PartAlert>();  
+                foreach(var part in GridParts)
+                {
+                    if (part.PartId > 0 && !partAlerts.Any(x=>x.PartId == part.PartId))
+                    {
+                        PartAlert partAlert = new PartAlert();
+                        partAlert.PartId = part.PartId;
+                        partAlerts.Add(partAlert);
+                    }
+                }
+                AddEditAlert.PartAlerts = partAlerts;
+            }
+
+            var resultAlert = await AlertService.CreateAlertAsync(AddEditAlert);
+            if (resultAlert != null && resultAlert.AlertId > 0)
+            {
+                toastService.ShowInfo("Record Saved Successfully", "Info");
+                SerialNumber = string.Empty;
+                GridParts.Clear();
+                NavigationManager.NavigateTo("alerts",true);
+                StateHasChanged();
+            }
+            else
+            {
+                toastService.ShowError("Record Not Saved ! Something Worng", "Error");
+            }
+        }
+    }
+
+    private void MyOnChangeHandler(object theUserChoice)
+    {
+        var result = string.Format("The user confirmed: {0}", (string)theUserChoice);
+
+        MasterPart selectedMasterPart = MasterParts.Where(x => x.PartNumber == (string)theUserChoice).FirstOrDefault();
+        if(selectedMasterPart != null)
+        {
+            selectedMasterPartDescription = selectedMasterPart.Description;
+            if (AddEditAlert == null)
+            {
+                 AddEditAlert = new Alert();
+            }
+            AddEditAlert.MasterPart = selectedMasterPart;
+            AddEditAlert.MasterPartId = selectedMasterPart.MasterPartId;
+            StateHasChanged();
+        }
+    }
+
+    private async Task btnAddFindSerailNumberOnClick()
+    {
+        if (string.IsNullOrEmpty(SerialNumber))
+        {
+            toastService.ShowError("Please Enter Serial Number", "Error");
+            return;
+        }
+
+        if(AddEditAlert != null && AddEditAlert.MasterPartId > 0 && !string.IsNullOrWhiteSpace(SerialNumber))
+        {
+            var resultPart = await PartService.GetPartBySerialNumberAndMasterPart(SerialNumber.Trim(),AddEditAlert.MasterPartId);
+            if (resultPart == null || resultPart.PartId == 0)
+            {
+                toastService.ShowError("No Record Found ! Please Enter Valid Serial Number", "Error");
+                return;
+            }
+
+            if (resultPart != null && resultPart.PartId > 0)
+            {
+                if(GridParts != null && GridParts.Count() > 0 && GridParts.Any(x => x.PartId == resultPart.PartId))
+                {
+                    toastService.ShowError("Serial Number already exists.");
+                    return;
+                }
+
+                GridParts.Add(resultPart);
+                GridParts = new List<Part>(GridParts.Distinct().ToList());
+            }
+        }
+    }
 }

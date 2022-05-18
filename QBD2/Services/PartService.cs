@@ -117,6 +117,66 @@ namespace QBD2.Services
             return addPartsToDeviationModel;
         }
 
+        public async Task<AddPartsToAlertModel> AddPartsToAlertByList(MasterPart masterPart, List<string> serialNumbers)
+        {
+            AddPartsToAlertModel addPartsToAlertModel = new AddPartsToAlertModel();
+            addPartsToAlertModel.AddPartsToAlertError = new List<AddPartsToAlertError>();
+            addPartsToAlertModel.Parts = new List<Part>();
+
+            List<SerialNumberSearchResult> serialNumberSearchResults = await _serialNumberService.GetSerialNumbersFromSageFromList(masterPart.Itemno, serialNumbers);
+
+            return await AddPartsToAlert(masterPart, addPartsToAlertModel, serialNumberSearchResults);
+        }
+
+        public async Task<AddPartsToAlertModel> AddPartsToAlertByStartEnd(MasterPart masterPart, int startSerialNumber, int endSerialNumber)
+        {
+            AddPartsToAlertModel addPartsToAlertModel = new AddPartsToAlertModel();
+            addPartsToAlertModel.AddPartsToAlertError = new List<AddPartsToAlertError>();
+            addPartsToAlertModel.Parts = new List<Part>();
+
+            List<SerialNumberSearchResult> serialNumberSearchResults = await _serialNumberService.GetSerialNumbersFromSage(masterPart.Itemno, startSerialNumber, endSerialNumber);
+
+            return await AddPartsToAlert(masterPart, addPartsToAlertModel, serialNumberSearchResults);
+        }
+
+        private async Task<AddPartsToAlertModel> AddPartsToAlert(MasterPart masterPart, AddPartsToAlertModel addPartsToAlertModel, List<SerialNumberSearchResult> serialNumberSearchResults)
+        {
+            foreach (SerialNumberSearchResult serialNumberSearchResult in serialNumberSearchResults)
+            {
+                if (serialNumberSearchResult.IsInSage == false)
+                {
+                    AddPartsToAlertError addPartsToAlertError = new AddPartsToAlertError
+                    {
+                        Error = "Serial Number: " + serialNumberSearchResult.SerialNumber + " was not listed in Stage"
+                    };
+                    addPartsToAlertModel.AddPartsToAlertError.Add(addPartsToAlertError);
+                }
+                else
+                {
+                    Part part;
+                    //Check if serial number is in Parts table
+                    part = await GetPartBySerialNumber(serialNumberSearchResult.SerialNumber);
+
+                    if (part == null)
+                    {
+                        Part newPart = new Part
+                        {
+                            MasterPartId = masterPart.MasterPartId,
+                            SerialNumber = serialNumberSearchResult.SerialNumber
+
+                        };
+                        _context.Parts.Add(newPart);
+                        await _context.SaveChangesAsync();
+                        part = newPart;
+                    }
+
+                    addPartsToAlertModel.Parts.Add(part);
+                }
+            }
+
+            return addPartsToAlertModel;
+        }
+
         public async Task<Part> GetPartBySerialNumberAndMasterPart(string serialNumber, int masterPartId)
         {
             Part part = null;
@@ -149,6 +209,17 @@ namespace QBD2.Services
     public class AddPartsToDeviationModel
     {
         public List<AddPartsToDeviationError> AddPartsToDeviationError { get; set; }
+        public List<Part> Parts { get; set; }
+    }
+
+    public class AddPartsToAlertError
+    {
+        public string Error { get; set; }
+    }
+
+    public class AddPartsToAlertModel
+    {
+        public List<AddPartsToAlertError> AddPartsToAlertError { get; set; }
         public List<Part> Parts { get; set; }
     }
 }

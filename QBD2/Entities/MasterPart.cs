@@ -18,6 +18,8 @@ namespace QBD2.Entities
         public virtual ProductFamily ProductFamily { get; set; }
 
         public virtual List<Deviation> Deviations { get; set; }
-        
+
+        public virtual List<Alert> Alerts { get; set; }
+
     }
 }

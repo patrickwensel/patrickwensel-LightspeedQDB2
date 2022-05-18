@@ -22,7 +22,7 @@ namespace QBD2.Services
 
         public async Task<List<Deviation>> ReadDeviations()
         {
-            var x = await _context.Deviations.Include(a=>a.MasterPart).ToListAsync();
+            var x = await _context.Deviations.Include(a=>a.MasterPart).Include(x=>x.PartDeviations).ThenInclude(b=>b.Part).ToListAsync();
             return x;
         }
 

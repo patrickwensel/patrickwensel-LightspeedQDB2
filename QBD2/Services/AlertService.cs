@@ -20,7 +20,7 @@ namespace QBD2.Services
 
         public async Task<List<Alert>> ReadAlerts()
         {
-            var x = await _context.Alerts.Include(a => a.MasterPart).ToListAsync();
+            var x = await _context.Alerts.Include(a => a.MasterPart).Include(x => x.PartAlerts).ThenInclude(b => b.Part).ToListAsync();
             return x;
         }
 

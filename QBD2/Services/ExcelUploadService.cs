@@ -19,13 +19,15 @@ namespace QBD2.Services
         private readonly PartService _partService;
         private IOptions<ApplicationSettings> _appSettings;
         private BlobService _blobService;
+        private SerialNumberService _serialNumberService;
 
-        public ExcelUploadService(ApplicationDbContext context, PartService partService, IOptions<ApplicationSettings> appSettings, BlobService blobService)
+        public ExcelUploadService(ApplicationDbContext context, PartService partService, IOptions<ApplicationSettings> appSettings, BlobService blobService, SerialNumberService serialNumberService)
         {
             _context = context;
             _partService = partService;
             _appSettings = appSettings;
             _blobService = blobService;
+            _serialNumberService = serialNumberService;
         }
 
         public async Task<AddPartsToDeviationModel> ProcessSerialNumberExcelFile(string fileName, MasterPart masterPart)
@@ -263,6 +265,14 @@ namespace QBD2.Services
                         var masterPart = masterParts.Where(p => p.PartNumber.ToLower() == pnItem.PN.ToLower() && p.ProductFamily != null && p.ProductFamily.Name.ToLower() == pnItem.ProductFamily.ToLower()).FirstOrDefault();
                         if (masterPart != null)
                         {
+                            //Is Part in Sage, this only applies to the Parent Part
+                            SerialNumberSearchResult serialNumberSearchResult = await _serialNumberService.GetSerialNumberFromSage(masterPart.Itemno,Convert.ToInt32(item));
+                            //If the part number is NOT in Sage, add an Error message
+                            
+
+
+                            //If in Sage, is it already in QDB2, if it is not in QDB2, add it
+
                             var part = _context.Parts.Where(p => p.SerialNumber.ToLower() == item.ToLower() && p.MasterPartId == masterPart.MasterPartId).FirstOrDefault();
                             if (part == null)
                             {

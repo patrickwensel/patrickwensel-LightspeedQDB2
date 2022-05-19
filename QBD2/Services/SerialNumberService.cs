@@ -17,6 +17,25 @@ namespace QBD2.Services
             _appSettings = appSettings;
         }
 
+        public async Task<SerialNumberSearchResult> GetSerialNumberFromSage(string itemId, int serialNumber)
+        {
+            SerialNumberSearchResult serialNumberSearchResult = new SerialNumberSearchResult
+            {
+                ItemId = itemId,
+                SerialNumber = serialNumber.ToString()
+            };
+
+            var serialNumberResult = await _sage300Context.Icxsers
+                .Where(x => x.Itemnum == serialNumberSearchResult.ItemId && x.Serialnum == serialNumberSearchResult.SerialNumber)
+                .FirstOrDefaultAsync();
+            if (serialNumberResult != null)
+                serialNumberSearchResult.IsInSage = true;
+            else
+                serialNumberSearchResult.IsInSage = false;
+
+            return serialNumberSearchResult;
+        }
+
         public async Task<List<SerialNumberSearchResult>> GetSerialNumbersFromSage(string itemId, int startSerialNumber, int endSerialNumber)
         {
             List<SerialNumberSearchResult> serialNumberSearchResults = new List<SerialNumberSearchResult>();

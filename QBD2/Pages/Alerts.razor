@@ -243,6 +243,7 @@
 
     public async Task SelectRecord(Alert alert)
     {
+        GridParts.Clear();
         OriginalRecord = null;
         if (alert != null)
         {
@@ -264,6 +265,23 @@
 
             selectedMasterPartDescription = OriginalRecord.MasterPart.Description;
             selectedMasterPart = OriginalRecord.MasterPart.PartNumber;
+
+            if (OriginalRecord.PartAlerts != null && OriginalRecord.PartAlerts.Count() > 0)
+            {
+                List<Part> partLists = new List<Part>();
+                foreach (var part in OriginalRecord.PartAlerts)
+                {
+                    if (part.PartId > 0 && !partLists.Any(x => x.PartId == part.PartId))
+                    {
+                        Part parts = new Part();
+                        parts.PartId = part.PartId;
+                        parts.SerialNumber = part.Part.SerialNumber;
+                        partLists.Add(parts);
+                    }
+                }
+                GridParts.AddRange(partLists);
+                GridParts = new List<Part>(GridParts.Distinct().ToList());
+            }
         }
         else
         {

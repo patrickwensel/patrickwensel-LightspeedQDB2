@@ -37,6 +37,7 @@ namespace QBD2.Services
             {
                 var objDeviation = _context.Deviations.Where(d => d.DeviationId == itemToInsert.DeviationId).FirstOrDefault();
                 objDeviation.MasterPartId = itemToInsert.MasterPartId;
+                objDeviation.Title = itemToInsert.Title;
                 objDeviation.Originator = itemToInsert.Originator;
                 objDeviation.ReasonforManufacturingDeviation = itemToInsert.ReasonforManufacturingDeviation;
                 objDeviation.ECORequired = itemToInsert.ECORequired;

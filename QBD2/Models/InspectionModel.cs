@@ -7,6 +7,7 @@
         public string SerialNumber { get; set; }
         public string PartNumber { get; set; }
         public int PartId { get; set; }
+        public int MasterPartId { get; set; }
         public Inspection Inspection { get; set; }
         public List<InspectionFailed> InspectionFailedList { get; set; }
 

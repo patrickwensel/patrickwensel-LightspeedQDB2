@@ -8,6 +8,7 @@ namespace QBD2.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int DeviationId { get; set; }
+        public string? Title { get; set; }
         public DateTime? DateCreated { get; set; }
         public string? Originator { get; set; }
         public string? ReasonforManufacturingDeviation { get; set; }

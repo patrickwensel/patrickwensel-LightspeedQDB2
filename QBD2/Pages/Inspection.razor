@@ -1,10 +1,15 @@
 ﻿@page "/inspection"
-
+@using QBD2.Models
 @using QBD2.Services
 @using QBD2.Entities
 @inject InspectionService InspectionService
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
+<style>
+    table, th, td {
+        border: 2px solid;
+    }
+</style>
 <h3>Inspection</h3>
 
 <div class="form-group row">
@@ -12,12 +17,26 @@
 
         <div class="row">
 
-            <div class="col-sm-8">
+            <div class="col-sm-7">
                 <TelerikTextBox id="txtSerialSearch" Class="form-control col-sm-12" @bind-Value="SerialNumber"></TelerikTextBox>
             </div>
-            <div class=" col-sm-4">
+            <div class=" col-sm-1">
                 <TelerikButton id="btnSearch" OnClick="@btnFindOnClick" ButtonType="@ButtonType.Submit">Find</TelerikButton>
             </div>
+             <div class=" col-sm-4">
+                <TelerikGrid Data=@GridAlertDeviationData Sortable="true" Pageable="false">
+                         <GridColumns>
+                             <GridColumn Field=@nameof(AlertDeviationDetailModel.Title) Title="Alert" Filterable="false">
+                             </GridColumn>
+                             <GridCommandColumn Width="60px">
+                                <GridCommandButton Icon="eye" OnClick="@((args)=> SelectAlertDeviationRecord(args.Item as AlertDeviationDetailModel))"></GridCommandButton>
+                             </GridCommandColumn>
+                         </GridColumns>
+                         <NoDataTemplate>
+                             <text>No Records Available</text>
+                         </NoDataTemplate>
+                    </TelerikGrid>
+             </div>
         </div>
         <br />
         <div class="row">
@@ -156,7 +175,233 @@
     </div>
 </div>
 
+@if(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)
+{
+        <TelerikWindow Visible="@(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)" Modal="true" Width="800px">
+            <WindowTitle>
+                @{
+                    <h5><i aria-hidden="true"></i>
+                    @if(SelectedAlertDeviationRecord.AlertId > 0)
+                    {
+                        <text>Alert Detail</text>
+                    }
+                    else if(SelectedAlertDeviationRecord.DeviationId > 0)
+                    {
+                        <text>Deviation Detail</text>
+                    }
+                    </h5>
+                }
+            </WindowTitle>
+            <WindowContent>
+            @if (SelectedAlertDeviationRecord.AlertId > 0)
+            {
+                 <div class="form-group row">
+                    <label for="Title" class="col-sm-4 col-form-label" style="font-weight:bold">Title</label>
+                    <div class="col-sm-8">
+                     <label for="Title" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.Alert.Title</label>
+                    </div>
+                 </div>
 
+                  <div class="form-group row">
+                    <label for="ReasonforManufacturingDeviation" class="col-sm-4 col-form-label" style="font-weight:bold">Reason for Manufacturing Deviation</label>
+                    <div class="col-sm-8">
+                     <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.Alert.ReasonforManufacturingDeviation</label>
+                    </div>
+                 </div>
+
+                 <div class="form-group row">
+                    <label for="DateCreated" class="col-sm-4 col-form-label" style="font-weight:bold">Date Created</label>
+                    <div class="col-sm-8">
+                        <label for="DateCreated" class="col-sm-12 col-form-label">:&ensp;
+                            @if (SelectedAlertDeviationRecord.Alert != null && SelectedAlertDeviationRecord.Alert.DateCreated != null)
+                            {
+                                @SelectedAlertDeviationRecord.Alert.DateCreated.Value.ToString("dd-MM-yyyy")
+                            }
+                     </label>
+                    </div>
+                 </div>
+
+                <div class="form-group row">
+                    <label for="ExpirationDate" class="col-sm-4 col-form-label" style="font-weight:bold">Expiration Date</label>
+                    <div class="col-sm-8">
+                        <label for="ExpirationDate" class="col-sm-12 col-form-label">:&ensp;
+                            @if (SelectedAlertDeviationRecord.Alert != null && SelectedAlertDeviationRecord.Alert.ExpirationDate != null)
+                            {
+                                @SelectedAlertDeviationRecord.Alert.ExpirationDate.Value.ToString("dd-MM-yyyy")
+                            }
+                     </label>
+                    </div>
+                 </div>
+
+                 <div class="form-group row">
+                    <label for="MasterPartNumber" class="col-sm-4 col-form-label" style="font-weight:bold">Master Part Number</label>
+                    <div class="col-sm-8">
+                     <label for="MasterPartNumber" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.MasterPartNumber</label>
+                    </div>
+                 </div>
+
+                 <div class="form-group row">
+                    <label for="MasterPartDescription" class="col-sm-4 col-form-label" style="font-weight:bold">Master Part Description</label>
+                    <div class="col-sm-8">
+                     <label for="MasterPartDescription" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.MasterPartDescription</label>
+                    </div>
+                 </div>
+            }
+            else if (SelectedAlertDeviationRecord.DeviationId > 0)
+            { 
+                <div class="form-group row">
+                    <label for="Title" class="col-sm-4 col-form-label" style="font-weight:bold">Title</label>
+                    <div class="col-sm-8">
+                     <label for="Title" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.Deviation.Title</label>
+                    </div>
+                 </div>
+
+                 <div class="form-group row">
+                    <label for="ReasonforManufacturingDeviation" class="col-sm-4 col-form-label" style="font-weight:bold">Reason for Manufacturing Deviation</label>
+                    <div class="col-sm-8">
+                     <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.Deviation.ReasonforManufacturingDeviation</label>
+                    </div>
+                 </div>
+
+                 <div class="form-group row">
+                        <div class="row">
+                            <label class="col-md-6 col-form-label" style="font-weight:bold">Location</label>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <table width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th width="25%"></th>
+                                            <th width="15%">SVRART</th>
+                                            <th width="15%">SEVE</th>
+                                            <th width="15%">2</th>
+                                            <th width="15%">WIP</th>
+                                            <th width="15%">3(FGI)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Vendor</td>
+                                            <td>@SelectedAlertDeviationRecord.Deviation.VendorSVPART</td>
+                                            <td>@SelectedAlertDeviationRecord.Deviation.VendorSEVE</td>
+                                            <td>@SelectedAlertDeviationRecord.Deviation.Vendor2</td>
+                                            <td>@SelectedAlertDeviationRecord.Deviation.VendorWIP</td>
+                                            <td>@SelectedAlertDeviationRecord.Deviation.Vendor3FGI</td>
+                                        </tr>
+                                        <tr>
+                                            <td>LSA</td>
+                                            <td>@SelectedAlertDeviationRecord.Deviation.LSASVPART</td>
+                                            <td>@SelectedAlertDeviationRecord.Deviation.LSASEVE</td>
+                                            <td>@SelectedAlertDeviationRecord.Deviation.LSA2</td>
+                                            <td>@SelectedAlertDeviationRecord.Deviation.LSAWIP</td>
+                                            <td>@SelectedAlertDeviationRecord.Deviation.LSAFGI</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                  </div>
+
+                <div class="form-group row">
+                    <label for="Title" class="col-sm-4 col-form-label" style="font-weight:bold">ECO Required</label>
+                    <div class="col-sm-8">
+                        <label for="ECORequired" class="col-sm-12 col-form-label">:&ensp;
+                            @if (SelectedAlertDeviationRecord.Deviation.ECORequired)
+                            {
+                                <text>Yes</text>
+                            }
+                            else
+                            {
+                                 <text>No</text>
+                            }
+                     </label>
+                    </div>
+               </div>
+
+                @if (SelectedAlertDeviationRecord.Deviation.ECORequired)
+                {
+                    <div class="form-group row">
+                        <label for="ECONumber" class="col-sm-4 col-form-label" style="font-weight:bold">ECO Number</label>
+                        <div class="col-sm-8">
+                            <label for="ECONumber" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.Deviation.ECONumber</label>
+                        </div>
+                    </div>
+                }
+
+                 <div class="form-group row">
+                    <label for="CommentCorrectiveAction" class="col-sm-4 col-form-label" style="font-weight:bold">Comment Corrective Action</label>
+                    <div class="col-sm-8">
+                     <label for="CommentCorrectiveAction" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.Deviation.CommentCorrectiveAction</label>
+                    </div>
+                 </div>
+
+                 <div class="form-group row">
+                    <label for="DateCreated" class="col-sm-4 col-form-label" style="font-weight:bold">Date Created</label>
+                    <div class="col-sm-8">
+                        <label for="DateCreated" class="col-sm-12 col-form-label">:&ensp;
+                            @if (SelectedAlertDeviationRecord.Deviation != null && SelectedAlertDeviationRecord.Deviation.DateCreated != null)
+                            {
+                                @SelectedAlertDeviationRecord.Deviation.DateCreated.Value.ToString("dd-MM-yyyy")
+                            }
+                     </label>
+                    </div>
+                 </div>
+
+                 <div class="form-group row">
+                    <label for="MasterPartNumber" class="col-sm-4 col-form-label" style="font-weight:bold">Master Part Number</label>
+                    <div class="col-sm-8">
+                     <label for="MasterPartNumber" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.MasterPartNumber</label>
+                    </div>
+                 </div>
+
+                 <div class="form-group row">
+                    <label for="MasterPartDescription" class="col-sm-4 col-form-label" style="font-weight:bold">Master Part Description</label>
+                    <div class="col-sm-8">
+                     <label for="MasterPartDescription" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.MasterPartDescription</label>
+                    </div>
+                 </div>
+            }
+
+            @if (SelectedAlertDeviationRecord.PartList != null && SelectedAlertDeviationRecord.PartList.Count() > 0)
+            {
+               <div class="form-group row">
+                <div class="row">
+                    <label for="PartDeviations" class="col-sm-8 col-form-label" style="font-weight:bold">
+                    @if(SelectedAlertDeviationRecord.AlertId > 0)
+                    {
+                        <text>Part Alerts</text>
+                    }
+                    else if(SelectedAlertDeviationRecord.DeviationId > 0)
+                    {
+                        <text>Part Deviations</text>
+                    }
+                    </label>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <TelerikGrid Data=@SelectedAlertDeviationRecord.PartList Sortable="true" Pageable="false">
+                             <GridColumns>
+                                 <GridColumn Field=@nameof(Part.SerialNumber) Title="Serial Number" Filterable="false">
+                                 </GridColumn>
+                             </GridColumns>
+                             <NoDataTemplate>
+                                 <text>No Records Available</text>
+                             </NoDataTemplate>
+                        </TelerikGrid>
+                    </div>
+                </div>
+                </div>
+               <br/>
+            }
+            <div class="form-row">
+                <div class="col-md-12 m-0 p-0" style="text-align: right;">
+                    <TelerikButton OnClick="(()=>ClearAlertDeviationSelection())">Close</TelerikButton>
+                </div>
+            </div>
+            </WindowContent>
+        </TelerikWindow>
+}
 @code {
     List<Entities.Inspection> MyData { get; set; }
     List<Models.InspectionFailed> dataFailureGrid { get; set; }
@@ -168,6 +413,9 @@
     Models.InspectionModel dataInspectionModel { get; set; }
     Models.Inspection dataInspection { get; set; }
 
+    List<Models.AlertDeviationDetailModel> GridAlertDeviationData { get; set; }
+    public Models.AlertDeviationDetailModel SelectedAlertDeviationRecord { get; set; }
+    public bool IsDisplayPopUpWindow { get; set; } = false;
 
     int DdlFailurePrimaryValue { get; set; }
     int DdlFailureValue { get; set; }
@@ -178,17 +426,27 @@
 
     protected override async Task OnInitializedAsync()
     {
-
         await GetGridData();
         GetDropDownData();
-
         RdoStatusValue = 1;
-
     }
 
     async Task GetGridData()
     {
         MyData = await InspectionService.Read();
+    }
+
+    async Task GetGridAlertDeviationData()
+    {
+        if (dataInspectionModel != null && dataInspectionModel.MasterPartId > 0)
+        {
+            GridAlertDeviationData = await InspectionService.ReadAlertAndDeviationDataByMasterPart(dataInspectionModel.MasterPartId);
+        }
+        else
+        {
+            GridAlertDeviationData = new List<Models.AlertDeviationDetailModel>();    
+        }
+        StateHasChanged();
     }
 
     void GetDropDownData()
@@ -269,6 +527,7 @@
         }
 
         dataInspectionModel = await InspectionService.GetDataBySerialNumber(SerialNumber.Trim());
+        await GetGridAlertDeviationData();
         if (dataInspectionModel == null)
         {
             toastService.ShowError("No Record Found ! Please Enter Valid Serial Number", "Error");
@@ -324,5 +583,23 @@
         {
             toastService.ShowError("Record Not Saved ! Something Worng", "Error");
         }
+    }
+
+    public async Task SelectAlertDeviationRecord(Models.AlertDeviationDetailModel item)
+    {
+        if (item != null)
+        {
+            SelectedAlertDeviationRecord = new  Models.AlertDeviationDetailModel();
+            SelectedAlertDeviationRecord = item;
+            IsDisplayPopUpWindow = true;
+        }
+        StateHasChanged();
+    }
+
+    public async Task ClearAlertDeviationSelection()
+    {
+        IsDisplayPopUpWindow = false;
+        SelectedAlertDeviationRecord  = new  Models.AlertDeviationDetailModel();
+        StateHasChanged();
     }
     }

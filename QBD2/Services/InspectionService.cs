@@ -26,6 +26,61 @@ namespace QBD2.Services
 
         }
 
+        public async Task<List<Models.AlertDeviationDetailModel>> ReadAlertAndDeviationDataByMasterPart(int masterPartId)
+        {
+            List<Models.AlertDeviationDetailModel> alertDeviationDetailModelList = new List<Models.AlertDeviationDetailModel>();
+            var alerDetailtList = await (from a in _context.Alerts
+                                  join mp in _context.MasterParts
+                                  on a.MasterPartId equals mp.MasterPartId
+                                  where a.MasterPartId == masterPartId
+                                  select new Models.AlertDeviationDetailModel
+                                  {
+                                      AlertId = a.AlertId,
+                                      Title = a.Title,
+                                      Alert = a,
+                                      DeviationId = 0,
+                                      MasterPartId = a.MasterPartId,
+                                      MasterPartNumber = mp.PartNumber,
+                                      MasterPartDescription = mp.Description,
+                                      PartList = (from pa in  _context.PartAlerts
+                                                  join p in _context.Parts on pa.PartId equals p.PartId
+                                                  where pa.AlertId == a.AlertId
+                                                  select p).ToList()
+                                  }).ToListAsync();
+
+            if(alerDetailtList != null && alerDetailtList.Count() > 0)
+            {
+                alertDeviationDetailModelList.AddRange(alerDetailtList);
+            }
+
+            var deviationsDetailtList = await (from d in _context.Deviations
+                                         join mp in _context.MasterParts
+                                         on d.MasterPartId equals mp.MasterPartId
+                                         where d.MasterPartId == masterPartId
+                                         select new Models.AlertDeviationDetailModel
+                                         {
+                                             DeviationId = d.DeviationId,
+                                             Title = d.Title,
+                                             Deviation = d,
+                                             AlertId = 0,
+                                             MasterPartId = d.MasterPartId,
+                                             MasterPartNumber = mp.PartNumber,
+                                             MasterPartDescription = mp.Description,
+                                             PartList = (from pd in _context.PartDeviations
+                                                         join p in _context.Parts on pd.PartId equals p.PartId
+                                                         where pd.DeviationId == d.DeviationId
+                                                         select p).ToList()
+                                         }
+                                  ).ToListAsync();
+
+            if (deviationsDetailtList != null && deviationsDetailtList.Count() > 0)
+            {
+                alertDeviationDetailModelList.AddRange(deviationsDetailtList);
+            }
+
+            return alertDeviationDetailModelList;
+        }
+
         public List<Models.DropDownBind> DropDownData(Models.Enum.DropDownType dropDownType, int? value)
         {
             var dropDownitemsList = new List<Models.DropDownBind>();
@@ -65,7 +120,8 @@ namespace QBD2.Services
                                             Description = mp.Description,
                                             Family = familyinfo != null ? familyinfo.Name : "",
                                             PartNumber = mp.PartNumber,
-                                            PartId = p.PartId
+                                            PartId = p.PartId,
+                                            MasterPartId = p.MasterPartId
                                         }
                                       ).FirstOrDefaultAsync();
 

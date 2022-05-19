@@ -160,8 +160,11 @@ namespace QBD2.Services
             return addPartsToAlertModel;
         }
 
-        public async Task ProcessExcelFile(string fileName)
+        public async Task<AddPartsToExcelUploadModel> ProcessExcelFile(string fileName)
         {
+            AddPartsToExcelUploadModel addPartsToExcelUploadModel = new AddPartsToExcelUploadModel();
+            addPartsToExcelUploadModel.AddPartsToExcelUploadError = new List<AddPartsToExcelUploadError>();
+            addPartsToExcelUploadModel.Parts = new List<Part>();
             List<ExcelRow> excelRows = new List<ExcelRow>();
             if (fileName.EndsWith(".xls"))
             {
@@ -267,12 +270,18 @@ namespace QBD2.Services
                         {
                             //Is Part in Sage, this only applies to the Parent Part
                             SerialNumberSearchResult serialNumberSearchResult = await _serialNumberService.GetSerialNumberFromSage(masterPart.Itemno,Convert.ToInt32(item));
-                            //If the part number is NOT in Sage, add an Error message
                             
-
+                            //If the part number is NOT in Sage, add an Error message
+                            if (serialNumberSearchResult.IsInSage == false)
+                            {
+                                AddPartsToExcelUploadError addPartsToExcelUploadError = new AddPartsToExcelUploadError
+                                {
+                                    Error = "Serial Number: " + serialNumberSearchResult.SerialNumber + " was not listed in Stage"
+                                };
+                                addPartsToExcelUploadModel.AddPartsToExcelUploadError.Add(addPartsToExcelUploadError);
+                            }
 
                             //If in Sage, is it already in QDB2, if it is not in QDB2, add it
-
                             var part = _context.Parts.Where(p => p.SerialNumber.ToLower() == item.ToLower() && p.MasterPartId == masterPart.MasterPartId).FirstOrDefault();
                             if (part == null)
                             {
@@ -315,7 +324,18 @@ namespace QBD2.Services
                     }
                 }
             }
+            return addPartsToExcelUploadModel;
         }
     }
 
+    public class AddPartsToExcelUploadError
+    {
+        public string Error { get; set; }
+    }
+
+    public class AddPartsToExcelUploadModel
+    {
+        public List<AddPartsToExcelUploadError> AddPartsToExcelUploadError { get; set; }
+        public List<Part> Parts { get; set; }
+    }
 }

@@ -8,14 +8,20 @@
 @inject ExcelUploadService ExcelUploadService
 @inject ApplicationSettings ApplicationSettings
 
-
 <h3>Upload CSV File</h3>
-
 @*<InputFile OnChange="@LoadFiles" multiple />*@
-
 <form @onsubmit="OnSubmit">
+    @if (AddPartsToExcelUploadError != null && AddPartsToExcelUploadError.Count() > 0)
+    {
+        <div class="row">
+            @foreach(var item in AddPartsToExcelUploadError)
+            {
+                <label class="text-danger">@item.Error</label><br />
+            }
+        </div>
+        <br/>
+     }
     <InputFile OnChange="OnInputFileChange" />
     <br /><br />
     <button type="submit">Upload Selected File(s)</button>
 </form>
-

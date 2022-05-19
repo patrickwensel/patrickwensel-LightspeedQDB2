@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazored.Toast.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Options;
 using QBD2.Data;
@@ -18,6 +19,10 @@ namespace QBD2.Pages.Admin
         [Inject]
         private ExcelUploadService _excelUploadService { get; set; }
 
+        [Inject]
+        private IToastService ToastService { get; set; }
+
+        public List<AddPartsToExcelUploadError> AddPartsToExcelUploadError { get; set; }
 
         string Message = "No file(s) selected";
         IReadOnlyList<IBrowserFile> selectedFiles;
@@ -32,27 +37,44 @@ namespace QBD2.Pages.Admin
         public async void OnSubmit()
         {
             string? path = null;
-            foreach (var file in selectedFiles)
+            if (selectedFiles != null)
             {
-                if (this._appSettings.Value.FileUploadType.ToLower() == FileUploadType.Local.ToString().ToLower())
+                foreach (var file in selectedFiles)
                 {
-                    Stream stream = file.OpenReadStream();
-                    path = _appSettings.Value.LocalFileUploadPath + file.Name;
-                    FileStream fs = File.Create(path);
-                    await stream.CopyToAsync(fs);
-                    stream.Close();
-                    fs.Close();
+                    if (this._appSettings.Value.FileUploadType.ToLower() == FileUploadType.Local.ToString().ToLower())
+                    {
+                        Stream stream = file.OpenReadStream();
+                        path = _appSettings.Value.LocalFileUploadPath + file.Name;
+                        FileStream fs = File.Create(path);
+                        await stream.CopyToAsync(fs);
+                        stream.Close();
+                        fs.Close();
 
-                    await _excelUploadService.ProcessExcelFile(path);
+                        var errors = await _excelUploadService.ProcessExcelFile(path);
+                        if (errors != null && errors.AddPartsToExcelUploadError != null && errors.AddPartsToExcelUploadError.Count() > 0)
+                        {
+                            AddPartsToExcelUploadError = errors.AddPartsToExcelUploadError;
+                        }
+                        else
+                        {
+                            AddPartsToExcelUploadError = null;
+                        }
+                        StateHasChanged();
+                    }
+                    else
+                    {
+
+                    }
                 }
-                else
-                {
 
-                }
-
+                Message = $"{selectedFiles.Count} file(s) uploaded on server";
+                this.StateHasChanged();
             }
-            Message = $"{selectedFiles.Count} file(s) uploaded on server";
-            this.StateHasChanged();
+            else
+            {
+                ToastService.ShowError("Please Select file", "Error");
+                return;
+            }
         }
     }
 }

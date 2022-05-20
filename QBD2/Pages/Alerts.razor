@@ -351,7 +351,7 @@
         MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditAlert.MasterPartId).FirstOrDefault();
 
         var x = serialNumberRange;
-        var errors = await PartService.AddPartsToAlertByStartEnd(selectedMasterPart, Convert.ToInt32(serialNumberRange.StartSerialNumber), Convert.ToInt32(serialNumberRange.EndSerialNumber));
+        var errors = await PartService.AddPartsToAlertByStartEnd(selectedMasterPart, long.Parse(serialNumberRange.StartSerialNumber), long.Parse(serialNumberRange.EndSerialNumber));
 
         if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
         {
@@ -442,7 +442,7 @@
         MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditAlert.MasterPartId).FirstOrDefault();
 
         var x = serialNumberRange;
-        var errors = await PartService.AddPartsToAlertByStartEnd(selectedMasterPart, Convert.ToInt32(SerialNumber), Convert.ToInt32(SerialNumber));
+        var errors = await PartService.AddPartsToAlertByStartEnd(selectedMasterPart, long.Parse(SerialNumber), long.Parse(SerialNumber));
 
         if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
         {

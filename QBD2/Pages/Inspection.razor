@@ -26,7 +26,7 @@
              <div class=" col-sm-4">
                 <TelerikGrid Data=@GridAlertDeviationData Sortable="true" Pageable="false">
                          <GridColumns>
-                             <GridColumn Field=@nameof(AlertDeviationDetailModel.Title) Title="Alert" Filterable="false">
+                            <GridColumn Field=@nameof(AlertDeviationDetailModel.Title) Title="Alerts & Deviations" Filterable="false">
                              </GridColumn>
                              <GridCommandColumn Width="60px">
                                 <GridCommandButton Icon="eye" OnClick="@((args)=> SelectAlertDeviationRecord(args.Item as AlertDeviationDetailModel))"></GridCommandButton>

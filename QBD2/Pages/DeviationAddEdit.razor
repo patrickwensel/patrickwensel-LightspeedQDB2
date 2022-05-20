@@ -363,7 +363,7 @@
             selectedMasterPartDescription = OriginalRecord.MasterPart.Description;
             selectedMasterPart = OriginalRecord.MasterPart.PartNumber;
 
-            
+
             if (OriginalRecord.PartDeviations != null && OriginalRecord.PartDeviations.Count() > 0)
             {
                 List<Part> partLists = new List<Part>();
@@ -447,7 +447,7 @@
 
         MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
 
-        var errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, Convert.ToInt32(serialNumberRange.StartSerialNumber), Convert.ToInt32(serialNumberRange.EndSerialNumber));
+        var errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, long.Parse(serialNumberRange.StartSerialNumber),long.Parse(serialNumberRange.EndSerialNumber));
         if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
         {
             GridParts.AddRange(errors.Parts);
@@ -475,7 +475,7 @@
             return;
         }
 
-                if (AddEditDeviation.MasterPartId == 0)
+        if (AddEditDeviation.MasterPartId == 0)
         {
             toastService.ShowError("Please Select Master Part", "Error");
             return;
@@ -483,7 +483,7 @@
 
         MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
 
-        var errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, Convert.ToInt32(SerialNumber), Convert.ToInt32(SerialNumber));
+        var errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, long.Parse(SerialNumber), long.Parse(SerialNumber));
         if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
         {
             GridParts.AddRange(errors.Parts);

@@ -67,7 +67,7 @@ namespace QBD2.Services
             return await AddPartsToDeviation(masterPart, addPartsToDeviationModel, serialNumberSearchResults);
         }
 
-        public async Task<AddPartsToDeviationModel> AddPartsToDeviationByStartEnd(MasterPart masterPart, int startSerialNumber, int endSerialNumber)
+        public async Task<AddPartsToDeviationModel> AddPartsToDeviationByStartEnd(MasterPart masterPart, long startSerialNumber, long endSerialNumber)
         {
             AddPartsToDeviationModel addPartsToDeviationModel = new AddPartsToDeviationModel();
             addPartsToDeviationModel.AddPartsToDeviationError = new List<AddPartsToDeviationError>();
@@ -128,7 +128,7 @@ namespace QBD2.Services
             return await AddPartsToAlert(masterPart, addPartsToAlertModel, serialNumberSearchResults);
         }
 
-        public async Task<AddPartsToAlertModel> AddPartsToAlertByStartEnd(MasterPart masterPart, int startSerialNumber, int endSerialNumber)
+        public async Task<AddPartsToAlertModel> AddPartsToAlertByStartEnd(MasterPart masterPart, long startSerialNumber, long endSerialNumber)
         {
             AddPartsToAlertModel addPartsToAlertModel = new AddPartsToAlertModel();
             addPartsToAlertModel.AddPartsToAlertError = new List<AddPartsToAlertError>();

@@ -36,11 +36,11 @@ namespace QBD2.Services
             return serialNumberSearchResult;
         }
 
-        public async Task<List<SerialNumberSearchResult>> GetSerialNumbersFromSage(string itemId, int startSerialNumber, int endSerialNumber)
+        public async Task<List<SerialNumberSearchResult>> GetSerialNumbersFromSage(string itemId, long startSerialNumber, long endSerialNumber)
         {
             List<SerialNumberSearchResult> serialNumberSearchResults = new List<SerialNumberSearchResult>();
 
-            for (int i = startSerialNumber; i < endSerialNumber + 1;)
+            for (long i = startSerialNumber; i < endSerialNumber + 1;)
             {
                 SerialNumberSearchResult serialNumberSearch = new SerialNumberSearchResult
                 {

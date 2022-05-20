@@ -43,7 +43,7 @@ namespace QBD2.Services
                 {
                     MemoryStream ms = new MemoryStream();
                     await file.DownloadToStreamAsync(ms);
-                   
+
                     DataSet dsexcelRecords = new DataSet();
                     using (var reader = ExcelReaderFactory.CreateReader(file.OpenReadAsync().Result))
                     {
@@ -210,132 +210,110 @@ namespace QBD2.Services
 
             if (excelRows.Count > 0)
             {
-                List<Entities.MasterPart> masterPartsList = new List<Entities.MasterPart>();
+                //List<string> distinctMasterParts = new List<string>();
+                var distinctMasterParts = excelRows.Select(m => new { m.PN }).Distinct().ToList();
 
-                var pnProductFamilyList = excelRows.Where(q => q.PN != null && q.ProductFamily != null).Select(m => new { m.PN, m.ProductFamily }).Distinct().ToList();
-                List<Entities.ProductFamily> productFamiliesList = _context.ProductFamilies.ToList();
-                foreach (var item in pnProductFamilyList)
+                foreach (var part in distinctMasterParts)
                 {
-                    int? productFamilyId = null;
-                    if (!string.IsNullOrWhiteSpace(item.ProductFamily))
-                    {
-                        var productFamilies = productFamiliesList.Where(q => q.Name.ToLower() == item.ProductFamily.ToLower()).FirstOrDefault();
-                        if (productFamilies != null)
-                        {
-                            productFamilyId = productFamilies.ProductFamilyId;
-                        }
-                    }
-                    var isPartNumberAvailabe = _context.MasterParts.Any(p => p.ProductFamilyId == productFamilyId && p.PartNumber.ToLower() == item.PN.ToLower());
-                    if (!isPartNumberAvailabe)
-                    {
-                        Entities.MasterPart masterPart = new Entities.MasterPart
-                        {
-                            PartNumber = item.PN.ToString(),
-                            ProductFamilyId = productFamilyId,
-                            Description = item.ProductFamily ?? String.Empty
-                        };
-                        masterPartsList.Add(masterPart);
-                    }
-                }
+                    // is it in the Mater Parts table
+                    MasterPart masterPart = _context.MasterParts.Where(p => p.PartNumber == part.PN).FirstOrDefault();
 
-                var partNumberProductFamilyList = excelRows.Where(q => q.PartNumber != null).Select(m => new { m.PartNumber, m.PartDescription }).Distinct().ToList();
-                foreach (var item in partNumberProductFamilyList)
-                {
-                    var isPartNumberAvailabe = _context.MasterParts.Any(p => p.PartNumber.ToLower() == item.PartNumber.ToLower());
-                    if (!isPartNumberAvailabe)
+                    //if not, throw an error
+                    if (masterPart == null)
                     {
-                        Entities.MasterPart masterPart = new Entities.MasterPart
+                        AddPartsToExcelUploadError addPartsToExcelUploadError = new AddPartsToExcelUploadError
                         {
-                            PartNumber = item.PartNumber,
-                            ProductFamilyId = null,
-                            Description = item.PartDescription ?? String.Empty
+                            Error = "Master Part number: " + part.PN + " is not in Sage"
                         };
-                        masterPartsList.Add(masterPart);
+
+                        addPartsToExcelUploadModel.AddPartsToExcelUploadError.Add(addPartsToExcelUploadError);
                     }
-                }
-                if (masterPartsList.Count > 0)
-                {
-                    _context.MasterParts.AddRange(masterPartsList);
-                    await _context.SaveChangesAsync();
-                }
-                var masterParts = _context.MasterParts.Include(q => q.ProductFamily).ToList();
-                foreach (var pnItem in pnProductFamilyList)
-                {
-                    var pnSNList = excelRows.Where(q => q.SN != null && q.PN == pnItem.PN && q.ProductFamily == pnItem.ProductFamily).Select(q => q.SN).Distinct().ToList();
-                    foreach (var item in pnSNList)
+                    else
                     {
-                        var partsList = new List<Entities.Part>();
-                        var masterPart = masterParts.Where(p => p.PartNumber.ToLower() == pnItem.PN.ToLower() && p.ProductFamily != null && p.ProductFamily.Name.ToLower() == pnItem.ProductFamily.ToLower()).FirstOrDefault();
-                        if (masterPart != null)
+
+                        //if it is, get a list of distinct PNs
+
+                        var distinctPartSerialNumbers = excelRows.Where(z => z.PN == part.PN).Select(m => new { m.SN }).Distinct().ToList();
+
+                        //loop over PNs and make sure they are in Sage with the correct ItemNum
+
+                        foreach (var serialNumber in distinctPartSerialNumbers)
                         {
-                            //Is Part in Sage, this only applies to the Parent Part
-                            SerialNumberSearchResult serialNumberSearchResult = await _serialNumberService.GetSerialNumberFromSage(masterPart.Itemno,Convert.ToInt32(item));
-                            
-                            //If the part number is NOT in Sage, add an Error message
+                            SerialNumberSearchResult serialNumberSearchResult = await _serialNumberService.GetSerialNumberFromSage(masterPart.Itemno, Convert.ToInt32(serialNumber.SN));
+                            //If not, throw an error
                             if (serialNumberSearchResult.IsInSage == false)
                             {
                                 AddPartsToExcelUploadError addPartsToExcelUploadError = new AddPartsToExcelUploadError
                                 {
-                                    Error = "Serial Number: " + serialNumberSearchResult.SerialNumber + " was not listed in Stage"
+                                    Error = "Serial number: " + serialNumber.SN + " is not in Sage"
                                 };
+
                                 addPartsToExcelUploadModel.AddPartsToExcelUploadError.Add(addPartsToExcelUploadError);
                             }
-
-                            //If in Sage, is it already in QDB2, if it is not in QDB2, add it
-                            var part = _context.Parts.Where(p => p.SerialNumber.ToLower() == item.ToLower() && p.MasterPartId == masterPart.MasterPartId).FirstOrDefault();
-                            if (part == null)
+                            else
                             {
-                                part = new Entities.Part
+                                // if they are in Sage, check if they are in the Parts list
+                                var partFromQDB = _context.Parts.Where(p => p.SerialNumber.ToLower() == serialNumber.SN.ToLower() && p.MasterPartId == masterPart.MasterPartId).FirstOrDefault();
+                                if (partFromQDB == null)
                                 {
-                                    SerialNumber = item,
-                                    MasterPartId = masterPart.MasterPartId,
-                                    ParentPartId = null
-                                };
-                                _context.Parts.Add(part);
-                                await _context.SaveChangesAsync();
-                            }
-
-                            var childParts = excelRows.Where(q => q.SN == item && q.PN == pnItem.PN && q.PartNumber != null && q.SerialNumber != null && q.ProductFamily == pnItem.ProductFamily).ToList();
-                            foreach (var childItem in childParts)
-                            {
-                                var childMasterPart = masterParts.Where(p => p.PartNumber.ToLower() == childItem.PartNumber.ToLower()).FirstOrDefault();
-                                if (childMasterPart != null)
-                                {
-                                    var isSerialNumberAvailabe = _context.Parts.Any(p => p.MasterPartId == childMasterPart.MasterPartId && p.ParentPartId == part.PartId && p.SerialNumber.ToLower() == childItem.SerialNumber.ToLower());
-                                    if (!isSerialNumberAvailabe)
+                                    //If not add them to the parts list
+                                    partFromQDB = new Entities.Part
                                     {
+                                        SerialNumber = serialNumber.SN,
+                                        MasterPartId = masterPart.MasterPartId,
+                                        ParentPartId = null
+                                    };
+                                    _context.Parts.Add(partFromQDB);
+                                    await _context.SaveChangesAsync();
+                                }
+
+                                var childParts = excelRows.Where(q => q.SN == serialNumber.SN && q.PN == part.PN && q.PartNumber != null && q.SerialNumber != null).ToList();
+                                var partsList = new List<Entities.Part>();
+                                foreach (var childItem in childParts)
+                                {
+                                    // Loop over all the child parts and see if they are in the Parts table
+                                    //Child parts do not need to be in Sage
+                                    Part childPartFromQDB = _context.Parts.Where(p => p.SerialNumber.ToLower() == childItem.SerialNumber.ToLower() && p.MasterPartId == masterPart.MasterPartId  && p.ParentPartId == partFromQDB.PartId).FirstOrDefault();
+
+                                    //If they are in the Parts table already, update the values
+                                    if (childPartFromQDB == null)
+                                    {
+                                        //If they are not in the Parts table, add them
                                         var childPart = new Entities.Part
                                         {
                                             SerialNumber = childItem.SerialNumber,
-                                            MasterPartId = childMasterPart.MasterPartId,
-                                            ParentPartId = part.PartId
+                                            MasterPartId = masterPart.MasterPartId,
+                                            ParentPartId = partFromQDB.PartId
                                         };
 
                                         partsList.Add(childPart);
+
                                     }
+
                                 }
-                            }
-                            if (partsList.Count > 0)
-                            {
-                                _context.Parts.AddRange(partsList);
-                                await _context.SaveChangesAsync();
+                                if (partsList.Count > 0)
+                                {
+                                    _context.Parts.AddRange(partsList);
+                                    await _context.SaveChangesAsync();
+                                }
                             }
                         }
                     }
                 }
             }
+
             return addPartsToExcelUploadModel;
         }
-    }
 
-    public class AddPartsToExcelUploadError
-    {
-        public string Error { get; set; }
-    }
+        public class AddPartsToExcelUploadError
+        {
+            public string Error { get; set; }
+        }
 
-    public class AddPartsToExcelUploadModel
-    {
-        public List<AddPartsToExcelUploadError> AddPartsToExcelUploadError { get; set; }
-        public List<Part> Parts { get; set; }
+        public class AddPartsToExcelUploadModel
+        {
+            public List<AddPartsToExcelUploadError> AddPartsToExcelUploadError { get; set; }
+            public List<Part> Parts { get; set; }
+        }
     }
 }

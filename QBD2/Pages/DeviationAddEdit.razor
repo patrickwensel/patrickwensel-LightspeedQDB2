@@ -10,6 +10,7 @@
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
 @inject BlobService BlobService
+@inject IJSRuntime JSRuntime
 
 <style>
     table, th, td {
@@ -199,7 +200,7 @@
             <div class="col-md-2">
                 <div class="row">
                     <div class="col-md-10">
-                        <input type="text" class="form-control" style="width:170px;" @bind-value="@SerialNumber" />
+                        <input type="text" class="form-control numeric" style="width:170px;" @bind-value="@SerialNumber" />
                     </div>
                     <div class="col-md-2">
                         <TelerikButton Class="RightButton" @onclick="(()=> btnAddFindSerailNumberOnClick())">Add</TelerikButton>
@@ -260,14 +261,14 @@
                     <div class="form-group row">
                         <label for="startSerialNumber" class="col-md-5 col-form-label">Start Serial Number</label>
                         <div class="col-sm-5">
-                            <TelerikTextBox @bind-Value="@serialNumberRange.StartSerialNumber" Class="form-control"></TelerikTextBox>
-
+                            <TelerikTextBox @bind-Value="@serialNumberRange.StartSerialNumber" Class="form-control numeric"></TelerikTextBox>
+                            
                         </div>
                     </div>
                     <div class="form-group row" style="margin-top:15px;">
                         <label for="endSerialNumber" class="col-md-5 col-form-label">End Serial Number</label>
                         <div class="col-sm-5">
-                            <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control"></TelerikTextBox>
+                            <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control numeric"></TelerikTextBox>
                         </div>
                     </div>
                     <div class="form-group row" style="margin-top:15px;">
@@ -333,6 +334,7 @@
 
     public async Task SelectRecord(Deviation deviation)
     {
+        await JSRuntime.InvokeVoidAsync("onlyAllowNumbers");
         GridParts.Clear();
         OriginalRecord = null;
         if (deviation != null)
@@ -445,26 +447,55 @@
             return;
         }
 
-        MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
-
-        var errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, long.Parse(serialNumberRange.StartSerialNumber),long.Parse(serialNumberRange.EndSerialNumber));
-        if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
+        if (string.IsNullOrEmpty(serialNumberRange.StartSerialNumber))
         {
-            GridParts.AddRange(errors.Parts);
-            GridParts = new List<Part>(GridParts.Distinct().ToList());
+            toastService.ShowError("Please Enter Start Serial Number", "Error");
+            return;
         }
 
-        if (errors != null && errors.AddPartsToDeviationError != null && errors.AddPartsToDeviationError.Count() > 0)
+        if (string.IsNullOrEmpty(serialNumberRange.EndSerialNumber))
         {
-            RangeAddPartsToDeviationError = errors.AddPartsToDeviationError;
-
-        }
-        else
-        {
-            RangeAddPartsToDeviationError = null;
+            toastService.ShowError("Please Enter End Serial Number", "Error");
+            return;
         }
 
-        StateHasChanged();
+        if (!string.IsNullOrWhiteSpace(serialNumberRange.StartSerialNumber) && !string.IsNullOrWhiteSpace(serialNumberRange.EndSerialNumber))
+        {
+            try
+            {
+                if (long.Parse(serialNumberRange.StartSerialNumber) > long.Parse(serialNumberRange.EndSerialNumber) )
+                {
+                    toastService.ShowError("Start serial number lower than end serial number.", "Error");
+                    return;
+                }
+            }
+            catch(Exception ex)
+            {
+                toastService.ShowError("Please enter valid serial number.", "Error");
+                return;
+            }
+
+            MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
+
+            var errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, long.Parse(serialNumberRange.StartSerialNumber),long.Parse(serialNumberRange.EndSerialNumber));
+            if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
+            {
+                GridParts.AddRange(errors.Parts);
+                GridParts = new List<Part>(GridParts.Distinct().ToList());
+            }
+
+            if (errors != null && errors.AddPartsToDeviationError != null && errors.AddPartsToDeviationError.Count() > 0)
+            {
+                RangeAddPartsToDeviationError = errors.AddPartsToDeviationError;
+
+            }
+            else
+            {
+                RangeAddPartsToDeviationError = null;
+            }
+
+            StateHasChanged();
+        }
     }
 
     private async Task btnAddFindSerailNumberOnClick()
@@ -482,8 +513,18 @@
         }
 
         MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
+        AddPartsToDeviationModel errors = null;
 
-        var errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, long.Parse(SerialNumber), long.Parse(SerialNumber));
+        try
+        {
+             errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, long.Parse(SerialNumber), long.Parse(SerialNumber));
+        }
+        catch (Exception ex)
+        {
+             toastService.ShowError("Please enter valid serial number.", "Error");
+             return;
+        }
+
         if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
         {
             GridParts.AddRange(errors.Parts);

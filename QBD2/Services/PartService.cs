@@ -73,6 +73,16 @@ namespace QBD2.Services
             addPartsToDeviationModel.AddPartsToDeviationError = new List<AddPartsToDeviationError>();
             addPartsToDeviationModel.Parts = new List<Part>();
 
+            if (startSerialNumber > endSerialNumber)
+            {
+                AddPartsToDeviationError addPartsToDeviationError = new AddPartsToDeviationError
+                {
+                    Error = "Start serial number lower than end serial number."
+                };
+                addPartsToDeviationModel.AddPartsToDeviationError.Add(addPartsToDeviationError);
+                return addPartsToDeviationModel;
+            }
+
             List<SerialNumberSearchResult> serialNumberSearchResults = await _serialNumberService.GetSerialNumbersFromSage(masterPart.Itemno, startSerialNumber, endSerialNumber);
 
             return await AddPartsToDeviation(masterPart, addPartsToDeviationModel, serialNumberSearchResults);
@@ -133,6 +143,16 @@ namespace QBD2.Services
             AddPartsToAlertModel addPartsToAlertModel = new AddPartsToAlertModel();
             addPartsToAlertModel.AddPartsToAlertError = new List<AddPartsToAlertError>();
             addPartsToAlertModel.Parts = new List<Part>();
+
+            if (startSerialNumber > endSerialNumber)
+            {
+                AddPartsToAlertError addPartsToAlertError = new AddPartsToAlertError
+                {
+                    Error = "Start serial number lower than end serial number."
+                };
+                addPartsToAlertModel.AddPartsToAlertError.Add(addPartsToAlertError);
+                return addPartsToAlertModel;
+            }
 
             List<SerialNumberSearchResult> serialNumberSearchResults = await _serialNumberService.GetSerialNumbersFromSage(masterPart.Itemno, startSerialNumber, endSerialNumber);
 

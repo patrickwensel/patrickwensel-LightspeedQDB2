@@ -22,6 +22,7 @@ namespace QBD2.Data
         public DbSet<Station> Stations { get; set; }
         public DbSet<Alert> Alerts { get; set; }
         public DbSet<PartAlert> PartAlerts { get; set; }
+        public DbSet<GLCode> GLCodes { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

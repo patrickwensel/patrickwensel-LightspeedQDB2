@@ -112,7 +112,8 @@ namespace QBD2.Services
                         Part newPart = new Part
                         {
                             MasterPartId = masterPart.MasterPartId,
-                            SerialNumber = serialNumberSearchResult.SerialNumber
+                            SerialNumber = serialNumberSearchResult.SerialNumber,
+                            PartStatusId = 1
 
                         };
                         _context.Parts.Add(newPart);
@@ -182,7 +183,8 @@ namespace QBD2.Services
                         Part newPart = new Part
                         {
                             MasterPartId = masterPart.MasterPartId,
-                            SerialNumber = serialNumberSearchResult.SerialNumber
+                            SerialNumber = serialNumberSearchResult.SerialNumber,
+                            PartStatusId = 1
 
                         };
                         _context.Parts.Add(newPart);

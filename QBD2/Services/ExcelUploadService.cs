@@ -261,6 +261,7 @@ namespace QBD2.Services
                                     {
                                         SerialNumber = serialNumber.SN,
                                         MasterPartId = masterPart.MasterPartId,
+                                        PartStatusId = 1,
                                         ParentPartId = null
                                     };
                                     _context.Parts.Add(partFromQDB);
@@ -283,6 +284,7 @@ namespace QBD2.Services
                                         {
                                             SerialNumber = childItem.SerialNumber,
                                             MasterPartId = masterPart.MasterPartId,
+                                            PartStatusId = 1,
                                             ParentPartId = partFromQDB.PartId
                                         };
 

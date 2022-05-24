@@ -23,6 +23,8 @@ namespace QBD2.Data
         public DbSet<Alert> Alerts { get; set; }
         public DbSet<PartAlert> PartAlerts { get; set; }
         public DbSet<GLCode> GLCodes { get; set; }
+        public DbSet<FailureCode> FailureCodes { get; set; }
+        public DbSet<PartStatus> PartStatuses { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -86,6 +88,31 @@ namespace QBD2.Data
 
             modelBuilder.Entity<FailureType>().HasData(new FailureType { FailureTypeId = 1, Name = "Color", FailureTypePrimaryId = 1 });
             // Need to add the rest
+
+            #endregion
+
+            #region GLCode
+
+            modelBuilder.Entity<GLCode>().HasData(new GLCode { GLCodeId = 1, Name = "5471 - Refurbish Parts" });
+            modelBuilder.Entity<GLCode>().HasData(new GLCode { GLCodeId = 2, Name = "5490 - Cost of Service Parts" });
+            modelBuilder.Entity<GLCode>().HasData(new GLCode { GLCodeId = 3, Name = "5493 - Conversion Costs" });
+
+            #endregion
+
+            #region FailureCode
+
+            modelBuilder.Entity<FailureCode>().HasData(new FailureCode { FailureCodeId = 1, Name = "Battery Box" }); 
+            modelBuilder.Entity<FailureCode>().HasData(new FailureCode { FailureCodeId = 2, Name = "Active, Comm Audio" });
+            modelBuilder.Entity<FailureCode>().HasData(new FailureCode { FailureCodeId = 3, Name = "Cable" });
+            modelBuilder.Entity<FailureCode>().HasData(new FailureCode { FailureCodeId = 4, Name = "Other Noise" });
+            modelBuilder.Entity<FailureCode>().HasData(new FailureCode { FailureCodeId = 5, Name = "Headband Sliders" });
+
+            #endregion
+
+            #region PartStatus
+
+            modelBuilder.Entity<PartStatus>().HasData(new PartStatus { PartStatusId = 1, Name = "Active" });
+            modelBuilder.Entity<PartStatus>().HasData(new PartStatus { PartStatusId = 2, Name = "Removed" });
 
             #endregion
 

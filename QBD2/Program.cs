@@ -47,6 +47,9 @@ builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<SerialNumberService>();
 builder.Services.AddScoped<BlobService>();
 builder.Services.AddScoped<AlertService>();
+builder.Services.AddScoped<GLCodeService>();
+builder.Services.AddScoped<FailureCodeService>();
+builder.Services.AddScoped<PartStatusService>();
 builder.Services.AddScoped<ApplicationSettings>();
 builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformer>();
 

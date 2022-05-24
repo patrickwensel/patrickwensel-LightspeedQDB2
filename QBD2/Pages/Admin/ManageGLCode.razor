@@ -1,0 +1,74 @@
+﻿@page "/manageglcode"
+@using QBD2.Services
+@using QBD2.Entities
+@inject GLCodeService GLCodeService
+
+<h3>GL Code</h3>
+
+<TelerikGrid Data="@MyData" 
+             Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
+             Resizable="true" 
+             EditMode="Telerik.Blazor.GridEditMode.Popup"
+             OnUpdate=@UpdateHandler
+             OnDelete=@DeleteHandler
+             OnCreate=@CreateHandler>
+             <GridToolBar>
+                <GridCommandButton Command="Add" Icon="add">Add a GL Code</GridCommandButton>
+            </GridToolBar>
+            <GridColumns>
+                <GridColumn Field="@(nameof(GLCode.Name))" Title="Name" Groupable="false" />
+                        <GridCommandColumn>
+                    <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
+                    <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
+                    <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
+                    <GridCommandButton Command="Cancel" Icon="cancel" ShowInEdit="true">Cancel</GridCommandButton>
+                </GridCommandColumn>
+            </GridColumns>
+</TelerikGrid>
+
+@code {
+
+    List<GLCode> MyData { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetGridData();
+    }
+
+    async Task GetGridData()
+    {
+        MyData = await GLCodeService.Read();
+    }
+
+    async Task UpdateHandler(GridCommandEventArgs args)
+    {
+        GLCode item = (GLCode)args.Item;
+
+        await GLCodeService.Update(item);
+
+        await GetGridData();
+    }
+
+    async Task DeleteHandler(GridCommandEventArgs args)
+    {
+        GLCode item = (GLCode)args.Item;
+
+        await GLCodeService.Delete(item);
+
+        await GetGridData();
+    }
+
+    async Task CreateHandler(GridCommandEventArgs args)
+    {
+        GLCode item = (GLCode)args.Item;
+
+        await GLCodeService.Create(item);
+
+        await GetGridData();
+    }
+
+    async Task CancelHandler(GridCommandEventArgs args)
+    {
+        GLCode item = (GLCode)args.Item;
+    }
+}

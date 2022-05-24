@@ -1,0 +1,74 @@
+﻿@page "/managepartstatus"
+@using QBD2.Services
+@using QBD2.Entities
+@inject PartStatusService PartStatusService
+
+<h3>Part Status</h3>
+
+<TelerikGrid Data="@MyData" 
+             Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
+             Resizable="true" 
+             EditMode="Telerik.Blazor.GridEditMode.Popup"
+             OnUpdate=@UpdateHandler
+             OnDelete=@DeleteHandler
+             OnCreate=@CreateHandler>
+             <GridToolBar>
+                <GridCommandButton Command="Add" Icon="add">Add a Part Status</GridCommandButton>
+            </GridToolBar>
+            <GridColumns>
+                <GridColumn Field="@(nameof(PartStatus.Name))" Title="Name" Groupable="false" />
+                        <GridCommandColumn>
+                    <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
+                    <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
+                    <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
+                    <GridCommandButton Command="Cancel" Icon="cancel" ShowInEdit="true">Cancel</GridCommandButton>
+                </GridCommandColumn>
+            </GridColumns>
+</TelerikGrid>
+
+@code {
+
+    List<PartStatus> MyData { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetGridData();
+    }
+
+    async Task GetGridData()
+    {
+        MyData = await PartStatusService.Read();
+    }
+
+    async Task UpdateHandler(GridCommandEventArgs args)
+    {
+        PartStatus item = (PartStatus)args.Item;
+
+        await PartStatusService.Update(item);
+
+        await GetGridData();
+    }
+
+    async Task DeleteHandler(GridCommandEventArgs args)
+    {
+        PartStatus item = (PartStatus)args.Item;
+
+        await PartStatusService.Delete(item);
+
+        await GetGridData();
+    }
+
+    async Task CreateHandler(GridCommandEventArgs args)
+    {
+        PartStatus item = (PartStatus)args.Item;
+
+        await PartStatusService.Create(item);
+
+        await GetGridData();
+    }
+
+    async Task CancelHandler(GridCommandEventArgs args)
+    {
+        PartStatus item = (PartStatus)args.Item;
+    }
+}

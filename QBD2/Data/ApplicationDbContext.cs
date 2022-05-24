@@ -136,8 +136,11 @@ namespace QBD2.Data
 
             modelBuilder.Entity<MasterPart>().Property(m => m.ProductFamilyId).IsRequired(false);
             modelBuilder.Entity<Part>().Property(m => m.ParentPartId).IsRequired(false);
+            modelBuilder.Entity<Part>().Property(m => m.GLCodeId).IsRequired(false);
+            modelBuilder.Entity<Part>().Property(m => m.FailureCodeId).IsRequired(false);
             modelBuilder.Entity<MasterPart>().HasMany(x=>x.Deviations).WithOne(x => x.MasterPart).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<MasterPart>().HasMany(x => x.Alerts).WithOne(x => x.MasterPart).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<PartStatus>().HasMany(x => x.Parts).WithOne(x => x.PartStatus).OnDelete(DeleteBehavior.NoAction);
 
             base.OnModelCreating(modelBuilder);
 

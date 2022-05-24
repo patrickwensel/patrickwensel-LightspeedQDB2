@@ -9,5 +9,7 @@ namespace QBD2.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int PartStatusId { get; set; }
         public string Name { get; set; }
+
+        public virtual List<Part> Parts { get; set; }
     }
 }

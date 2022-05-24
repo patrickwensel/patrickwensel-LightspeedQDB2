@@ -29,7 +29,7 @@ namespace QBD2.Entities
         public virtual GLCode GLCode { get; set; }
 
         [ForeignKey("FailureCode")]
-        public int FailureCodeId { get; set; }
+        public int? FailureCodeId { get; set; }
         public virtual FailureCode FailureCode { get; set; }
     }
 }

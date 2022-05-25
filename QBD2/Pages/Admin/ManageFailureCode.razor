@@ -1,0 +1,74 @@
+﻿@page "/managefailurecode"
+@using QBD2.Services
+@using QBD2.Entities
+@inject FailureCodeService FailureCodeService
+
+<h3>Failure Code</h3>
+
+<TelerikGrid Data="@MyData" 
+             Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
+             Resizable="true" 
+             EditMode="Telerik.Blazor.GridEditMode.Popup"
+             OnUpdate=@UpdateHandler
+             OnDelete=@DeleteHandler
+             OnCreate=@CreateHandler>
+             <GridToolBar>
+                <GridCommandButton Command="Add" Icon="add">Add a Failure Code</GridCommandButton>
+            </GridToolBar>
+            <GridColumns>
+                <GridColumn Field="@(nameof(FailureCode.Name))" Title="Name" Groupable="false" />
+                        <GridCommandColumn>
+                    <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
+                    <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
+                    <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
+                    <GridCommandButton Command="Cancel" Icon="cancel" ShowInEdit="true">Cancel</GridCommandButton>
+                </GridCommandColumn>
+            </GridColumns>
+</TelerikGrid>
+
+@code {
+
+    List<FailureCode> MyData { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetGridData();
+    }
+
+    async Task GetGridData()
+    {
+        MyData = await FailureCodeService.Read();
+    }
+
+    async Task UpdateHandler(GridCommandEventArgs args)
+    {
+        FailureCode item = (FailureCode)args.Item;
+
+        await FailureCodeService.Update(item);
+
+        await GetGridData();
+    }
+
+    async Task DeleteHandler(GridCommandEventArgs args)
+    {
+        FailureCode item = (FailureCode)args.Item;
+
+        await FailureCodeService.Delete(item);
+
+        await GetGridData();
+    }
+
+    async Task CreateHandler(GridCommandEventArgs args)
+    {
+        FailureCode item = (FailureCode)args.Item;
+
+        await FailureCodeService.Create(item);
+
+        await GetGridData();
+    }
+
+    async Task CancelHandler(GridCommandEventArgs args)
+    {
+        FailureCode item = (FailureCode)args.Item;
+    }
+}

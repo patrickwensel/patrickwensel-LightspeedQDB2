@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QBD2.Entities
@@ -20,6 +21,7 @@ namespace QBD2.Entities
         public int? ParentPartId { get; set; }
         public virtual Part ParentPart { get; set; }
 
+        [DefaultValue(1)]
         [ForeignKey("PartStatus")]
         public int PartStatusId { get; set; }
         public virtual PartStatus PartStatus { get; set; }

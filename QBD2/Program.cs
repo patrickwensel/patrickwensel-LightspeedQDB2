@@ -51,6 +51,7 @@ builder.Services.AddScoped<GLCodeService>();
 builder.Services.AddScoped<FailureCodeService>();
 builder.Services.AddScoped<PartStatusService>();
 builder.Services.AddScoped<ApplicationSettings>();
+builder.Services.AddScoped<RepairService>();
 builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformer>();
 
 #endregion

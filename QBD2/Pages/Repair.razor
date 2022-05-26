@@ -1,7 +1,288 @@
 ﻿@page "/repair"
+@using QBD2.Models
+@using QBD2.Services
+@using QBD2.Entities
+@inject IToastService toastService
+@inject NavigationManager NavigationManager
+@inject RepairService RepairService
+@inject PartService PartService;
+@inject GLCodeService GLCodeService
+@inject PartStatusService PartStatusService;
+
+<style>
+    table, th, td {
+        border: 2px solid;
+    }
+</style>
 
 <h3>Repair</h3>
 
+<div class="form-group row">
+    <div class="col-sm-7">
+        <div class="row">
+
+            <div class="col-sm-7">
+                <TelerikTextBox id="txtSerialSearch" Class="form-control col-sm-12" @bind-Value="SerialNumber"></TelerikTextBox>
+            </div>
+            <div class=" col-sm-1">
+                <TelerikButton id="btnSearch" OnClick="@btnFindOnClick" ButtonType="@ButtonType.Submit">Find</TelerikButton>
+            </div>
+        </div>
+        <br />
+
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-2 col-form-label">Family :</label>
+                <label id="lblDescValue" class="col-sm-7 col-form-label">@(dataRepairModel !=null ? dataRepairModel.Family:string.Empty)</label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="col-sm-2 col-form-label">Desc :</label>
+                <label id="lblDescValue" class="col-sm-7 col-form-label">@(dataRepairModel !=null ? dataRepairModel.Description:string.Empty)</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-7">
+                <label class="col-sm-3 col-form-label">Part Number :</label>
+                <label id="lblPartNumberValue" class="col-sm-7 col-form-label">@(dataRepairModel !=null ? dataRepairModel.PartNumber:string.Empty)</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-8">
+                <label class="col-sm-3 col-form-label">Serial Number :</label>
+                <label id="lblSerialNumberValue" class="col-sm-7 col-form-label">@(dataRepairModel !=null ? dataRepairModel.SerialNumber:string.Empty)</label>
+            </div>
+        </div>
+    </div>
+      
+    <div class=" col-sm-5">
+        <h6>History</h6>
+       <TelerikGrid Data="@MyData"
+        Pageable="true" Sortable="true"
+        Resizable="true">
+        <GridColumns>
+              <GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false" Width="200px"/>
+              <GridColumn Field="@(nameof(Models.Parts.UpdateDate))" Title="Date Updated" Groupable="false" Width="120px">
+                    <Template>
+                          @{
+                              var parts = context as Models.Parts;
+                              if (parts != null && !parts.UpdateDate.Equals(DateTime.MinValue))
+                              {
+                                  @parts.UpdateDate.ToString("dd/MM/yyyy @ h:mm")
+                              }
+                          }
+                    </Template>
+              </GridColumn>
+              <GridCommandColumn Width="60px">
+              <GridCommandButton Icon="eye"></GridCommandButton>
+              </GridCommandColumn>
+        </GridColumns>
+      </TelerikGrid>
+    </div>
+</div>
+
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <EditForm EditContext="@ECAddPart">
+        <DataAnnotationsValidator />
+
+        <div class="row">
+
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <div class="row">
+                        <label for="PartNumber" class="col-sm-8 col-form-label">Part Number</label>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-11">
+                            <TelerikTextBox @bind-Value="@AddParts.PartNumber" Class="form-control"></TelerikTextBox>
+                            <ValidationMessage For="@(() => AddParts.PartNumber)"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <div class="row">
+                        <label for="GLCodeId" class="col-sm-8 col-form-label">GL Code</label>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-11">
+                             <TelerikDropDownList Data="@dataGLCodeDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                             @bind-Value="@AddParts.GLCodeId" DefaultText="GL Code">
+                            </TelerikDropDownList>
+                            <ValidationMessage For="@(() => AddParts.GLCodeId)"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="col-md-2">
+                <div class="form-group row">
+                    <div class="row">
+                        <label class="col-sm-8 col-form-label"><br/></label>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-11">
+                            <TelerikButton Class="SaveButton" Icon="add" OnClick="(()=> btnAddPartOnClick())"></TelerikButton>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        </EditForm>
+    </div>
+</div>
+
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <TelerikGrid Data="@MyData"
+         Pageable="true" Sortable="true"
+         Resizable="true">
+            <GridColumns>
+                <GridColumn Field="@(nameof(Models.Parts.PartNumber))" Title="Part Number" Groupable="false" Width="80px"/>
+                <GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false" Width="200px"/>
+                <GridColumn Field="@(nameof(Models.Parts.Description))" Title="Description" Groupable="false" Width="120px"/>
+                <GridColumn Field="@(nameof(Models.Parts.GLCode))" Title="GL Code" Groupable="false" Width="120px"/>
+               <GridColumn Field=@nameof(Models.Parts.PartStatus) Title="Status" Width="60px">
+                    <Template>
+                        @{
+                            var partStatus = context as Models.Parts;
+                            var oldPartStatusId = partStatus.PartStatusId;
+                            <TelerikDropDownList @bind-Value="@partStatus.PartStatusId" Width="100%"
+                                                 Data="@dataPartStatusDropdown"
+                                                 ValueField="DropValue"
+                                                 TextField="DropText"
+                                                 Class="form-control"
+                                                 OnChange="@(() => OnPartStatusesChangeHandler(partStatus,oldPartStatusId))">
+                            </TelerikDropDownList>
+                        }
+                    </Template>
+              </GridColumn>
+            </GridColumns>
+        </TelerikGrid>
+    </div>
+</div>
+
 @code {
 
+    List<Models.DropDownBind> dataGLCodeDropdown { get; set; }
+
+    List<Models.DropDownBind> dataPartStatusDropdown { get; set; }
+
+    AddPartModel AddParts { get; set; }
+
+    EditContext ECAddPart { get; set; }
+
+    List<Models.Parts> MyData { get; set; }
+
+    Models.RepairModel dataRepairModel { get; set; }
+
+    string SerialNumber { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AddParts = new AddPartModel();
+        ECAddPart = new EditContext(AddParts);
+        await GetDropDownData();
+        base.OnInitialized();
+    }
+
+    async Task btnFindOnClick()
+    {
+        if (string.IsNullOrEmpty(SerialNumber))
+        {
+            toastService.ShowError("Please Enter Serial Number", "Error");
+            return;
+        }
+
+        dataRepairModel = await RepairService.GetDataBySerialNumber(SerialNumber.Trim());
+
+        if (dataRepairModel == null)
+        {
+            toastService.ShowError("No Record Found ! Please Enter Valid Serial Number", "Error");
+            AddParts.SelectedPartId = 0;
+        }
+
+        if(dataRepairModel != null)
+            AddParts.SelectedPartId = dataRepairModel.PartId;
+
+        await GetGridData();
+    }
+
+    async Task GetGridData()
+    {
+        if (dataRepairModel != null && dataRepairModel.PartId > 0)
+        {
+            MyData = await PartService.GetParentPartByPart(dataRepairModel.PartId);
+        }
+        else
+        {
+            MyData = null;
+        }
+        StateHasChanged();
+    }
+
+    async Task GetDropDownData()
+    {
+        dataGLCodeDropdown =  GLCodeService.DropDownData();
+        dataPartStatusDropdown = PartStatusService.DropDownData();
+    }
+
+    async Task btnAddPartOnClick()
+    {
+        if (string.IsNullOrEmpty(SerialNumber))
+        {
+            toastService.ShowError("Please Enter Serial Number", "Error");
+            return;
+        }
+
+        if (dataRepairModel == null || dataRepairModel.PartId == 0)
+        {
+            toastService.ShowError("Please Select Part", "Error");
+            return;
+        }
+
+        if (AddParts != null)
+        {
+            AddParts.SelectedPartId = dataRepairModel.PartId;
+            if(string.IsNullOrWhiteSpace(AddParts.PartNumber))
+            {
+                toastService.ShowError("Please Enter Part Number", "Error");
+                return;
+            }
+
+            if (await PartService.AddPart(AddParts))
+            {
+                toastService.ShowInfo("Record Saved Successfully", "Info");
+                await GetGridData();
+            }
+            else
+            {
+                toastService.ShowError("Record Not Saved ! Something Worng", "Error");
+            }
+        }
+    }
+
+    public async Task OnPartStatusesChangeHandler(Models.Parts parts,int oldPartStatusId)
+    {
+        if (parts != null && parts.PartId > 0 && parts.PartStatusId != oldPartStatusId)
+        {
+            if (await PartService.UpdatePartStatus(parts))
+            {
+                    toastService.ShowInfo("Part Status Updated Successfully", "Info");
+                    await GetGridData();
+            }
+            else
+            {
+                toastService.ShowError("Record Not Updated ! Something Worng", "Error");
+            }
+        }
+    }
 }

@@ -38,5 +38,10 @@ namespace QBD2.Services
             _context.PartStatuses.Remove(partStatus);
             await _context.SaveChangesAsync();
         }
+
+        public List<Models.DropDownBind> DropDownData()
+        {
+            return _context.PartStatuses.Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.PartStatusId }).ToList();
+        }
     }
 }

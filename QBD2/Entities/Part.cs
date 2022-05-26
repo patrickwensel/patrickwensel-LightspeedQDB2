@@ -33,5 +33,7 @@ namespace QBD2.Entities
         [ForeignKey("FailureCode")]
         public int? FailureCodeId { get; set; }
         public virtual FailureCode FailureCode { get; set; }
+
+        public DateTime UpdateDate { get; set; }
     }
 }

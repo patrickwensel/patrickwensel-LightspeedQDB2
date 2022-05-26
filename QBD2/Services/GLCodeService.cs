@@ -38,5 +38,10 @@ namespace QBD2.Services
             _context.GLCodes.Remove(glCodes);
             await _context.SaveChangesAsync();
         }
+
+        public List<Models.DropDownBind> DropDownData()
+        {
+            return _context.GLCodes.Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.GLCodeId }).ToList();
+        }
     }
 }

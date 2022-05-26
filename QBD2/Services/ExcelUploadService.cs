@@ -262,7 +262,8 @@ namespace QBD2.Services
                                         SerialNumber = serialNumber.SN,
                                         MasterPartId = masterPart.MasterPartId,
                                         PartStatusId = 1,
-                                        ParentPartId = null
+                                        ParentPartId = null,
+                                        UpdateDate = DateTime.Now
                                     };
                                     _context.Parts.Add(partFromQDB);
                                     await _context.SaveChangesAsync();
@@ -285,7 +286,8 @@ namespace QBD2.Services
                                             SerialNumber = childItem.SerialNumber,
                                             MasterPartId = masterPart.MasterPartId,
                                             PartStatusId = 1,
-                                            ParentPartId = partFromQDB.PartId
+                                            ParentPartId = partFromQDB.PartId,
+                                            UpdateDate = DateTime.Now
                                         };
 
                                         partsList.Add(childPart);

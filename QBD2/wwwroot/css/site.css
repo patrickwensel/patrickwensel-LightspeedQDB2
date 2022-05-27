@@ -151,6 +151,200 @@ nav#sidebar ul li i {
     margin-right: 20px;
 }
 
+/*inspection page css start here*/
+.inspection .current-inspection {
+    margin-top: 20px;
+}
+    .inspection .current-inspection h3 {
+        color: #231F20;
+        font-size: 15px;
+        font-weight: 500;
+        margin: 0;
+        background: #0000000B;
+        padding: 10px 10px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+.inspection .left-input input#txtSerialSearch {
+    height: 40px;
+    border: 1px solid #00000014;
+}
+
+.inspection .col-sm-3.b-btn {
+    padding-left: 0;
+}
+.inspection .b-btn button#btnSearch {
+    background: rgb(17, 81, 94);
+    color: rgb(255, 255, 255);
+    font-size: 18px;
+    height: 40px;
+    line-height: 50px;
+    width: 100%;
+}
+.inspection .col-form-label {
+    color: #656565;
+    font-size: 15px;
+}
+.inspection .row {
+    padding: 5px 0;
+}
+.inspection .station-section .k-input-inner {
+    height: 40px;
+}
+
+.inspection .reason-section {
+    margin-top: 20px;
+}
+
+    .inspection .reason-section h3 {
+        color: #231F20;
+        font-size: 15px;
+        font-weight: 500;
+        margin: 0;
+        background: #0000000B;
+        padding: 10px 10px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+.inspection .add-reason-btn button#btnSearch {
+    height: 38px;
+    background: #11515E;
+    color: #fff;
+    font-size: 15px;
+    line-height: 0;
+}
+.inspection .add-reason-btn {
+    text-align: right;
+}
+
+.inspection .k-pager-numbers .k-link.k-state-selected {
+    color: #11515e;
+    background-color: rgb(16 104 179 / 20%);
+}
+.inspection .k-pager-info {
+    color: #656565;
+    font-size: 14px;
+}
+.inspection .save-btn {
+    text-align: right;
+}
+    .inspection .save-btn button.telerik-blazor.k-button.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base {
+        height: 38px;
+        background: #11515E;
+        color: #fff;
+        font-size: 15px;
+        line-height: 0;
+    }
+.inspection .k-radio-list {
+    flex-flow: inherit;
+}
+.inspection ul.k-radio-list.telerik-blazor.k-list-vertical li {
+    display: inline-block;
+    float: left;
+    margin-right: 10px;
+}
+
+.inspection .k-grid-content {
+    overflow: auto;
+}
+.inspection .k-grid-header, .k-grid-footer {
+    padding-inline-start: 0;
+    padding-inline-end: 0;
+}
+.inspection .k-picker {
+    background-color: #ffffff;
+}
+
+.inspection .k-i-delete::before {
+    content: "\e10c";
+    color: #ff3838;
+}
+.inspection button.telerik-blazor.k-button.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base.k-icon-button {
+    background: none !important;
+    border: none !important;
+}
+
+.inspection .k-column-title {
+    font-size: 15px;
+    color: #231F20;
+}
+
+.inspection .k-grid td {
+    border-width: 0 0 0px 1px;
+    vertical-align: middle;
+    color: #656565;
+    font-size: 15px;
+}
+
+.inspection .current-inspection td.k-command-cell:last-child {
+    text-align: center;
+}
+.inspection .col-sm-6.right-scroll-column {
+    height: 470px;
+    overflow: hidden;
+    overflow-y: scroll;
+    border-left: 1px solid #0000001A;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 1px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px #F5F5F5;
+    border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #F5F5F5;
+    border-radius: 10px;
+}
+
+ul.switch-btn {
+    padding: 0;
+    float: left;
+    margin-left: 10px;
+}
+
+    ul.switch-btn li {
+        display: inline-block;
+        background: #fff;
+        padding: 10px 10px;
+        border: 1px solid #e1e1e1;
+        cursor: pointer;
+        color: #656565;
+        line-height: 0;
+    }
+
+        ul.switch-btn li:first-child {
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        ul.switch-btn li:last-child {
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            position: relative;
+            right: 4px;
+        }
+
+
+    ul.switch-btn .active {
+        background: #4DBF79 !important;
+        color: #fff;
+    }
+
+    ul.switch-btn li.failed.active {
+        background: #BB4430;
+        color: #fff;
+    }
+
+
+
 @media (min-width:320px) and (max-width: 767px) {
     .logo img {
         width: 150px;

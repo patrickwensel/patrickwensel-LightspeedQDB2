@@ -232,13 +232,13 @@ namespace QBD2.Services
                            join ps in _context.PartStatuses
                            on p.PartStatusId equals ps.PartStatusId
 
-                           join fc in _context.FailureCodes
-                           on p.FailureCodeId equals fc.FailureCodeId into failureCodes
-                           from failureInfo in failureCodes.DefaultIfEmpty()
+                           //join fc in _context.FailureCodes
+                           //on p.FailureCodeId equals fc.FailureCodeId into failureCodes
+                           //from failureInfo in failureCodes.DefaultIfEmpty()
 
-                           join gc in _context.GLCodes
-                           on p.GLCodeId equals gc.GLCodeId into gLCodes
-                           from gLInfo in gLCodes.DefaultIfEmpty()
+                           //join gc in _context.GLCodes
+                           //on p.GLCodeId equals gc.GLCodeId into gLCodes
+                           //from gLInfo in gLCodes.DefaultIfEmpty()
 
                            where p.ParentPartId == partId
 
@@ -253,10 +253,10 @@ namespace QBD2.Services
                                UpdateDate = p.UpdateDate,
                                PartStatusId = p.PartStatusId,
                                PartStatus = ps.Name,
-                               FailureCodeId = p.FailureCodeId,
-                               FailureCode = failureInfo != null ? failureInfo.Name : "",
-                               GLCodeId = p.GLCodeId,
-                               GLCode = gLInfo != null ? gLInfo.Name : "",
+                               //FailureCodeId = p.FailureCodeId,
+                               //FailureCode = failureInfo != null ? failureInfo.Name : "",
+                               //GLCodeId = p.GLCodeId,
+                               //GLCode = gLInfo != null ? gLInfo.Name : "",
                            }).ToListAsync();
 
             if (x != null && x.Count() > 0)
@@ -311,10 +311,10 @@ namespace QBD2.Services
                     part.UpdateDate = DateTime.Now;
                     part.PartStatusId = 1;
 
-                    if (itemToInsert.GLCodeId > 0)
-                    {
-                        part.GLCodeId = itemToInsert.GLCodeId;
-                    }
+                    //if (itemToInsert.GLCodeId > 0)
+                    //{
+                    //    part.GLCodeId = itemToInsert.GLCodeId;
+                    //}
 
                     _context.Parts.Add(part);
                     _context.SaveChanges();

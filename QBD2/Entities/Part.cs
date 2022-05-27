@@ -26,14 +26,6 @@ namespace QBD2.Entities
         public int PartStatusId { get; set; }
         public virtual PartStatus PartStatus { get; set; }
 
-        [ForeignKey("GLCode")]
-        public int? GLCodeId { get; set; }
-        public virtual GLCode GLCode { get; set; }
-
-        [ForeignKey("FailureCode")]
-        public int? FailureCodeId { get; set; }
-        public virtual FailureCode FailureCode { get; set; }
-
         public DateTime UpdateDate { get; set; }
     }
 }

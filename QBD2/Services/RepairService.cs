@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QBD2.Data;
+using QBD2.Entities;
 
 namespace QBD2.Services
 {
@@ -10,6 +11,12 @@ namespace QBD2.Services
         public RepairService(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<List<Repair>> ReadRepairs()
+        {
+            var x = _context.Repairs.Include(a => a.Part).Include(x => x.GLCode).Include(z => z.FailureCode).ToList();
+            return x;
         }
 
         public async Task<Models.RepairModel> GetDataBySerialNumber(string serialNumber)
@@ -40,6 +47,16 @@ namespace QBD2.Services
 
             }
             return RepairItem;
+        }
+
+        public async Task Delete(Entities.Repair itemToDelete)
+        {
+             var repairs = _context.Repairs.Where(d => d.RepairId == itemToDelete.RepairId).FirstOrDefault();
+             if (repairs != null)
+             {
+                 _context.Repairs.Remove(repairs);
+                 await _context.SaveChangesAsync();
+             }
         }
     }
 }

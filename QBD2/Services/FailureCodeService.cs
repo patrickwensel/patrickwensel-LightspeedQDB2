@@ -38,5 +38,10 @@ namespace QBD2.Services
             _context.FailureCodes.Remove(failureCodes);
             await _context.SaveChangesAsync();
         }
+
+        public List<Models.DropDownBind> DropDownData()
+        {
+            return _context.FailureCodes.Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.FailureCodeId }).ToList();
+        }
     }
 }

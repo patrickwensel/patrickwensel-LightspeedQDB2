@@ -225,6 +225,16 @@ namespace QBD2.Services
 
         public async Task<List<Parts>> GetParentPartByPart(int partId)
         {
+            var p1 = await _context.Parts.FindAsync(partId);
+            if(p1 != null && p1.ParentPartId == null)
+            {
+                partId = p1.PartId;
+            }
+            else if(p1 != null && p1.ParentPartId > 0)
+            {
+                partId = p1.ParentPartId.Value;
+            }
+
             var x = await (from p in _context.Parts
                            join mp in _context.MasterParts
                            on p.MasterPartId equals mp.MasterPartId
@@ -232,13 +242,8 @@ namespace QBD2.Services
                            join ps in _context.PartStatuses
                            on p.PartStatusId equals ps.PartStatusId
 
-                           //join fc in _context.FailureCodes
-                           //on p.FailureCodeId equals fc.FailureCodeId into failureCodes
-                           //from failureInfo in failureCodes.DefaultIfEmpty()
-
-                           //join gc in _context.GLCodes
-                           //on p.GLCodeId equals gc.GLCodeId into gLCodes
-                           //from gLInfo in gLCodes.DefaultIfEmpty()
+                           join repairsInfo in _context.Repairs
+                           on p.PartId equals repairsInfo.PartId
 
                            where p.ParentPartId == partId
 
@@ -253,10 +258,8 @@ namespace QBD2.Services
                                UpdateDate = p.UpdateDate,
                                PartStatusId = p.PartStatusId,
                                PartStatus = ps.Name,
-                               //FailureCodeId = p.FailureCodeId,
-                               //FailureCode = failureInfo != null ? failureInfo.Name : "",
-                               //GLCodeId = p.GLCodeId,
-                               //GLCode = gLInfo != null ? gLInfo.Name : "",
+                               GLCodeId = repairsInfo.GLCodeId,
+                               GLCode = repairsInfo != null && repairsInfo.GLCode != null ? repairsInfo.GLCode.Name : "",
                            }).ToListAsync();
 
             if (x != null && x.Count() > 0)
@@ -306,18 +309,30 @@ namespace QBD2.Services
                         part.ParentPartId = itemToInsert.SelectedPartId;
                     }
 
-                    part.SerialNumber = selectedPart.SerialNumber;
+                    if (!string.IsNullOrWhiteSpace(itemToInsert.SerialNumber))
+                    {
+                        part.SerialNumber = itemToInsert.SerialNumber;
+                    }
+                    else
+                    {
+                        part.SerialNumber = "";
+                    }
+
                     part.MasterPartId = masterPart.MasterPartId;
                     part.UpdateDate = DateTime.Now;
                     part.PartStatusId = 1;
-
-                    //if (itemToInsert.GLCodeId > 0)
-                    //{
-                    //    part.GLCodeId = itemToInsert.GLCodeId;
-                    //}
-
                     _context.Parts.Add(part);
                     _context.SaveChanges();
+
+                    Repair repair = new Repair();
+                    repair.Description = itemToInsert.RepairDescription;
+                    repair.GLCodeId = itemToInsert.GLCodeId.Value;
+                    repair.FailureCodeId = itemToInsert.FailureCodeId.Value;
+                    repair.PartId = part.PartId;
+                    repair.UpdateDate = DateTime.Now;
+                    _context.Repairs.Add(repair);
+                    _context.SaveChanges();
+
                     return true;
                 }
 

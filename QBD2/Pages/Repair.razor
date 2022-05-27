@@ -5,18 +5,36 @@
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
 @inject RepairService RepairService
-@inject PartService PartService;
+@inject PartService PartService
 @inject GLCodeService GLCodeService
-@inject PartStatusService PartStatusService;
-
-<style>
-    table, th, td {
-        border: 2px solid;
-    }
-</style>
+@inject PartStatusService PartStatusService
+@inject FailureCodeService FailureCodeService
 
 <h3>Repair</h3>
+@if (AddParts == null)
+{
+     <TelerikGrid Data="@GridData"
+             Pageable="true"
+             Sortable="true"
+             FilterMode="@GridFilterMode.FilterRow">
+        <GridToolBar>
+            <TelerikButton Icon="add" OnClick="(() => SelectRecord(null))">Add new Repair</TelerikButton>
+        </GridToolBar>
+        <GridColumns>
+            <GridColumn Field="@(nameof(Entities.Repair.UpdateDate))" Title="Update Date" DisplayFormat="{0:dd-MM-yyyy}"/>
+            <GridColumn Field="@(nameof(Entities.Repair.Description))" Title="Description" Filterable="false"/>
+            <GridColumn Field="@(nameof(Entities.Repair.PartSerialNumber))" Title="Serial Number" Filterable="false"/>
+            <GridCommandColumn Width="150px">
+                 <GridCommandButton Icon="edit" OnClick="@((args)=> SelectRecord(args.Item as Entities.Repair))"></GridCommandButton>
+                 <GridCommandButton Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Entities.Repair))"></GridCommandButton>
+            </GridCommandColumn>
+        </GridColumns>
+    </TelerikGrid>
+}
 
+@if (AddParts != null)
+{
+    <br/>
 <div class="form-group row">
     <div class="col-sm-7">
         <div class="row">
@@ -64,7 +82,7 @@
         Resizable="true">
         <GridColumns>
               <GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false" Width="200px"/>
-              <GridColumn Field="@(nameof(Models.Parts.UpdateDate))" Title="Date Updated" Groupable="false" Width="120px">
+              <GridColumn Field="@(nameof(Models.Parts.UpdateDate))" Title="Date Updated" Groupable="false" Width="70px">
                     <Template>
                           @{
                               var parts = context as Models.Parts;
@@ -75,8 +93,8 @@
                           }
                     </Template>
               </GridColumn>
-              <GridCommandColumn Width="60px">
-              <GridCommandButton Icon="eye"></GridCommandButton>
+              <GridCommandColumn Width="30px">
+              <GridCommandButton Icon="eye" OnClick="@((args)=> btnHistoryGridEyeOnClick(args.Item as Models.Parts))"></GridCommandButton>
               </GridCommandColumn>
         </GridColumns>
       </TelerikGrid>
@@ -108,6 +126,20 @@
             <div class="col-md-3">
                 <div class="form-group row">
                     <div class="row">
+                        <label for="SerialNumber" class="col-sm-8 col-form-label">Serial Number (optional)</label>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-11">
+                            <TelerikTextBox @bind-Value="@AddParts.SerialNumber" Class="form-control"></TelerikTextBox>
+                            <ValidationMessage For="@(() => AddParts.SerialNumber)"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <div class="row">
                         <label for="GLCodeId" class="col-sm-8 col-form-label">GL Code</label>
                     </div>
                     <div class="row">
@@ -121,7 +153,42 @@
                 </div>
             </div>
 
-             <div class="col-md-2">
+        </div>
+
+
+        <div class="row">
+
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <div class="row">
+                        <label for="RepairDescription" class="col-sm-8 col-form-label">Repair Description</label>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-11">
+                             <textarea @bind-value="AddParts.RepairDescription" class="form-control" rows="3" @bind-value:event="oninput"></textarea>
+                            <ValidationMessage For="@(() => AddParts.RepairDescription)"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <div class="row">
+                        <label for="FailureCodeId" class="col-sm-8 col-form-label">Failure Code</label>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-11">
+                             <TelerikDropDownList Data="@dataFailureCodesDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                             @bind-Value="@AddParts.FailureCodeId" DefaultText="Failure Code">
+                            </TelerikDropDownList>
+                            <ValidationMessage For="@(() => AddParts.FailureCodeId)"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="col-md-1">
                 <div class="form-group row">
                     <div class="row">
                         <label class="col-sm-8 col-form-label"><br/></label>
@@ -148,8 +215,8 @@
             <GridColumns>
                 <GridColumn Field="@(nameof(Models.Parts.PartNumber))" Title="Part Number" Groupable="false" Width="80px"/>
                 <GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false" Width="200px"/>
-                <GridColumn Field="@(nameof(Models.Parts.Description))" Title="Description" Groupable="false" Width="120px"/>
-                <GridColumn Field="@(nameof(Models.Parts.GLCode))" Title="GL Code" Groupable="false" Width="120px"/>
+                <GridColumn Field="@(nameof(Models.Parts.Description))" Title="Description" Groupable="false" Width="140px"/>
+                <GridColumn Field="@(nameof(Models.Parts.GLCode))" Title="GL Code" Groupable="false" Width="100px"/>
                <GridColumn Field=@nameof(Models.Parts.PartStatus) Title="Status" Width="60px">
                     <Template>
                         @{
@@ -169,12 +236,16 @@
         </TelerikGrid>
     </div>
 </div>
-
+}
 @code {
+
+    List<Entities.Repair> GridData { get; set; }
 
     List<Models.DropDownBind> dataGLCodeDropdown { get; set; }
 
     List<Models.DropDownBind> dataPartStatusDropdown { get; set; }
+
+    List<Models.DropDownBind> dataFailureCodesDropdown { get; set; }
 
     AddPartModel AddParts { get; set; }
 
@@ -188,10 +259,28 @@
 
     protected override async Task OnInitializedAsync()
     {
-        AddParts = new AddPartModel();
-        ECAddPart = new EditContext(AddParts);
-        await GetDropDownData();
+        await GetRepairGridData();
         base.OnInitialized();
+    }
+
+    public async Task SelectRecord(Entities.Repair repair)
+    {
+        if (repair != null)
+        {
+             SerialNumber = repair.PartSerialNumber;
+             await btnFindOnClick();
+        }
+        else
+        {
+            AddParts = new AddPartModel();
+        }
+
+        if (AddParts != null)
+        {
+            ECAddPart = new EditContext(AddParts);
+        }
+        await GetDropDownData();
+        StateHasChanged();
     }
 
     async Task btnFindOnClick()
@@ -211,9 +300,20 @@
         }
 
         if(dataRepairModel != null)
+        {
+            AddParts = new AddPartModel();
+            ECAddPart = new EditContext(AddParts);
             AddParts.SelectedPartId = dataRepairModel.PartId;
+            StateHasChanged();
+        }
 
         await GetGridData();
+    }
+
+    async Task GetRepairGridData()
+    {
+        GridData = await RepairService.ReadRepairs();
+        StateHasChanged();
     }
 
     async Task GetGridData()
@@ -233,10 +333,26 @@
     {
         dataGLCodeDropdown =  GLCodeService.DropDownData();
         dataPartStatusDropdown = PartStatusService.DropDownData();
+        dataFailureCodesDropdown = FailureCodeService.DropDownData();
+    }
+
+    async Task btnHistoryGridEyeOnClick(Models.Parts parts)
+    {
+        if (parts != null)
+        {
+            SerialNumber = parts.SerialNumber;
+            await btnFindOnClick();
+        }
     }
 
     async Task btnAddPartOnClick()
     {
+        var IsValid = ECAddPart.Validate();
+        if(!IsValid)
+        {
+            return;
+        }
+
         if (string.IsNullOrEmpty(SerialNumber))
         {
             toastService.ShowError("Please Enter Serial Number", "Error");
@@ -261,7 +377,7 @@
             if (await PartService.AddPart(AddParts))
             {
                 toastService.ShowInfo("Record Saved Successfully", "Info");
-                await GetGridData();
+                await btnFindOnClick();
             }
             else
             {
@@ -276,8 +392,8 @@
         {
             if (await PartService.UpdatePartStatus(parts))
             {
-                    toastService.ShowInfo("Part Status Updated Successfully", "Info");
-                    await GetGridData();
+                toastService.ShowInfo("Part Status Updated Successfully", "Info");
+                await GetGridData();
             }
             else
             {
@@ -285,4 +401,13 @@
             }
         }
     }
+
+    public async Task DeleteRecord(Entities.Repair item)
+    {
+        if (item != null)
+        {
+            await RepairService.Delete(item);
+            await GetRepairGridData();
+        }
+     }
 }

@@ -25,7 +25,7 @@ namespace QBD2.Data
         public DbSet<GLCode> GLCodes { get; set; }
         public DbSet<FailureCode> FailureCodes { get; set; }
         public DbSet<PartStatus> PartStatuses { get; set; }
-
+        public DbSet<Repair> Repairs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

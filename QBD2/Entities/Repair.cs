@@ -24,5 +24,20 @@ namespace QBD2.Entities
         public virtual Part Part { get; set; }
 
         public DateTime UpdateDate { get; set; }
+
+        public string PartSerialNumber
+        {
+            get
+            {
+                if (Part != null)
+                {
+                    return Part.SerialNumber;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+        }
     }
 }

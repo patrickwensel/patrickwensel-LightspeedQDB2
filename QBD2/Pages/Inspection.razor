@@ -127,8 +127,8 @@
                                    TextField="@nameof(Models.DropDownBind.DropText)">
                 </TelerikRadioGroup>---->
                 <ul class="switch-btn">
-                   <li class="active"><i class="fa-regular fa-circle-check"></i> Passed</li>
-                   <li class="failed"><i class="fa-light fa-circle-xmark"></i> Failed</li>
+                   <li class="@AddActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(1))"><i class="fa-regular fa-circle-check"></i> Passed</li>
+                   <li class="failed @AddInActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(0))"><i class="fa-light fa-circle-xmark"></i> Failed</li>
                 </ul>
             </div>
         </div>
@@ -461,6 +461,9 @@
     string SerialNumber { get; set; }
     string FailureCommentValue { get; set; }
 
+    public string AddActiveCssClass { get; set; } = "active";
+    public string AddInActiveCssClass { get; set; } 
+
     protected override async Task OnInitializedAsync()
     {
         await GetGridData();
@@ -639,4 +642,19 @@
         SelectedAlertDeviationRecord  = new  Models.AlertDeviationDetailModel();
         StateHasChanged();
     }
+
+    public async void OnDataStatusChangeHandler(int value)
+    {
+        RdoStatusValue = value;
+        if (value == 1)
+        {
+            AddActiveCssClass = "active";
+            AddInActiveCssClass = string.Empty;
+        }
+        else if(value == 0)
+        { 
+            AddActiveCssClass = string.Empty;
+            AddInActiveCssClass = "active";
+        }
     }
+ }

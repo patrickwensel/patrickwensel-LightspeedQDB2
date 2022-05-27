@@ -340,7 +340,7 @@ ul.switch-btn {
     }
 
     ul.switch-btn li.failed.active {
-        background: #BB4430;
+        background: #BB4430  !important;
         color: #fff;
     }
 

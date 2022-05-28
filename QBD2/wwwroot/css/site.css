@@ -1,10 +1,12 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 @import url(//db.onlinewebfonts.com/c/2556d7a29ab01dc80b96eb824a049df6?family=Effra);
+
 @font-face {
     font-family: "Effra";
     src: url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.eot");
     src: url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.woff") format("woff"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.svg#Effra") format("svg");
 }
+
 html, body {
     font-family: 'Effra', sans-serif;
 }
@@ -87,6 +89,7 @@ nav#sidebar {
 .logo img {
     width: 206px;
 }
+
 div#content {
     width: 100%;
     padding: 80px 0 0 0;
@@ -107,15 +110,18 @@ header#header {
     background-color: #11515E;
     padding-left: 20px;
 }
+
 .nav-link:hover {
     background: #fff;
     border-radius: 5px;
     color: #000;
 }
+
 ul.nav.navbar-nav.ml-auto {
     margin-left: auto;
     padding-right: 35px;
 }
+
 .nav-link:focus {
     color: #000;
 }
@@ -123,6 +129,7 @@ ul.nav.navbar-nav.ml-auto {
 .logo-left {
     width: 48%;
 }
+
 .head-center h4 {
     color: #fff;
     font-size: 21px;
@@ -156,6 +163,7 @@ nav#sidebar ul li i {
 .inspection .current-inspection {
     margin-top: 20px;
 }
+
     .inspection .current-inspection h3 {
         color: #231F20;
         font-size: 15px;
@@ -175,6 +183,7 @@ nav#sidebar ul li i {
 .inspection .col-sm-3.b-btn {
     padding-left: 0;
 }
+
 .inspection .b-btn button#btnSearch {
     background: rgb(17, 81, 94);
     color: rgb(255, 255, 255);
@@ -183,19 +192,23 @@ nav#sidebar ul li i {
     line-height: 50px;
     width: 100%;
 }
+
 .inspection .col-form-label {
     color: #656565;
     font-size: 15px;
 }
+
 .inspection .row {
     padding: 5px 0;
 }
+
 .inspection .station-section .k-input-inner {
     height: 40px;
 }
 
 .inspection .reason-section {
     margin-top: 20px;
+    margin-bottom: 30px;
 }
 
     .inspection .reason-section h3 {
@@ -208,6 +221,7 @@ nav#sidebar ul li i {
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
     }
+
 .inspection .add-reason-btn button#btnSearch {
     height: 38px;
     background: #11515E;
@@ -215,6 +229,7 @@ nav#sidebar ul li i {
     font-size: 15px;
     line-height: 0;
 }
+
 .inspection .add-reason-btn {
     text-align: right;
 }
@@ -223,13 +238,16 @@ nav#sidebar ul li i {
     color: #11515e;
     background-color: rgb(16 104 179 / 20%);
 }
+
 .inspection .k-pager-info {
     color: #656565;
     font-size: 14px;
 }
+
 .inspection .save-btn {
     text-align: right;
 }
+
     .inspection .save-btn button.telerik-blazor.k-button.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base {
         height: 38px;
         background: #11515E;
@@ -237,9 +255,11 @@ nav#sidebar ul li i {
         font-size: 15px;
         line-height: 0;
     }
+
 .inspection .k-radio-list {
     flex-flow: inherit;
 }
+
 .inspection ul.k-radio-list.telerik-blazor.k-list-vertical li {
     display: inline-block;
     float: left;
@@ -249,10 +269,12 @@ nav#sidebar ul li i {
 .inspection .k-grid-content {
     overflow: auto;
 }
+
 .inspection .k-grid-header, .k-grid-footer {
     padding-inline-start: 0;
     padding-inline-end: 0;
 }
+
 .inspection .k-picker {
     background-color: #ffffff;
 }
@@ -261,6 +283,7 @@ nav#sidebar ul li i {
     content: "\e10c";
     color: #ff3838;
 }
+
 .inspection button.telerik-blazor.k-button.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base.k-icon-button {
     background: none !important;
     border: none !important;
@@ -281,6 +304,7 @@ nav#sidebar ul li i {
 .inspection .current-inspection td.k-command-cell:last-child {
     text-align: center;
 }
+
 .inspection .col-sm-6.right-scroll-column {
     height: 470px;
     overflow: hidden;
@@ -308,7 +332,8 @@ nav#sidebar ul li i {
 ul.switch-btn {
     padding: 0;
     float: left;
-    margin-left: 10px;
+    margin-left: 0px;
+    margin-bottom: 0;
 }
 
     ul.switch-btn li {
@@ -319,6 +344,8 @@ ul.switch-btn {
         cursor: pointer;
         color: #656565;
         line-height: 0;
+        height: 40px;
+        font-size: 15px;
     }
 
         ul.switch-btn li:first-child {
@@ -340,7 +367,7 @@ ul.switch-btn {
     }
 
     ul.switch-btn li.failed.active {
-        background: #BB4430  !important;
+        background: #BB4430 !important;
         color: #fff;
     }
 
@@ -349,13 +376,44 @@ a.nav-link.active {
     border-top-right-radius: 100px;
     border-bottom-right-radius: 100px;
 }
+
     a.nav-link.active i {
         color: #fff !important;
     }
+
     a.nav-link.active span {
         color: #fff !IMPORTANT;
     }
 
+.right-value {
+    padding: 0;
+}
+
+.inspection .col-form-label.font-b {
+    font-size: 19px;
+}
+
+.inspection label.col-sm-12.col-form-label {
+    padding: 0;
+    line-height: 0;
+}
+
+.inspection textarea#txtGenerelComment {
+    height: 95px;
+}
+
+.inspection span.k-textbox.k-input.form-control.col-sm-11.k-valid.telerik-blazor.k-input-solid.k-rounded-md.k-input-md {
+    height: 64px;
+}
+
+.inspection .k-grid.telerik-blazor {
+    border-radius: 0px 0 11px 11px;
+}
+
+.inspection .k-grid-pager {
+    border-radius: 0px 0px 11px 11px;
+    box-shadow: 0 4px 2px #b1b1b1;
+}
 
 
 @media (min-width:320px) and (max-width: 767px) {

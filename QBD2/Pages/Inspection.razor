@@ -62,22 +62,22 @@
 
     <div class=" col-sm-6 right-scroll-column">
 
-    <div class="row">
+   <div class="row class=">
             <div class="col-sm-12">
-                <label class="col-sm-2 col-form-label">Desc :</label>
-                <label id="lblDescValue" class="col-sm-7 col-form-label">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty)</label>
+                <label class="col-sm-12 col-form-label">Desc :</label>
+                <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty)</label>
             </div>
         </div>
         <div class="row">
             <div class="col-sm-12">
-                <label class="col-sm-3 col-form-label">Part Number :</label>
-                <label id="lblPartNumberValue" class="col-sm-7 col-form-label">@(dataInspectionModel !=null ? dataInspectionModel.PartNumber:string.Empty)</label>
+                <label class="col-sm-12 col-form-label">Part Number :</label>
+                <label id="lblPartNumberValue" class="col-sm-12 col-form-label right-value n-font">@(dataInspectionModel !=null ? dataInspectionModel.PartNumber:string.Empty)</label>
             </div>
         </div>
         <div class="row">
             <div class="col-sm-12">
-                <label class="col-sm-3 col-form-label">Serial Number :</label>
-                <label id="lblSerialNumberValue" class="col-sm-7 col-form-label">@(dataInspectionModel !=null ? dataInspectionModel.SerialNumber:string.Empty)</label>
+                <label class="col-sm-12 col-form-label">Serial Number :</label>
+                <label id="lblSerialNumberValue" class="col-sm-12 col-form-label right-value n-font">@(dataInspectionModel !=null ? dataInspectionModel.SerialNumber:string.Empty)</label>
             </div>
 
         </div>
@@ -108,9 +108,9 @@
 
        
         <div class="row station-section">
-            <label class="col-sm-3 col-form-label">Station</label>
+            <label class="col-sm-2 col-form-label">Station</label>
 
-            <div class="col-sm-9">
+            <div class="col-sm-10">
                 <TelerikDropDownList Data="@dataStationDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
                                      @bind-Value="@DdlStationValue" DefaultText="Select Status ">
                 </TelerikDropDownList>
@@ -119,8 +119,8 @@
         </div>
 
         <div class="row">
-            <label class="col-sm-3 col-form-label">Status</label>
-            <div class="col-sm-9">
+            <label class="col-sm-2 col-form-label">Status</label>
+            <div class="col-sm-10">
                 <!----<TelerikRadioGroup Data="@dataStatusOptions"
                                    @bind-Value="@RdoStatusValue"
                                    ValueField="@nameof(Models.DropDownBind.DropValue)"
@@ -138,24 +138,24 @@
             {
 
                 <div class="row">
-                    <label class="col-sm-3 col-form-label">Primary</label>
-                    <div class="col-sm-9">
+                    <label class="col-sm-2 col-form-label">Primary</label>
+                    <div class="col-sm-10">
                         <TelerikDropDownList Data="@dataFailurePrimaryDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
                                          @bind-Value="@DdlFailurePrimaryValue" DefaultText="Select Failure Primary" OnChange="@MyOnChangeHandler">
                         </TelerikDropDownList>
                     </div>
                     </div>
                     <div class="row">
-                    <label class="col-sm-3 col-form-label">Secondary</label>
-                    <div class="col-sm-9">
+                    <label class="col-sm-2 col-form-label">Secondary</label>
+                    <div class="col-sm-10">
                         <TelerikDropDownList Data="@dataFailureDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
                                          @bind-Value="@DdlFailureValue" DefaultText="Select Failure ">
                         </TelerikDropDownList>
                     </div>
                     </div>
                     <div class="row">
-                     <label class="col-sm-3 col-form-label">Comment</label>
-                    <div class="col-sm-9">
+                     <label class="col-sm-2 col-form-label">Comment</label>
+                    <div class="col-sm-10">
                         <TelerikTextBox Class="form-control col-sm-11" @bind-Value="@FailureCommentValue"></TelerikTextBox>
                     </div>
                     </div>
@@ -188,13 +188,13 @@
             }
         }
         <div class="row">
-            <label class="col-sm-3 col-form-label">General Comments</label>
+            <label class="col-sm-2 col-form-label">General Comments</label>
            
             @{
                 if (dataInspection == null)
                     dataInspection = new Models.Inspection();
             }
-            <div class="col-sm-9 add-reason-btn">
+            <div class="col-sm-10 add-reason-btn">
             <TelerikTextArea Id="txtGenerelComment" @bind-Value="@dataInspection.GeneralComments">
             </TelerikTextArea>
             </div>

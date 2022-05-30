@@ -27,18 +27,20 @@
             <div class="current-inspection">
             <h3>Current Inspections</h3>
             <TelerikGrid Data="@MyData"
-                     Pageable="true" Sortable="true"
+                     Pageable="true" 
+                     Sortable="true"
                      Resizable="true"
-                     EditMode="Telerik.Blazor.GridEditMode.Inline">
+                     EditMode="Telerik.Blazor.GridEditMode.Inline"
+                     FilterMode="@GridFilterMode.FilterRow">
             <GridColumns>
-                <GridColumn Field="Part.SerialNumber" Title="Serial Number" Groupable="false" >
+                <GridColumn Field="Part.SerialNumber" Title="Serial Number" Groupable="false" Filterable="true" Sortable="false">
                 <HeaderTemplate>
                 <span><i class="fa-solid fa-barcode" style="color: #11515E;"></i> Serial Number</span>
                 </HeaderTemplate>
                 </GridColumn>
                 <!---<GridColumn Field="Part.SerialNumber" Title="Serial Number" Groupable="false" />--> 
 
-                <GridColumn Field="@(nameof(Entities.Inspection.UpdateDate))" Title="Update Date" Groupable="false">
+                <GridColumn Field="@(nameof(Entities.Inspection.UpdateDate))" Title="Update Date" Groupable="false" Sortable="true" Filterable="false">
                 <HeaderTemplate>
                 <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Update Date</span>
                 </HeaderTemplate>
@@ -46,8 +48,8 @@
 
                <!---<i class="fa-solid fa-arrows-rotate"></i> <GridColumn Field="@(nameof(Entities.Inspection.UpdateDate))" Title="Update Date" Groupable="false" />---> 
                 <GridCommandColumn Width="10%;">
-                    
-                    <i class="fa-solid fa-chevron-right" style="color: #69A3AF;"></i>
+
+                    <GridCommandButton OnClick="@((args)=> findInspectionsDetail(args.Item as Entities.Inspection))"><i class="fa-solid fa-chevron-right" style="color: #69A3AF;"></i></GridCommandButton>
                 </GridCommandColumn>
             </GridColumns>
         </TelerikGrid>
@@ -527,6 +529,16 @@
         dataFailureGrid.Remove(item);
 
     }
+
+    async Task findInspectionsDetail(Entities.Inspection inspection)
+    {
+        if (inspection != null && inspection.Part != null)
+        {
+            SerialNumber = inspection.Part.SerialNumber;
+            await btnFindOnClick();
+        }
+    }
+
     async Task btnFindOnClick()
     {
         if (string.IsNullOrEmpty(SerialNumber))
@@ -550,6 +562,17 @@
             if (dataInspectionModel.InspectionFailedList.Count > 0)
             {
                 dataFailureGrid = dataInspectionModel.InspectionFailedList;
+            }
+           
+            if (RdoStatusValue == 1)
+            {
+                AddActiveCssClass = "active";
+                AddInActiveCssClass = string.Empty;
+            }
+            else if(RdoStatusValue == 0)
+            { 
+                AddActiveCssClass = string.Empty;
+                AddInActiveCssClass = "active";
             }
         }
 

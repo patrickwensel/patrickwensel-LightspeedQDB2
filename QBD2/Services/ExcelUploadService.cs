@@ -267,6 +267,21 @@ namespace QBD2.Services
                                     };
                                     _context.Parts.Add(partFromQDB);
                                     await _context.SaveChangesAsync();
+
+                                    // Add Parts in to inspection record
+                                    var station = await _context.Stations.Where(x => x.Name.ToLower() == "Seveco".ToLower()).FirstOrDefaultAsync();
+                                    if (!_context.Inspections.Any(x => x.Pass == true && x.GeneralComments.ToLower() == "Seveco".ToLower() &&
+                                         x.PartId == partFromQDB.PartId && x.StationId == station.StationId))
+                                    {
+                                        Entities.Inspection inspection = new Entities.Inspection();
+                                        inspection.Pass = true;
+                                        inspection.GeneralComments = "Seveco";
+                                        inspection.PartId = partFromQDB.PartId;
+                                        inspection.StationId = station.StationId;
+                                        inspection.UpdateDate = DateTime.Now;
+                                        _context.Inspections.Add(inspection);
+                                        await _context.SaveChangesAsync();
+                                    }
                                 }
 
                                 var childParts = excelRows.Where(q => q.SN == serialNumber.SN && q.PN == part.PN && q.PartNumber != null && q.SerialNumber != null).ToList();
@@ -293,12 +308,30 @@ namespace QBD2.Services
                                         partsList.Add(childPart);
 
                                     }
-
                                 }
+
                                 if (partsList.Count > 0)
                                 {
                                     _context.Parts.AddRange(partsList);
                                     await _context.SaveChangesAsync();
+
+                                    foreach (var item in partsList)
+                                    {
+                                        // Add Parts in to inspection record
+                                        var station = await _context.Stations.Where(x => x.Name.ToLower() == "Seveco".ToLower()).FirstOrDefaultAsync();
+                                        if(!_context.Inspections.Any(x=>x.Pass == true && x.GeneralComments.ToLower() == "Seveco".ToLower() && 
+                                        x.PartId == item.PartId && x.StationId == station.StationId))
+                                        {
+                                            Entities.Inspection inspection = new Entities.Inspection();
+                                            inspection.Pass = true;
+                                            inspection.GeneralComments = "Seveco";
+                                            inspection.PartId = item.PartId;
+                                            inspection.StationId = station.StationId;
+                                            inspection.UpdateDate = DateTime.Now;
+                                            _context.Inspections.Add(inspection);
+                                            await _context.SaveChangesAsync();
+                                        }
+                                    }
                                 }
                             }
                         }

@@ -71,6 +71,7 @@ namespace QBD2.Data
             #region Station
 
             modelBuilder.Entity<Station>().HasData(new Station { StationId = 1, Name = "Final Inspection" });
+            modelBuilder.Entity<Station>().HasData(new Station { StationId = 2, Name = "Seveco" });
 
             #endregion
 

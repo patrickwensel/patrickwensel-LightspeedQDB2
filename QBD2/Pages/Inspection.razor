@@ -400,37 +400,6 @@
                  </div>
             }
 
-            @if (SelectedAlertDeviationRecord.PartList != null && SelectedAlertDeviationRecord.PartList.Count() > 0)
-            {
-               <div class="form-group row">
-                <div class="row">
-                    <label for="PartDeviations" class="col-sm-8 col-form-label" style="font-weight:bold">
-                    @if(SelectedAlertDeviationRecord.AlertId > 0)
-                    {
-                        <text>Part Alerts</text>
-                    }
-                    else if(SelectedAlertDeviationRecord.DeviationId > 0)
-                    {
-                        <text>Part Deviations</text>
-                    }
-                    </label>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <TelerikGrid Data=@SelectedAlertDeviationRecord.PartList Sortable="true" Pageable="false">
-                             <GridColumns>
-                                 <GridColumn Field=@nameof(Part.SerialNumber) Title="Serial Number" Filterable="false">
-                                 </GridColumn>
-                             </GridColumns>
-                             <NoDataTemplate>
-                                 <text>No Records Available</text>
-                             </NoDataTemplate>
-                        </TelerikGrid>
-                    </div>
-                </div>
-                </div>
-               <br/>
-            }
             <div class="form-row">
                 <div class="col-md-12 m-0 p-0" style="text-align: right;">
                     <TelerikButton OnClick="(()=>ClearAlertDeviationSelection())">Close</TelerikButton>

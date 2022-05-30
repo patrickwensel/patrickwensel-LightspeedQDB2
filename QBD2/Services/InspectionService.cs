@@ -222,20 +222,23 @@ namespace QBD2.Services
                         await _context.SaveChangesAsync();
                     }
                     List<Entities.InspectionFailure> objList = new List<InspectionFailure>();
-                    foreach (var item in inspectionFailureItem)
+                    if (inspectionFailureItem != null)
                     {
-                        objList.Add(new InspectionFailure
+                        foreach (var item in inspectionFailureItem)
                         {
-                            Comment = item.Comment,
-                            FailureTypeId = item.FailureTypeId,
-                            InspectionId = objInspection.InspectionId
+                            objList.Add(new InspectionFailure
+                            {
+                                Comment = item.Comment,
+                                FailureTypeId = item.FailureTypeId,
+                                InspectionId = objInspection.InspectionId
 
-                        });
+                            });
 
 
+                        }
+                        _context.InspectionFailures.AddRange(objList);
+                        await _context.SaveChangesAsync();
                     }
-                    _context.InspectionFailures.AddRange(objList);
-                    await _context.SaveChangesAsync();
                 }
 
 

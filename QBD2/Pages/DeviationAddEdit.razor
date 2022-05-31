@@ -160,10 +160,14 @@
         <div class="form-group row">
             <label for="ECORequired" class="col-sm-2 col-form-label">ECO Required</label>
             <div class="col-sm-7">
-                <InputRadioGroup Name="ECORequired" @bind-Value="AddEditDeviation.ECORequired">
+                @*<InputRadioGroup Name="ECORequired" @bind-Value="AddEditDeviation.ECORequired">
                     <InputRadio Name="ECORequired" Value="@(true)" /> Yes
                     <InputRadio Name="ECORequired" Value="@(false)" /> No
-                </InputRadioGroup>
+                </InputRadioGroup>*@
+                <ul class="switch-btn">
+                   <li class="@AddActiveCssClass" @onclick="(() => OnECORequiredChangeHandler(true))"><i class="fa-regular fa-circle-check"></i> Yes</li>
+                   <li class="failed @AddInActiveCssClass" @onclick="(() => OnECORequiredChangeHandler(false))"><i class="fa-light fa-circle-xmark"></i> No</li>
+                </ul>
                 <ValidationMessage For="@(() => AddEditDeviation.ECORequired)"></ValidationMessage>
             </div>
         </div>
@@ -313,6 +317,10 @@
     List<AddPartsToDeviationError> ExcelAddPartsToDeviationError { get; set; }
     SerialNumberRange serialNumberRange = new();
 
+    public string AddActiveCssClass { get; set; } = "active";
+
+    public string AddInActiveCssClass { get; set; } 
+
     protected override async Task OnInitializedAsync()
     {
         GridData = await DeviationService.ReadDeviations();
@@ -375,6 +383,17 @@
         {
             AddEditDeviation = new Deviation();
             AddEditDeviation.DeviationId = 0;
+        }
+
+        if (AddEditDeviation.ECORequired == true)
+        {
+                AddActiveCssClass = "active";
+                AddInActiveCssClass = string.Empty;
+        }
+        else if(AddEditDeviation.ECORequired == false)
+        { 
+                AddActiveCssClass = string.Empty;
+                AddInActiveCssClass = "active";
         }
 
         if (AddEditDeviation != null)
@@ -505,12 +524,12 @@
 
         try
         {
-             errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, long.Parse(SerialNumber), long.Parse(SerialNumber));
+            errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, long.Parse(SerialNumber), long.Parse(SerialNumber));
         }
         catch (Exception ex)
         {
-             toastService.ShowError("Please enter valid serial number.", "Error");
-             return;
+            toastService.ShowError("Please enter valid serial number.", "Error");
+            return;
         }
 
         if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
@@ -592,5 +611,19 @@
         }
     }
 
-
+    public async void OnECORequiredChangeHandler(bool value)
+    {
+        if (value == true)
+        {
+            AddEditDeviation.ECORequired = true;
+            AddActiveCssClass = "active";
+            AddInActiveCssClass = string.Empty;
+        }
+        else if(value == false)
+        { 
+            AddEditDeviation.ECORequired = false;
+            AddActiveCssClass = string.Empty;
+            AddInActiveCssClass = "active";
+        }
+    }
 }

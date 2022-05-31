@@ -13,7 +13,7 @@
 
 
 <div class="form-group row inspection">
-    <div class="col-sm-6">
+    <div class="col-sm-6 left-serial">
 
         <div class="row">
 
@@ -67,7 +67,7 @@
    <div class="row class=">
             <div class="col-sm-12">
                 <label class="col-sm-12 col-form-label">Desc :</label>
-                <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty)</label>
+                <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty) <i class="fa-solid fa-circle-xmark"></i></label>
             </div>
         </div>
         <div class="row">
@@ -86,7 +86,7 @@
 
         <div class="row">
 
-             <div class=" col-sm-12">
+             <div class=" col-sm-12 alert-section">
                 <TelerikGrid Data=@GridAlertDeviationData Sortable="true" Pageable="false">
                          <GridColumns>
                             <GridColumn Field=@nameof(AlertDeviationDetailModel.Title) Title="Alerts & Deviations" Filterable="false">

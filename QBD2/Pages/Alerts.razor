@@ -33,28 +33,41 @@
         left: 72%;
     }
 </style>
+<div class="row alerts-row">
+    <div class="col-md-8">
+        <h3 class="alert-title"><i class="fas fa-chevron-left"></i> <i class="fa fa-bell" aria-hidden="true"></i> Alerts</h3>
+    </div>
+    <div class="col-md-4 add-alrert-btn">
+        <GridToolBar>
+            <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Alert</TelerikButton>
+        </GridToolBar>
+    </div>
+</div>
 
-<h3>Alerts</h3>
+<hr />
+
 @if (AddEditAlert == null)
 {
+    <h3 class="alert-table-title">Listed Alerts</h3>
+    <div class="al-table">
     <TelerikGrid Data="@GridData"
              Pageable="true"
              Sortable="true"
              FilterMode="@GridFilterMode.FilterRow">
-        <GridToolBar>
-            <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Alert</TelerikButton>
-        </GridToolBar>
-        <GridColumns>
+        
+         
+             <GridColumns>
             <GridColumn Field="@(nameof(Alert.DateCreated))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}"/>
             <GridColumn Field="@(nameof(Alert.Title))" Title="Title" Filterable="false"/>
             <GridColumn Field="@(nameof(Alert.MasterPartNumber))" Title="Part Number" Filterable="false"/>
             <GridColumn Field="@(nameof(Alert.MasterPartDescription))" Title="Description" Filterable="false"/>
-            <GridCommandColumn Width="150px">
-                 <GridCommandButton Icon="edit" OnClick="@((args)=> SelectRecord(args.Item as Alert))"></GridCommandButton>
-                 <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
+            <GridCommandColumn Width="100px">
+                 <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Alert))"><i class="fal fa-edit"></i></GridCommandButton>
+                 <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete"></GridCommandButton>
             </GridCommandColumn>
         </GridColumns>
     </TelerikGrid>
+    </div>
 }
 
 @if (AddEditAlert != null)
@@ -77,46 +90,42 @@
         </div>
 
          <div class="form-group row">
+          <div class="col-md-6">
             <div class="row">
-                <label for="Title" class="col-sm-8 col-form-label">Title</label>
+            <label for="Title" class="col-md-3 col-form-label">Title </label>
+            <div class="col-md-9">
+            <TelerikTextBox @bind-Value="@AddEditAlert.Title" Class="form-control"></TelerikTextBox>
+            <ValidationMessage For="@(() => AddEditAlert.Title)"></ValidationMessage></div>
             </div>
-            <div class="row">
-                <div class="col-md-11">
-                    <TelerikTextBox @bind-Value="@AddEditAlert.Title" Class="form-control"></TelerikTextBox>
-                    <ValidationMessage For="@(() => AddEditAlert.Title)"></ValidationMessage>
-                </div>
-            </div>
-        </div>
+          </div>
 
-        <div class="form-group row">
-            <div class="row">
-                <label for="ExpirationDate" class="col-sm-8 col-form-label">Expiration Date</label>
+          <div class="col-md-6">
+          <div class="row">
+            <label for="ExpirationDate" class="col-md-4 col-form-label">Expiration Date </label>
+            <div class="col-md-8">
+            <TelerikDatePicker @bind-Value="@AddEditAlert.ExpirationDate" Class="form-control" @ref="theDatePickerExpirationDate" Format="dd/MM/yyyy"></TelerikDatePicker>
+            <ValidationMessage For="@(() => AddEditAlert.ExpirationDate)"></ValidationMessage></div>
+          </div>
             </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <TelerikDatePicker @bind-Value="@AddEditAlert.ExpirationDate" Class="form-control" @ref="theDatePickerExpirationDate" Format="dd/MM/yyyy"></TelerikDatePicker>
-                    <ValidationMessage For="@(() => AddEditAlert.ExpirationDate)"></ValidationMessage>
-                </div>
-            </div>
-        </div>
+         </div>
+            
+        
 
-        <div class="form-group row">
-            <div class="row">
-                <label for="ReasonforManufacturingDeviation" class="col-sm-8 col-form-label">Reason for Manufacturing Deviation</label>
-            </div>
-            <div class="row">
-                <div class="col-md-11">
-                    <textarea @bind-value="AddEditAlert.ReasonforManufacturingDeviation" class="form-control" rows="8" @bind-value:event="oninput"></textarea>
-                    <ValidationMessage For="@(() => AddEditAlert.ReasonforManufacturingDeviation)"></ValidationMessage>
-                </div>
+        <div class="form-group row">          
+            <label for="ReasonforManufacturingDeviation" class="col-md-3 col-form-label">Reason for Manufacturing Deviation</label>
+            <div class="col-md-9">
+            <textarea @bind-value="AddEditAlert.ReasonforManufacturingDeviation" class="form-control" rows="8" @bind-value:event="oninput"></textarea>
+            <ValidationMessage For="@(() => AddEditAlert.ReasonforManufacturingDeviation)"></ValidationMessage>
             </div>
         </div>
+       
 
         <br />
         <div class="row">
             <div class="col-md-12">
-                <h5>Affected Serial Numbers</h5>
                 <hr>
+                <h5>Affected Serial Numbers</h5>
+                
             </div>
         </div>
 

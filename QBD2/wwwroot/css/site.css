@@ -9,6 +9,7 @@
 
 html, body {
     font-family: 'Effra', sans-serif;
+    background: #f5f5f5;
 }
 
 h1:focus {
@@ -78,7 +79,7 @@ nav#sidebar {
     transition: all 0.3s;
     box-shadow: 0px 0px 20px rgb(1 41 112 / 10%);
     padding: 75px 0px;
-    height: 100vh;
+    height: auto;
 }
 
     nav#sidebar span {
@@ -178,6 +179,8 @@ nav#sidebar ul li i {
 .inspection .left-input input#txtSerialSearch {
     height: 40px;
     border: 1px solid #00000014;
+    color: #656565;
+    font-size: 15px;
 }
 
 .inspection .col-sm-3.b-btn {
@@ -234,14 +237,14 @@ nav#sidebar ul li i {
     text-align: right;
 }
 
-.inspection .k-pager-numbers .k-link.k-state-selected {
-    color: #11515e;
-    background-color: rgb(16 104 179 / 20%);
+.k-pager-numbers .k-link.k-state-selected {
+    color: #11515e !important;
+    background-color: rgb(16 104 179 / 20%) !important;
 }
 
-.inspection .k-pager-info {
-    color: #656565;
-    font-size: 14px;
+.k-pager-info {
+    color: #656565 !important;
+    font-size: 14px !important;
 }
 
 .inspection .save-btn {
@@ -306,10 +309,11 @@ nav#sidebar ul li i {
 }
 
 .inspection .col-sm-6.right-scroll-column {
-    height: 470px;
+    height: 600px;
     overflow: hidden;
     overflow-y: scroll;
     border-left: 1px solid #0000001A;
+    padding-left: 30px;
 }
 
 /* width */
@@ -387,6 +391,7 @@ a.nav-link.active {
 
 .right-value {
     padding: 0;
+    font: normal normal bold 15px/20px Effra;
 }
 
 .inspection .col-form-label.font-b {
@@ -400,6 +405,7 @@ a.nav-link.active {
 
 .inspection textarea#txtGenerelComment {
     height: 95px;
+    resize: none;
 }
 
 .inspection span.k-textbox.k-input.form-control.col-sm-11.k-valid.telerik-blazor.k-input-solid.k-rounded-md.k-input-md {
@@ -415,6 +421,126 @@ a.nav-link.active {
     box-shadow: 0 4px 2px #b1b1b1;
 }
 
+.alert-eye span.k-icon.k-i-eye.k-button-icon {
+    color: #656565;
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    border: 1px solid #E6E6E6;
+    border-radius: 5px;
+}
+
+#lblDescValue svg.svg-inline--fa.fa-circle-xmark.fa-w-16 {
+    color: #c3c3c355;
+    float: right;
+    font-size: 30px;
+    position: absolute;
+    right: 35px;
+    top: 100px;
+}
+
+span.k-icon.k-i-arrow-60-down.k-button-icon {
+    color: #69A3AF;
+}
+
+.left-serial {
+    padding-right: 30px;
+}
+
+
+.inspection .alert-section button.telerik-blazor.k-button.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base.k-icon-button {
+    background: #FFFFFF 0% 0% no-repeat padding-box !important;
+    border: 1px solid #E6E6E6 !IMPORTANT;
+    border-radius: 5px !important;
+}
+
+.current-inspection .k-button-solid-base {
+    border: none !important;
+    background: none !IMPORTANT;
+}
+
+.alert-title svg.svg-inline--fa.fa-chevron-left.fa-w-10 {
+    color: #69A3AF;
+    font-size: 25px;
+}
+
+.alert-title svg.svg-inline--fa.fa-bell.fa-w-14 {
+    color: #11515E;
+    margin: 0 10px;
+}
+.alert-title {
+    color: #11515E;
+    font: normal normal bold 25px/19px Effra;
+}
+label.col-form-label {
+    color: #656565;
+    font: normal normal normal 15px/20px Effra;
+}
+
+.add-alrert-btn button.telerik-blazor.k-button.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base {
+    width: 188px;
+    height: 50px;
+    background: #11515E 0% 0% no-repeat padding-box;
+    border: 1px solid #00000014;
+    border-radius: 5px;
+    color: #fff;
+    font: normal normal normal 20px/24px Effra;
+    text-transform: capitalize;
+    font-size: 20px;
+}
+.add-alrert-btn {
+    text-align: right;
+}
+
+.row.alerts-row {
+    align-items: center;
+}
+
+h3.alert-table-title {
+    color: #231F20;
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0;
+    background: #0000000B;
+    padding: 15px 13px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.k-pager-wrap.k-floatwrap.telerik-blazor.k-grid-pager {
+    border-radius: 0px 0px 11px 11px;
+    box-shadow: 0 4px 2px #b1b1b1;
+}
+
+.bgb-none {
+    background: none !important;
+    border: none !important;
+}
+
+.edit-btn {
+    color: #69A3AF !important;
+}
+.del-btn {
+    color: #ff3838 !important;
+}
+
+.al-table table.k-grid-table td:last-child {
+    text-align: center;
+}
+.al-table thead tr:first-child {
+    height: 54px;
+    background: #fff;
+}
+span.k-icon.k-i-calendar.k-button-icon {
+    color: #11515E;
+}
+span.k-icon.k-i-filter.k-button-icon {
+    color: #11515E;
+}
+span.k-icon.k-i-filter-clear.k-button-icon {
+    color: #11515E;
+}
+
+hr {
+    color: #9f9f9f;
+}
 
 @media (min-width:320px) and (max-width: 767px) {
     .logo img {

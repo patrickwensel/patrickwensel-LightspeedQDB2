@@ -1,4 +1,5 @@
 ﻿@page "/managepartstatus"
+@attribute [Authorize(Roles = "Admin")]
 @using QBD2.Services
 @using QBD2.Entities
 @inject PartStatusService PartStatusService

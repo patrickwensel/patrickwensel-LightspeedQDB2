@@ -35,12 +35,26 @@
 </style>
 <div class="row alerts-row">
     <div class="col-md-8">
-        <h3 class="alert-title"><i class="fas fa-chevron-left"></i> <i class="fa fa-bell" aria-hidden="true"></i> Alerts</h3>
+        <h3 class="alert-title"><i class="fas fa-chevron-left"></i> <i class="fa fa-bell" aria-hidden="true"></i>
+            @if (AddEditAlert != null && AddEditAlert.AlertId == 0)
+            {
+                <text> Add New Alert</text>
+            }
+            else if(AddEditAlert != null && AddEditAlert.AlertId > 0)
+            {
+                <text> Edit Alert</text>
+            }
+            else
+            {
+                 <text> Alerts</text>
+            }
+        </h3>
     </div>
     <div class="col-md-4 add-alrert-btn">
-        <GridToolBar>
-            <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Alert</TelerikButton>
-        </GridToolBar>
+         @if (AddEditAlert == null)
+         {
+             <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Alert</TelerikButton>
+         }
     </div>
 </div>
 
@@ -130,16 +144,83 @@
         </div>
 
         <div class="row">
-            <div class="col-md-2">
-                <div class="row">
-                    <div class="col-md-10">
-                        <input type="text" class="form-control numeric" style="width:170px;" @bind-value="@SerialNumber"/>
-                    </div>
-                    <div class="col-md-2">
-                        <TelerikButton Class="RightButton" @onclick="(()=> btnAddFindSerailNumberOnClick())">Add</TelerikButton>
-                    </div>
-                </div><br />
-                <div class="form-group row" style="margin-left: 0px;">
+            <div class="col-md-6">
+                 <TelerikTabStrip @bind-ActiveTabIndex="@ActiveTabIndex" @ref="mySerialNumberTabStrip">
+                    <TabStripTab Title="Manually">
+                        @if (RangeAddPartsToAlertError != null && RangeAddPartsToAlertError.Count() > 0)
+                        {
+                            <div class="row">
+                                @foreach(var item in RangeAddPartsToAlertError)
+                                {
+                                    <label class="text-danger">@item.Error</label><br />
+                                }
+                            </div>
+                        }
+                        <div class="row">
+                            <div class="col-md-10">
+                                <input type="text" class="form-control numeric" @bind-value="@SerialNumber" placeholder="ADD SERIAL NUMBER"/>
+                            </div>
+                            <div class="col-md-2">
+                                <TelerikButton Class="RightButton" @onclick="(()=> btnAddFindSerailNumberOnClick())" Icon="add">Add</TelerikButton>
+                            </div>
+                         </div>
+                    </TabStripTab>
+                    <TabStripTab Title="Range">
+                       <form Model="@serialNumberRange" @onsubmit="OnSubmitRange">
+                            @if (RangeAddPartsToAlertError != null && RangeAddPartsToAlertError.Count() > 0)
+                            {
+                                <div class="row">
+                                    @foreach(var item in RangeAddPartsToAlertError)
+                                    {
+                                        <label class="text-danger">@item.Error</label><br />
+                                    }
+                                </div>
+                             }
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+                            <div class="form-group row">
+                                <label for="startSerialNumber" class="col-md-5 col-form-label">Start Serial Number</label>
+                                <div class="col-sm-5">
+                                    <TelerikTextBox @bind-Value="@serialNumberRange.StartSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
+                                
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-top:15px;">
+                                <label for="endSerialNumber" class="col-md-5 col-form-label">End Serial Number</label>
+                                <div class="col-sm-5">
+                                    <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-top:15px;">
+                                <TelerikButton Class="SaveButton">Add Range</TelerikButton>
+                            </div>
+                        </form>
+                    </TabStripTab>
+                    <TabStripTab Title="Upload Excel">
+                        @if (ExcelAddPartsToAlertError != null && ExcelAddPartsToAlertError.Count() > 0)
+                        {
+                            <div class="row">
+                                @foreach(var item in ExcelAddPartsToAlertError)
+                                {
+                                    <label class="text-danger">@item.Error</label><br />
+                                }
+                            </div>
+                        }
+                        <br />
+                        <form @onsubmit="OnSubmitExcelFile">
+                            <div class="form-group row">
+                                <InputFile OnChange="OnInputFileChange" />
+                            </div>
+                             <div class="form-group row">
+                               <TelerikButton Class="SaveButton" Icon="upload">Upload Selected File</TelerikButton>
+                            </div>
+                        </form>
+                    </TabStripTab>
+                </TelerikTabStrip>
+            </div>
+             <div class="col-md-6">
+                 <br/>
+                 <div class="form-group row" style="margin-left: 0px;">
                     <TelerikGrid Data=@GridParts Sortable="true" Pageable="false">
                          <GridColumns>
                              <GridColumn Field=@nameof(Part.SerialNumber) Title="Serial Number" Filterable="false">
@@ -151,65 +232,8 @@
                     </TelerikGrid>
                 </div>
             </div>
-            <div class="col-md-1" style="text-align:center;margin-top:82px;">OR</div>
-            <div class="col-md-3">
-                <form Model="@serialNumberRange" @onsubmit="OnSubmitRange">
-                    <div class="row">
-                        <label class="form-label">Range</label>
-                    </div>
-                    @if (RangeAddPartsToAlertError != null && RangeAddPartsToAlertError.Count() > 0)
-                    {
-                        <div class="row">
-                            @foreach(var item in RangeAddPartsToAlertError)
-                            {
-                                <label class="text-danger">@item.Error</label><br />
-                            }
-                        </div>
-                     }
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-                    <div class="form-group row">
-                        <label for="startSerialNumber" class="col-md-5 col-form-label">Start Serial Number</label>
-                        <div class="col-sm-5">
-                            <TelerikTextBox @bind-Value="@serialNumberRange.StartSerialNumber" Class="form-control numeric"></TelerikTextBox>
-                        
-                        </div>
-                    </div>
-                    <div class="form-group row" style="margin-top:15px;">
-                        <label for="endSerialNumber" class="col-md-5 col-form-label">End Serial Number</label>
-                        <div class="col-sm-5">
-                            <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control numeric"></TelerikTextBox>
-                        </div>
-                    </div>
-                    <div class="form-group row" style="margin-top:15px;">
-                        <TelerikButton Class="SaveButton">Add Range</TelerikButton>
-                    </div>
-                </form>
-            </div>
-            <div class="col-md-1" style="text-align:center;margin-top:82px;">OR</div>
-            <div class="col-md-3">
-                <div class="row">
-                    <label class="form-label">Upload Excel file with Serial Number List</label>
-                </div>
-                @if (ExcelAddPartsToAlertError != null && ExcelAddPartsToAlertError.Count() > 0)
-                {
-                    <div class="row">
-                        @foreach(var item in ExcelAddPartsToAlertError)
-                        {
-                            <label class="text-danger">@item.Error</label><br />
-                        }
-                    </div>
-                }
-                <br />
-                <div class="row">
-                    <form @onsubmit="OnSubmitExcelFile">
-                        <InputFile OnChange="OnInputFileChange" />
-                        <br /><br />
-                        <TelerikButton Class="SaveButton">Upload Selected File(s)</TelerikButton>
-                    </form>
-                </div>
-            </div>
         </div>
+        
         <br />
         <div class="row">
             <TelerikButton Class="SaveButton" OnClick="(()=>HandleValidSubmit())">Save</TelerikButton>
@@ -219,6 +243,10 @@
 }
 
 @code {
+
+    public int ActiveTabIndex { get; set; } = 0;
+
+    Telerik.Blazor.Components.TelerikTabStrip mySerialNumberTabStrip;
 
     string selectedMasterPart { get; set; }
 

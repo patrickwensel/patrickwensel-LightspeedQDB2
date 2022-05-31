@@ -450,6 +450,7 @@ span.k-icon.k-i-arrow-60-down.k-button-icon {
     background: #FFFFFF 0% 0% no-repeat padding-box !important;
     border: 1px solid #E6E6E6 !IMPORTANT;
     border-radius: 5px !important;
+    color: #656565;
 }
 
 .current-inspection .k-button-solid-base {
@@ -540,6 +541,148 @@ span.k-icon.k-i-filter-clear.k-button-icon {
 
 hr {
     color: #9f9f9f;
+}
+
+
+.m-tb {
+    margin-top: 20px;
+}
+
+.bg-w label {
+    background: #fff;
+    width: 100%;
+    float: left;
+    line-height: 34px;
+    height: 50px;
+    padding-left: 10px;
+    border-radius: 5px;
+}
+
+.alert-edit-page input.k-input-inner {
+    height: 50px;
+    border-radius: 5px;
+}
+
+.alert-edit-page h5 {
+    color: #656565;
+    font-size: 19px;
+    margin-bottom: 20px;
+}
+.affect-p {
+    color: #231F20;
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0;
+    background: #0000000B;
+    padding: 10px 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.alert-edit-page li.k-tabstrip-item.k-item.k-state-active.k-tab-on-top {
+    background: #11515E;
+    color: #fff;
+    font: normal normal normal 15px/18px Effra;
+}
+.alert-edit-page li.k-tabstrip-item.k-item.k-state-default {
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    border: 1px solid #00000014;
+    border-radius: 0px 5px 5px 0px px;
+    color: #11515E;
+}
+
+.alert-edit-page .k-tabstrip-content.k-state-active, .k-tabstrip > .k-content.k-state-active {
+    display: block;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-top: 20px;
+}
+.alert-edit-page .k-tabstrip-items-wrapper.k-hstack {
+    border: none;
+}
+
+.alert-edit-page input.form-control.numeric {
+    font-size: 15px;
+}
+
+.alert-edit-page button.telerik-blazor.k-button.RightButton.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base {
+    background: #11515E;
+    color: #fff;
+    font-size: 15px;
+}
+.alert-edit-page button.telerik-blazor.k-button.SaveButton.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base {
+    background: #11515E;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 15px;
+    line-height: initial;
+}
+.k-calendar .k-calendar-td.k-state-selected .k-link {
+    background-color: #11515E !important;
+}
+.k-calendar .k-other-month {
+    color: #666666;
+    background: #EDEDED 0% 0% no-repeat padding-box;
+    border-radius: 2px;
+    border: 1px solid #e3e3e3;
+    padding-right: 0px;
+}
+.k-calendar .k-nav-today {
+    color: #11515E !important;
+}
+.k-icon-button.k-button-md {
+    padding: 4px;
+    color: #11515E;
+}
+
+button.telerik-blazor.k-button.UploadexlButton.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base {
+    background: #11515E;
+    border: 1px solid #00000014;
+    border-radius: 5px;
+    color: #fff;
+    max-width: 200px;
+    height: 38px;
+    font-size: 15px;
+    float: right;
+    margin-top: 10px;
+}
+
+.uplaod-box {
+    background: #EDEDED 0% 0% no-repeat padding-box;
+    border: 1px dashed #70707038;
+    border-radius: 10px;
+    height: 88px;
+    line-height: 88px;
+    padding: 0 30px;
+}
+
+    .uplaod-box input[type="file"] {
+        height: 40px;
+        line-height: 39px;
+        border: 1px solid #eee !important;
+        background: #fff;
+        width: 89px;
+        float: right;
+        margin-top: 25px;
+        border-radius: 5px;
+    }
+
+.uplaod-box input[type=file]::file-selector-button{
+    background-color: #fff;
+    border: 1px solid #fff;
+}
+
+
+span.k-dateinput.k-valid.telerik-blazor.k-input.k-input-md.k-input-solid.k-rounded-md input {
+    height: 30px;
+}
+
+
+
+textarea.form-control {
+    font-size: 15px;
+    color: #656565;
+    resize: none
 }
 
 @media (min-width:320px) and (max-width: 767px) {

@@ -30,7 +30,6 @@
     .SaveButton {
         float: right;
         width: 100px;
-        left: 72%;
     }
 </style>
 <div class="row alerts-row">
@@ -87,6 +86,8 @@
 @if (AddEditAlert != null)
 {
     <br />
+
+    <div class="alert-edit-page"> 
     <TelerikAutoComplete Data="@MasterParts" @bind-Value="@selectedMasterPart"
                      ValueField="@( nameof(MasterPart.PartNumber) )"
                      Filterable="true" MinLength="3"
@@ -96,38 +97,34 @@
     <EditForm EditContext="@ECAddEditAlert">
         <DataAnnotationsValidator />
 
-        <div class="form-group row">
+        <div class="form-group row m-tb">
             <label for="PortDescription" class="col-sm-2 col-form-label">Part Description</label>
-            <div class="col-md-10">
+            <div class="col-md-10 bg-w">
                 <label style="padding-top:10px;">@selectedMasterPartDescription</label>
             </div>
         </div>
 
-         <div class="form-group row">
-          <div class="col-md-6">
-            <div class="row">
-            <label for="Title" class="col-md-3 col-form-label">Title </label>
-            <div class="col-md-9">
+         <div class="form-group row m-tb">
+          
+            <label for="Title" class="col-md-2 col-form-label">Title </label>
+            <div class="col-md-4">
             <TelerikTextBox @bind-Value="@AddEditAlert.Title" Class="form-control"></TelerikTextBox>
             <ValidationMessage For="@(() => AddEditAlert.Title)"></ValidationMessage></div>
-            </div>
-          </div>
+           
 
-          <div class="col-md-6">
-          <div class="row">
-            <label for="ExpirationDate" class="col-md-4 col-form-label">Expiration Date </label>
-            <div class="col-md-8">
+          
+            <label for="ExpirationDate" class="col-md-2 col-form-label">Expiration Date </label>
+            <div class="col-md-4">
             <TelerikDatePicker @bind-Value="@AddEditAlert.ExpirationDate" Class="form-control" @ref="theDatePickerExpirationDate" Format="dd/MM/yyyy"></TelerikDatePicker>
             <ValidationMessage For="@(() => AddEditAlert.ExpirationDate)"></ValidationMessage></div>
-          </div>
-            </div>
+          
          </div>
             
         
 
-        <div class="form-group row">          
-            <label for="ReasonforManufacturingDeviation" class="col-md-3 col-form-label">Reason for Manufacturing Deviation</label>
-            <div class="col-md-9">
+        <div class="form-group row m-tb">          
+            <label for="ReasonforManufacturingDeviation" class="col-md-2 col-form-label">Reason for Manufacturing Deviation</label>
+            <div class="col-md-10">
             <textarea @bind-value="AddEditAlert.ReasonforManufacturingDeviation" class="form-control" rows="8" @bind-value:event="oninput"></textarea>
             <ValidationMessage For="@(() => AddEditAlert.ReasonforManufacturingDeviation)"></ValidationMessage>
             </div>
@@ -179,20 +176,21 @@
                             <DataAnnotationsValidator />
                             <ValidationSummary />
                             <div class="form-group row">
-                                <label for="startSerialNumber" class="col-md-5 col-form-label">Start Serial Number</label>
-                                <div class="col-sm-5">
+                                <label for="startSerialNumber" class="col-md-4 col-form-label">Start Serial Number</label>
+                                <div class="col-sm-6">
                                     <TelerikTextBox @bind-Value="@serialNumberRange.StartSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
                                 
                                 </div>
                             </div>
                             <div class="form-group row" style="margin-top:15px;">
-                                <label for="endSerialNumber" class="col-md-5 col-form-label">End Serial Number</label>
-                                <div class="col-sm-5">
+                                <label for="endSerialNumber" class="col-md-4 col-form-label">End Serial Number </label>
+                                <div class="col-sm-6">
                                     <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
                                 </div>
                             </div>
                             <div class="form-group row" style="margin-top:15px;">
-                                <TelerikButton Class="SaveButton">Add Range</TelerikButton>
+                                <div class="col-md-4"></div>
+                                <div class="col-md-6"><TelerikButton Class="SaveButton">+ Add Range</TelerikButton></div>
                             </div>
                         </form>
                     </TabStripTab>
@@ -209,18 +207,26 @@
                         <br />
                         <form @onsubmit="OnSubmitExcelFile">
                             <div class="form-group row">
+                                <div class="col-md-12">
+                                <div class="uplaod-box">
+                                <span>Select an Excel File to upload...</span>
                                 <InputFile OnChange="OnInputFileChange" />
-                            </div>
+                                </div>
+                                </div>
+                                
+                              </div>
                              <div class="form-group row">
-                               <TelerikButton Class="SaveButton" Icon="upload">Upload Selected File</TelerikButton>
+                               <div class="col-md-12"><TelerikButton Class="UploadexlButton" Icon="upload">Upload Selected File</TelerikButton></div>
+                               
                             </div>
                         </form>
                     </TabStripTab>
                 </TelerikTabStrip>
             </div>
              <div class="col-md-6">
-                 <br/>
-                 <div class="form-group row" style="margin-left: 0px;">
+                 
+                 <div class="form-group row" style="margin-left: 0px;"> 
+                    <h3 class="affect-p">Affected Parts</h3>
                     <TelerikGrid Data=@GridParts Sortable="true" Pageable="false">
                          <GridColumns>
                              <GridColumn Field=@nameof(Part.SerialNumber) Title="Serial Number" Filterable="false">
@@ -240,6 +246,7 @@
         </div>
         <br />
     </EditForm>
+    </div>
 }
 
 @code {

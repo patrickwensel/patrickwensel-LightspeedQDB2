@@ -1,4 +1,5 @@
 ﻿@page "/managemasterpart"
+@attribute [Authorize(Roles = "Admin")]
 @using QBD2.Services
 @using QBD2.Entities
 @inject MasterPartService MasterPartService

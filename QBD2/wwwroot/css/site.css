@@ -477,7 +477,7 @@ label.col-form-label {
 }
 
 .add-alrert-btn button.telerik-blazor.k-button.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base {
-    width: 188px;
+    width: 100%;
     height: 50px;
     background: #11515E 0% 0% no-repeat padding-box;
     border: 1px solid #00000014;
@@ -552,10 +552,11 @@ hr {
     background: #fff;
     width: 100%;
     float: left;
-    line-height: 34px;
     height: 50px;
     padding-left: 10px;
     border-radius: 5px;
+    color: #656565;
+    font: normal normal normal 15px/34px Effra;
 }
 
 .alert-edit-page input.k-input-inner {
@@ -609,6 +610,9 @@ hr {
     background: #11515E;
     color: #fff;
     font-size: 15px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    height: 37px;
 }
 .alert-edit-page button.telerik-blazor.k-button.SaveButton.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base {
     background: #11515E;
@@ -678,12 +682,81 @@ span.k-dateinput.k-valid.telerik-blazor.k-input.k-input-md.k-input-solid.k-round
 }
 
 
-
 textarea.form-control {
     font-size: 15px;
     color: #656565;
     resize: none
 }
+
+.location-section-dev table, th, td {
+    border-right: 1px solid #e1e1e1 !important;
+    padding: 8px 10px;
+    color: #656565;
+    font: normal normal normal 15px/20px Effra;
+}
+
+.location-section-dev table {
+    border-radius: 10px;
+    box-shadow: 0px 10px 3px #d9d9d9, 0px -15px 3px #d9d9d9;
+}
+
+.location-section-dev {
+    margin: 35px 0;
+}
+ul.switch-btn.dev li {
+    line-height: 20px;
+}
+
+.form-group.row.location-section-dev input {
+    height: 30px;
+    border: 1px solid #00000014;
+    border-radius: 5px;
+    color: #656565;
+    font: normal normal normal 15px/20px Effra;
+}
+ul.switch-btn.dev .active {
+    background: #11515E !IMPORTANT;
+}
+.h-40 input {
+    height: 40px !important;
+}
+.affects-p .k-grid.telerik-blazor {
+    padding: 0;
+}
+
+label.col-md-10.col-form-label.h-40.input-label {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.input-label span.title-u {
+    width: 133px;
+    float: left;
+    margin-right: 14px;
+    margin-top: 10px;
+}
+
+.input-label span.k-textbox.k-input.form-control.numeric.k-valid.telerik-blazor.k-input-solid.k-rounded-md.k-input-md {
+    float: left;
+    width: 190px;
+}
+.range-add {
+    width: 323px;
+    margin-left: 11px;
+}
+
+.postion-top {
+    position: relative;
+    top: 14px;
+}
+.postion-bottom {
+    position: relative;
+    bottom: 18px;
+}
+.col-md-1.m-left {
+    margin-left: 3px;
+}
+
 
 @media (min-width:320px) and (max-width: 767px) {
     .logo img {

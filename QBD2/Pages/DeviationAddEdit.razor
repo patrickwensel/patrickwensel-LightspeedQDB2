@@ -14,9 +14,8 @@
 
 <style>
     table, th, td {
-        border: 2px solid;
-    }
-
+        /*border: 2px solid;*/
+    } 
     .RightButton {
         height: 38px;
         width: 75px;
@@ -31,32 +30,43 @@
     .SaveButton {
         float: right;
         width: 100px;
-        left: 72%;
     }
 </style>
 
+<div class="row alerts-row">
+    <div class="col-md-9">
+<h3 class="alert-title"><i class="fa-solid fa-arrows-turn-to-dots"></i> Deviations</h3>
+</div>
+ <div class="col-md-3 add-alrert-btn">
+     <GridToolBar>
+            <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Deviation</TelerikButton>
+        </GridToolBar>
+ </div>
+</div>
 
-<h3>Deviations</h3>
+<hr />
+
 @if (AddEditDeviation == null)
 {
+    <h3 class="alert-table-title">Listed Alerts</h3>
+     <div class="al-table">
     <TelerikGrid Data="@GridData"
              Pageable="true"
              Sortable="true"
              FilterMode="@GridFilterMode.FilterRow">
-        <GridToolBar>
-            <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Deviation</TelerikButton>
-        </GridToolBar>
+        
         <GridColumns>
             <GridColumn Field="@(nameof(Deviation.DateCreated))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}" />
             <GridColumn Field="@(nameof(Deviation.MasterPartNumber))" Title="Part Number" Filterable="false" />
             <GridColumn Field="@(nameof(Deviation.MasterPartDescription))" Title="Description" Filterable="false" />
-            <GridCommandColumn Width="150px">
+            <GridCommandColumn Width="100px">
                 @*<GridCommandButton Command="Save" Icon="eye"></GridCommandButton>*@
-                <GridCommandButton Icon="edit" OnClick="@((args)=> SelectRecord(args.Item as Deviation))"></GridCommandButton>
-                <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
+                <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Deviation))"><i class="fal fa-edit"></i></GridCommandButton>
+                <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete"></GridCommandButton>
             </GridCommandColumn>
         </GridColumns>
     </TelerikGrid>
+    </div>
 }
 
 @if (AddEditDeviation != null)
@@ -67,7 +77,7 @@
         <h5><i class="fa-regular fa-plus"></i> Manage Deviation</h5><br />
         </div>
         </div>*@
-
+    <div class="alert-edit-page">
     <TelerikAutoComplete Data="@MasterParts" @bind-Value="@selectedMasterPart"
                      ValueField="@( nameof(MasterPart.PartNumber) )"
                      Filterable="true" MinLength="3"
@@ -86,47 +96,37 @@
             </div>
             </div>*@
 
-        <div class="form-group row">
+         <div class="form-group row m-tb">
             <label for="PortDescription" class="col-sm-2 col-form-label">Part Description</label>
-            <div class="col-md-10">
-                <label>@selectedMasterPartDescription</label>
+            <div class="col-md-10 bg-w">
+                <label style="padding-top:10px;">@selectedMasterPartDescription</label>
             </div>
         </div>
 
-         <div class="form-group row">
-            <div class="row">
-                <label for="Title" class="col-sm-8 col-form-label">Title</label>
-            </div>
-            <div class="row">
-                <div class="col-md-11">
-                    <TelerikTextBox @bind-Value="@AddEditDeviation.Title" Class="form-control"></TelerikTextBox>
-                    <ValidationMessage For="@(() => AddEditDeviation.Title)"></ValidationMessage>
-                </div>
+        <div class="form-group row m-tb">
+           <label for="Title" class="col-sm-2 col-form-label">Title</label>
+           <div class="col-md-10">
+            <TelerikTextBox @bind-Value="@AddEditDeviation.Title" Class="form-control"></TelerikTextBox>
+           <ValidationMessage For="@(() => AddEditDeviation.Title)"></ValidationMessage>
+                
             </div>
         </div>
 
-        <div class="form-group row">
-            <div class="row">
-                <label for="ReasonforManufacturingDeviation" class="col-sm-8 col-form-label">Reason for Manufacturing Deviation</label>
-            </div>
-            <div class="row">
-                <div class="col-md-11">
-                    <textarea @bind-value="AddEditDeviation.ReasonforManufacturingDeviation" class="form-control" rows="8" @bind-value:event="oninput"></textarea>
-                    <ValidationMessage For="@(() => AddEditDeviation.ReasonforManufacturingDeviation)"></ValidationMessage>
-                </div>
-            </div>
+        <div class="form-group row m-tb">
+           <label for="ReasonforManufacturingDeviation" class="col-sm-2 col-form-label">Reason for Manufacturing Deviation</label>
+           <div class="col-md-10">
+           <textarea @bind-value="AddEditDeviation.ReasonforManufacturingDeviation" class="form-control" rows="8" @bind-value:event="oninput"></textarea>
+           <ValidationMessage For="@(() => AddEditDeviation.ReasonforManufacturingDeviation)"></ValidationMessage>
+           </div>
         </div>
 
-        <div class="form-group row">
-            <div class="row">
-                <label class="col-md-6 col-form-label">Location</label>
-            </div>
-            <div class="form-group row">
+        
+            <div class="form-group row location-section-dev">
                 <div class="col-md-12">
                     <table>
                         <thead>
                             <tr>
-                                <th width="25%"></th>
+                                <th width="25%">Location</th>
                                 <th width="15%">SVRART</th>
                                 <th width="15%">SEVE</th>
                                 <th width="15%">2</th>
@@ -155,18 +155,18 @@
                     </table>
                 </div>
             </div>
-        </div>
-        <br />
-        <div class="form-group row">
+        
+        
+        <div class="form-group row m-tb">
             <label for="ECORequired" class="col-sm-2 col-form-label">ECO Required</label>
             <div class="col-sm-7">
                 @*<InputRadioGroup Name="ECORequired" @bind-Value="AddEditDeviation.ECORequired">
                     <InputRadio Name="ECORequired" Value="@(true)" /> Yes
                     <InputRadio Name="ECORequired" Value="@(false)" /> No
                 </InputRadioGroup>*@
-                <ul class="switch-btn">
-                   <li class="@AddActiveCssClass" @onclick="(() => OnECORequiredChangeHandler(true))"><i class="fa-regular fa-circle-check"></i> Yes</li>
-                   <li class="failed @AddInActiveCssClass" @onclick="(() => OnECORequiredChangeHandler(false))"><i class="fa-light fa-circle-xmark"></i> No</li>
+                <ul class="switch-btn dev">
+                   <li class="@AddActiveCssClass" @onclick="(() => OnECORequiredChangeHandler(true))"> Yes</li>
+                   <li class="@AddInActiveCssClass" @onclick="(() => OnECORequiredChangeHandler(false))"> No</li>
                 </ul>
                 <ValidationMessage For="@(() => AddEditDeviation.ECORequired)"></ValidationMessage>
             </div>
@@ -174,18 +174,20 @@
 
         @if (AddEditDeviation.ECORequired)
         {
-            <div class="form-group row">
+            <div class="form-group row m-tb">
                 <label for="ECONumber" class="col-sm-2 col-form-label">ECO Number</label>
-                <div class="col-md-11">
+                <div class="col-md-2 h-40">
                     <TelerikTextBox @bind-Value="@AddEditDeviation.ECONumber" Class="form-control"></TelerikTextBox>
                     <ValidationMessage For="@(() => AddEditDeviation.ECONumber)"></ValidationMessage>
                 </div>
+                <div class="col-md-8"></div>
             </div>
         }
 
-        <div class="form-group row">
-            <div class="col-md-11">
-                <label for="ReasonforManufacturingDeviation">Comment Corrective Action</label><br>
+        <div class="form-group row m-tb">
+            
+                <label class="col-sm-2 col-form-label" for="ReasonforManufacturingDeviation">Comment <br>Corrective <br>Action</label><br>
+                <div class="col-md-10">
                 <textarea @bind-value="AddEditDeviation.CommentCorrectiveAction" class="form-control" rows="4" @bind-value:event="oninput"></textarea>
                 <ValidationMessage For="@(() => AddEditDeviation.CommentCorrectiveAction)"></ValidationMessage>
             </div>
@@ -236,20 +238,26 @@
                                 <DataAnnotationsValidator />
                                 <ValidationSummary />
                                 <div class="form-group row">
-                                    <label for="startSerialNumber" class="col-md-5 col-form-label">Start Serial Number</label>
-                                    <div class="col-sm-5">
+                                    <label for="startSerialNumber" class="col-md-10 col-form-label h-40 input-label postion-top">
+                                        <span class="title-u">Start Serial Number</span> 
                                         <TelerikTextBox @bind-Value="@serialNumberRange.StartSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
-                                        
-                                    </div>
+                                    </label>
+                                     <div class="col-sm-2"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-1 m-left"><img src="images/line-dash.png"></div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="endSerialNumber" class="col-md-10 col-form-label h-40 input-label postion-bottom">
+                                        <span class="title-u">End Serial Number</span> 
+                                        <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox></label>
+                                    <div class="col-sm-2"></div>
                                 </div>
                                 <div class="form-group row" style="margin-top:15px;">
-                                    <label for="endSerialNumber" class="col-md-5 col-form-label">End Serial Number</label>
-                                    <div class="col-sm-5">
-                                        <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
+                               
+                                    <div class="col-md-12">
+                                        <div class="range-add"><TelerikButton Class="SaveButton">+ Add Range</TelerikButton></div>
                                     </div>
-                                </div>
-                                <div class="form-group row" style="margin-top:15px;">
-                                    <TelerikButton Class="SaveButton">Add Range</TelerikButton>
                                 </div>
                             </form>
                         </TabStripTab>
@@ -265,10 +273,13 @@
                             }
                             <form @onsubmit="OnSubmitExcelFile">
                                 <div class="form-group row">
+                                    <div class="uplaod-box">
+                                <span>Select an Excel File to upload...</span>
                                     <InputFile OnChange="OnInputFileChange" />
+                                    </div>
                                 </div>
                                  <div class="form-group row">
-                                   <TelerikButton Class="SaveButton" Icon="upload">Upload Selected File</TelerikButton>
+                                   <div class="col-md-12"><TelerikButton Class="UploadexlButton" Icon="upload">Upload Selected File</TelerikButton></div>
                                 </div>
                             </form>
 
@@ -277,7 +288,8 @@
              </div>
              <div class="col-md-6">
                  <br/>
-                  <div class="form-group row" style="margin-left: 0px;">
+                  <div class="form-group row affects-p">
+                      <h3 class="affect-p">Affected Parts</h3>
                         <TelerikGrid Data=@GridParts Sortable="true" Pageable="false">
                             <GridColumns>
                                 <GridColumn Field=@nameof(Part.SerialNumber) Title="Serial Number" Filterable="false">
@@ -296,6 +308,7 @@
         </div>
         <br />
     </EditForm>
+    </div>
 }
 
 @code {

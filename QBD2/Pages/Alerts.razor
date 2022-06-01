@@ -176,21 +176,27 @@
                             <DataAnnotationsValidator />
                             <ValidationSummary />
                             <div class="form-group row">
-                                <label for="startSerialNumber" class="col-md-4 col-form-label">Start Serial Number</label>
-                                <div class="col-sm-6">
+                                <label for="startSerialNumber" class="col-md-10 col-form-label h-40 input-label postion-top">
+                                    <span class="title-u">Start Serial Number</span>
                                     <TelerikTextBox @bind-Value="@serialNumberRange.StartSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
+                                </label>
                                 
-                                </div>
+                                <div class="col-sm-2"></div>
                             </div>
-                            <div class="form-group row" style="margin-top:15px;">
-                                <label for="endSerialNumber" class="col-md-4 col-form-label">End Serial Number </label>
-                                <div class="col-sm-6">
+                            <div class="row">
+                                    <div class="col-md-1 m-left"><img src="images/line-dash.png"></div>
+                                </div>
+                            <div class="form-group row">
+                                <label for="endSerialNumber" class="col-md-10 col-form-label h-40 input-label postion-bottom">
+                                    <span class="title-u">End Serial Number</span>
                                     <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
-                                </div>
+                                </label>
+                                <div class="col-sm-2"></div>
                             </div>
                             <div class="form-group row" style="margin-top:15px;">
-                                <div class="col-md-4"></div>
-                                <div class="col-md-6"><TelerikButton Class="SaveButton">+ Add Range</TelerikButton></div>
+                                <div class="col-md-12">
+                                <div class="range-add"><TelerikButton Class="SaveButton">+ Add Range</TelerikButton></div>
+                                </div>
                             </div>
                         </form>
                     </TabStripTab>
@@ -225,7 +231,7 @@
             </div>
              <div class="col-md-6">
                  
-                 <div class="form-group row" style="margin-left: 0px;"> 
+                 <div class="form-group row affects-p"> 
                     <h3 class="affect-p">Affected Parts</h3>
                     <TelerikGrid Data=@GridParts Sortable="true" Pageable="false">
                          <GridColumns>

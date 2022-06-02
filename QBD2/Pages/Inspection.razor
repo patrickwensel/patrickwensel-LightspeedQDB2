@@ -62,7 +62,7 @@
                 <TelerikTextBox id="txtSerialSearch" Class="form-control col-sm-12" @bind-Value="SerialNumber"></TelerikTextBox>
             </div>
             <div class=" col-sm-3 b-btn">
-                <TelerikButton id="btnSearch" OnClick="@btnFindOnClick" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
+                <TelerikButton id="btnSearch" OnClick="(()=>btnFindOnClick(true))" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
         </div>
     </div>
 
@@ -422,6 +422,7 @@
     List<Models.DropDownBind> dataStationDropdown { get; set; }
     Models.InspectionModel dataInspectionModel { get; set; }
     Models.Inspection dataInspection { get; set; }
+    Models.Inspection SelectedDataInspection { get; set; }
 
     List<Models.AlertDeviationDetailModel> GridAlertDeviationData { get; set; }
     public Models.AlertDeviationDetailModel SelectedAlertDeviationRecord { get; set; }
@@ -537,11 +538,12 @@
         if (inspection != null && inspection.Part != null)
         {
             SerialNumber = inspection.Part.SerialNumber;
-            await btnFindOnClick();
+            SelectedDataInspection = await InspectionService.GetInspectionsById(inspection.InspectionId);
+            await btnFindOnClick(false);
         }
     }
 
-    async Task btnFindOnClick()
+    async Task btnFindOnClick(bool isFindButton)
     {
         if (string.IsNullOrEmpty(SerialNumber))
         {
@@ -558,14 +560,34 @@
         }
         if (dataInspectionModel.Inspection != null)
         {
-            dataInspection = dataInspectionModel.Inspection;
+            if (isFindButton)
+            {
+                dataInspection = new Models.Inspection();
+            }
+            else
+            {
+                if(SelectedDataInspection != null && SelectedDataInspection.InspectionId > 0)
+                {
+                    dataInspection = SelectedDataInspection;
+                }
+                else
+                {
+                    dataInspection = new Models.Inspection();
+                }
+            }
+
             RdoStatusValue = dataInspection.Pass ? 1 : 0;
             DdlStationValue = dataInspection.StationId;
-            if (dataInspectionModel.InspectionFailedList.Count > 0)
+
+            if (SelectedDataInspection != null && SelectedDataInspection.InspectionFailedList != null && SelectedDataInspection.InspectionFailedList.Count > 0)
             {
-                dataFailureGrid = dataInspectionModel.InspectionFailedList;
+                dataFailureGrid = SelectedDataInspection.InspectionFailedList;
             }
-           
+            else
+            {
+                dataFailureGrid = new List<Models.InspectionFailed>();
+            }
+
             if (RdoStatusValue == 1)
             {
                 AddActiveCssClass = "active";

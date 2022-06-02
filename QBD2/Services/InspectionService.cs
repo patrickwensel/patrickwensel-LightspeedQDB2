@@ -251,5 +251,51 @@ namespace QBD2.Services
 
 
         }
+
+        public async Task<Models.Inspection> GetInspectionsById(int inspectionId)
+        {
+            var inspection = new Models.Inspection();
+            try
+            {
+                inspection = await (from ps in _context.Parts
+                                    join i in _context.Inspections
+                                    on ps.PartId equals i.PartId
+                                    where i.InspectionId == inspectionId
+                                    select new Models.Inspection
+                                    {
+                                        PartId = i.PartId,
+                                        GeneralComments = i.GeneralComments,
+                                        Pass = i.Pass,
+                                        StationId = i.StationId,
+                                        InspectionId = i.InspectionId
+                                    }).FirstOrDefaultAsync();
+
+                if (inspection != null)
+                {
+                    inspection.InspectionFailedList = await (from f in _context.InspectionFailures
+                                                                 join i in _context.Inspections
+                                                                 on f.InspectionId equals i.InspectionId
+                                                                 join t in _context.FailureTypes
+                                                                 on f.FailureTypeId equals t.FailureTypeId
+                                                                 join p in _context.FailureTypePrimaries
+                                                                 on t.FailureTypePrimaryId equals p.FailureTypePrimaryId
+                                                                 where f.InspectionId == inspection.InspectionId
+                                                                 select new Models.InspectionFailed
+                                                                 {
+                                                                     InspectionFailureId = f.InspectionFailureId,
+                                                                     FailureTypeId = f.FailureTypeId,
+                                                                     Comment = f.Comment,
+                                                                     FailureName = t.Name,
+                                                                     FailurePrimaryName = p.Name,
+                                                                     FailurePrimaryTypeId = p.FailureTypePrimaryId
+                                                                 }
+                                                                 ).ToListAsync();
+                }
+            }
+            catch (Exception e)
+            {
+            }
+            return inspection;
+        }
     }
 }

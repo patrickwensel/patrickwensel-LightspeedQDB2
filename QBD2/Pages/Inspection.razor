@@ -17,13 +17,6 @@
 
         <div class="row">
 
-            <div class="col-sm-9 left-input">
-                <TelerikTextBox id="txtSerialSearch" Class="form-control col-sm-12" @bind-Value="SerialNumber"></TelerikTextBox>
-            </div>
-            <div class=" col-sm-3 b-btn">
-                <TelerikButton id="btnSearch" OnClick="@btnFindOnClick" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
-            </div>
-
             <div class="current-inspection">
             <h3>Current Inspections</h3>
             <TelerikGrid Data="@MyData"
@@ -63,6 +56,15 @@
     </div>
 
     <div class=" col-sm-6 right-scroll-column">
+
+    <div class="row">
+        <div class="col-sm-9 left-input">
+                <TelerikTextBox id="txtSerialSearch" Class="form-control col-sm-12" @bind-Value="SerialNumber"></TelerikTextBox>
+            </div>
+            <div class=" col-sm-3 b-btn">
+                <TelerikButton id="btnSearch" OnClick="@btnFindOnClick" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
+        </div>
+    </div>
 
    <div class="row class=">
             <div class="col-sm-12">

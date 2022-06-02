@@ -19,6 +19,7 @@
         public string GeneralComments { get; set; }
         public int PartId { get; set; }
         public int StationId { get; set; }
+        public List<InspectionFailed> InspectionFailedList { get; set; }
     }
 
     public class InspectionFailed

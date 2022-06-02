@@ -242,8 +242,8 @@ namespace QBD2.Services
                            join ps in _context.PartStatuses
                            on p.PartStatusId equals ps.PartStatusId
 
-                           join repairsInfo in _context.Repairs
-                           on p.PartId equals repairsInfo.PartId
+                           //join repairsInfo in _context.Repairs
+                           //on p.PartId equals repairsInfo.PartId
 
                            where p.ParentPartId == partId
 
@@ -258,8 +258,8 @@ namespace QBD2.Services
                                UpdateDate = p.UpdateDate,
                                PartStatusId = p.PartStatusId,
                                PartStatus = ps.Name,
-                               GLCodeId = repairsInfo.GLCodeId,
-                               GLCode = repairsInfo != null && repairsInfo.GLCode != null ? repairsInfo.GLCode.Name : "",
+                               //GLCodeId = repairsInfo.GLCodeId,
+                               //GLCode = repairsInfo != null && repairsInfo.GLCode != null ? repairsInfo.GLCode.Name : "",
                            }).ToListAsync();
 
             if (x != null && x.Count() > 0)

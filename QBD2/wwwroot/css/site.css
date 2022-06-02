@@ -161,9 +161,7 @@ nav#sidebar ul li i {
 }
 
 /*inspection page css start here*/
-.inspection .current-inspection {
-    margin-top: 20px;
-}
+
 
     .inspection .current-inspection h3 {
         color: #231F20;
@@ -226,6 +224,14 @@ nav#sidebar ul li i {
     }
 
 .inspection .add-reason-btn button#btnSearch {
+    height: 38px;
+    background: #11515E;
+    color: #fff;
+    font-size: 15px;
+    line-height: 0;
+}
+
+.add-reason-btn button.telerik-blazor.k-button.SaveButton.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base {
     height: 38px;
     background: #11515E;
     color: #fff;
@@ -308,7 +314,7 @@ nav#sidebar ul li i {
     text-align: center;
 }
 
-.inspection .col-sm-6.right-scroll-column {
+.inspection .right-scroll-column {
     height: 600px;
     overflow: hidden;
     overflow-y: scroll;
@@ -434,7 +440,7 @@ a.nav-link.active {
     font-size: 30px;
     position: absolute;
     right: 35px;
-    top: 100px;
+    top: 155px;
 }
 
 span.k-icon.k-i-arrow-60-down.k-button-icon {
@@ -467,10 +473,12 @@ span.k-icon.k-i-arrow-60-down.k-button-icon {
     color: #11515E;
     margin: 0 10px;
 }
+
 .alert-title {
     color: #11515E;
     font: normal normal bold 25px/19px Effra;
 }
+
 label.col-form-label {
     color: #656565;
     font: normal normal normal 15px/20px Effra;
@@ -487,6 +495,7 @@ label.col-form-label {
     text-transform: capitalize;
     font-size: 20px;
 }
+
 .add-alrert-btn {
     text-align: right;
 }
@@ -505,6 +514,7 @@ h3.alert-table-title {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
+
 .k-pager-wrap.k-floatwrap.telerik-blazor.k-grid-pager {
     border-radius: 0px 0px 11px 11px;
     box-shadow: 0 4px 2px #b1b1b1;
@@ -518,6 +528,7 @@ h3.alert-table-title {
 .edit-btn {
     color: #69A3AF !important;
 }
+
 .del-btn {
     color: #ff3838 !important;
 }
@@ -525,16 +536,20 @@ h3.alert-table-title {
 .al-table table.k-grid-table td:last-child {
     text-align: center;
 }
+
 .al-table thead tr:first-child {
     height: 54px;
     background: #fff;
 }
+
 span.k-icon.k-i-calendar.k-button-icon {
     color: #11515E;
 }
+
 span.k-icon.k-i-filter.k-button-icon {
     color: #11515E;
 }
+
 span.k-icon.k-i-filter-clear.k-button-icon {
     color: #11515E;
 }
@@ -569,6 +584,7 @@ hr {
     font-size: 19px;
     margin-bottom: 20px;
 }
+
 .affect-p {
     color: #231F20;
     font-size: 15px;
@@ -579,11 +595,13 @@ hr {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
+
 .alert-edit-page li.k-tabstrip-item.k-item.k-state-active.k-tab-on-top {
     background: #11515E;
     color: #fff;
     font: normal normal normal 15px/18px Effra;
 }
+
 .alert-edit-page li.k-tabstrip-item.k-item.k-state-default {
     background: #FFFFFF 0% 0% no-repeat padding-box;
     border: 1px solid #00000014;
@@ -598,6 +616,7 @@ hr {
     padding: 0;
     margin-top: 20px;
 }
+
 .alert-edit-page .k-tabstrip-items-wrapper.k-hstack {
     border: none;
 }
@@ -614,6 +633,7 @@ hr {
     border-bottom-left-radius: 0;
     height: 37px;
 }
+
 .alert-edit-page button.telerik-blazor.k-button.SaveButton.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base {
     background: #11515E;
     color: #fff;
@@ -621,9 +641,11 @@ hr {
     font-size: 15px;
     line-height: initial;
 }
+
 .k-calendar .k-calendar-td.k-state-selected .k-link {
     background-color: #11515E !important;
 }
+
 .k-calendar .k-other-month {
     color: #666666;
     background: #EDEDED 0% 0% no-repeat padding-box;
@@ -631,9 +653,11 @@ hr {
     border: 1px solid #e3e3e3;
     padding-right: 0px;
 }
+
 .k-calendar .k-nav-today {
     color: #11515E !important;
 }
+
 .k-icon-button.k-button-md {
     padding: 4px;
     color: #11515E;
@@ -671,10 +695,10 @@ button.telerik-blazor.k-button.UploadexlButton.k-button-solid.k-rounded-md.k-but
         border-radius: 5px;
     }
 
-.uplaod-box input[type=file]::file-selector-button{
-    background-color: #fff;
-    border: 1px solid #fff;
-}
+    .uplaod-box input[type=file]::file-selector-button {
+        background-color: #fff;
+        border: 1px solid #fff;
+    }
 
 
 span.k-dateinput.k-valid.telerik-blazor.k-input.k-input-md.k-input-solid.k-rounded-md input {
@@ -703,6 +727,7 @@ textarea.form-control {
 .location-section-dev {
     margin: 35px 0;
 }
+
 ul.switch-btn.dev li {
     line-height: 20px;
 }
@@ -714,12 +739,15 @@ ul.switch-btn.dev li {
     color: #656565;
     font: normal normal normal 15px/20px Effra;
 }
+
 ul.switch-btn.dev .active {
     background: #11515E !IMPORTANT;
 }
+
 .h-40 input {
     height: 40px !important;
 }
+
 .affects-p .k-grid.telerik-blazor {
     padding: 0;
 }
@@ -740,6 +768,7 @@ label.col-md-10.col-form-label.h-40.input-label {
     float: left;
     width: 190px;
 }
+
 .range-add {
     width: 323px;
     margin-left: 11px;
@@ -749,13 +778,105 @@ label.col-md-10.col-form-label.h-40.input-label {
     position: relative;
     top: 14px;
 }
+
 .postion-bottom {
     position: relative;
     bottom: 18px;
 }
+
 .col-md-1.m-left {
     margin-left: 3px;
 }
+
+.k-window-titlebar.k-dialog-titlebar.k-header {
+    background: #BB4430 0% 0% no-repeat padding-box;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 0px 10px 20px 10px;
+}
+
+.k-window-content.k-dialog-content {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    background: #fff;
+    position: relative;
+    top: -15px;
+}
+
+.k-window-titlebar.k-dialog-titlebar.k-header h5 i {
+    margin-right: 5px;
+}
+
+.k-window-titlebar.k-dialog-titlebar.k-header h5 {
+    font: normal normal normal 20px/19px Effra;
+}
+
+.popup-frm label.col-sm-12.col-form-label {
+    font: normal normal normal 15px/20px Effra;
+    color: #656565;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+    .popup-frm label.col-sm-12.col-form-label.pop-value-title {
+        font: normal normal bold 19px/20px Effra;
+    }
+
+    .popup-frm label.col-sm-12.col-form-label.pop-value {
+        font: normal normal bold 15px/20px Effra;
+    }
+
+.popup-frm.form-group.row {
+    margin-bottom: 10px;
+}
+
+.k-window {
+    height: 100%;
+    border-radius: 20px !important;
+    background: none !important;
+    margin-top: 15px;
+}
+
+.popup-frm button.telerik-blazor.k-button.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base {
+    color: #11515E;
+    font: normal normal normal 15px/18px Effra;
+    width: 70px;
+    background: #fff;
+}
+
+.k-window-titlebar.k-dialog-titlebar.k-header i.fa-light.fa-circle-xmark {
+    color: #d1d1d1aa;
+    font-size: 23px;
+}
+
+.k-window-content.k-dialog-content {
+    border-radius: 20px;
+    background: #fff;
+    position: relative;
+}
+
+.k-window-title.k-dialog-title {
+    display: block;
+}
+
+.dev-tab, th, td {
+    border: 1px solid #eee;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+
+.row.repair-description {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.row.p-lr {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+
 
 
 @media (min-width:320px) and (max-width: 767px) {

@@ -5,15 +5,11 @@
 @inject InspectionService InspectionService
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
-<style>
-    table, th, td {
-        border: 2px solid;
-    }
-</style>
+
 
 
 <div class="form-group row inspection">
-    <div class="col-sm-6 left-serial">
+    <div class="col-sm-5 left-serial">
 
         <div class="row">
 
@@ -55,7 +51,7 @@
        
     </div>
 
-    <div class=" col-sm-6 right-scroll-column">
+    <div class=" col-sm-7 right-scroll-column">
 
     <div class="row">
         <div class="col-sm-9 left-input">
@@ -218,102 +214,113 @@
 
 @if(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)
 {
-        <TelerikWindow Visible="@(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)" Modal="true" Width="800px">
+        <TelerikWindow Visible="@(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)" Modal="true" Width="570px">
             <WindowTitle>
                 @{
-                    <h5><i aria-hidden="true"></i>
+                    
+                    <h5><!---<i aria-hidden="true"></i>--->
                     @if(SelectedAlertDeviationRecord.AlertId > 0)
                     {
-                        <text>Alert Detail</text>
+                        <div class="row p-lr">
+                        <div class="col-md-11">
+                        <text><i class="fa-light fa-bell-exclamation"></i> Alert Detail </text>
+                        </div>
+                        
+
+                        <div class="col-md-1"><i class="fa-light fa-circle-xmark"></i></div>
+                        </div>
                     }
                     else if(SelectedAlertDeviationRecord.DeviationId > 0)
                     {
-                        <text>Deviation Detail</text>
+                        <div class="row p-lr">
+                        <div class="col-md-11">
+                        <text><i class="fa-light fa-arrows-turn-to-dots" b-kq6mrvu7il=""></i> Deviation Detail</text>
+                        </div>
+                         <div class="col-md-1"><i class="fa-light fa-circle-xmark"></i></div>
+                         </div>
                     }
                     </h5>
+                    
                 }
             </WindowTitle>
             <WindowContent>
             @if (SelectedAlertDeviationRecord.AlertId > 0)
             {
-                 <div class="form-group row">
-                    <label for="Title" class="col-sm-4 col-form-label" style="font-weight:bold">Title</label>
-                    <div class="col-sm-8">
-                     <label for="Title" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.Alert.Title</label>
-                    </div>
+                 <div class="form-group row popup-frm">
+                    <label for="Title" class="col-sm-12 col-form-label">Title</label>
+                    <label for="Title" class="col-sm-12 col-form-label pop-value-title">@SelectedAlertDeviationRecord.Alert.Title</label>
+                    
                  </div>
 
-                  <div class="form-group row">
-                    <label for="ReasonforManufacturingDeviation" class="col-sm-4 col-form-label" style="font-weight:bold">Reason for Manufacturing Deviation</label>
-                    <div class="col-sm-8">
-                     <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.Alert.ReasonforManufacturingDeviation</label>
-                    </div>
+                  <div class="form-group row popup-frm">
+                    <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label">Reason for Manufacturing Deviation</label>
+                    
+                     <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.Alert.ReasonforManufacturingDeviation</label>
+                    
                  </div>
 
-                 <div class="form-group row">
-                    <label for="DateCreated" class="col-sm-4 col-form-label" style="font-weight:bold">Date Created</label>
-                    <div class="col-sm-8">
-                        <label for="DateCreated" class="col-sm-12 col-form-label">:&ensp;
+                 <div class="form-group row popup-frm">
+                    <label for="DateCreated" class="col-sm-12 col-form-label">Date Created</label>
+                    
+                        <label for="DateCreated" class="col-sm-12 col-form-label pop-value">
                             @if (SelectedAlertDeviationRecord.Alert != null && SelectedAlertDeviationRecord.Alert.DateCreated != null)
                             {
                                 @SelectedAlertDeviationRecord.Alert.DateCreated.Value.ToString("dd-MM-yyyy")
                             }
                      </label>
-                    </div>
+                   
                  </div>
 
-                <div class="form-group row">
-                    <label for="ExpirationDate" class="col-sm-4 col-form-label" style="font-weight:bold">Expiration Date</label>
-                    <div class="col-sm-8">
-                        <label for="ExpirationDate" class="col-sm-12 col-form-label">:&ensp;
+                <div class="form-group row popup-frm">
+                    <label for="ExpirationDate" class="col-sm-12 col-form-label">Expiration Date</label>
+                    
+                        <label for="ExpirationDate" class="col-sm-12 col-form-label pop-value">
                             @if (SelectedAlertDeviationRecord.Alert != null && SelectedAlertDeviationRecord.Alert.ExpirationDate != null)
                             {
                                 @SelectedAlertDeviationRecord.Alert.ExpirationDate.Value.ToString("dd-MM-yyyy")
                             }
                      </label>
+                    
+                 </div>
+
+                 <div class="form-group row popup-frm">
+                    <label for="MasterPartNumber" class="col-sm-12 col-form-label">Master Part Number</label>
+                    <div class="col-sm-8">
+                     <label for="MasterPartNumber" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.MasterPartNumber</label>
                     </div>
                  </div>
 
-                 <div class="form-group row">
-                    <label for="MasterPartNumber" class="col-sm-4 col-form-label" style="font-weight:bold">Master Part Number</label>
+                 <div class="form-group row popup-frm">
+                    <label for="MasterPartDescription" class="col-sm-12 col-form-label">Master Part Description</label>
                     <div class="col-sm-8">
-                     <label for="MasterPartNumber" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.MasterPartNumber</label>
-                    </div>
-                 </div>
-
-                 <div class="form-group row">
-                    <label for="MasterPartDescription" class="col-sm-4 col-form-label" style="font-weight:bold">Master Part Description</label>
-                    <div class="col-sm-8">
-                     <label for="MasterPartDescription" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.MasterPartDescription</label>
+                     <label for="MasterPartDescription" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.MasterPartDescription</label>
                     </div>
                  </div>
             }
             else if (SelectedAlertDeviationRecord.DeviationId > 0)
             { 
-                <div class="form-group row">
-                    <label for="Title" class="col-sm-4 col-form-label" style="font-weight:bold">Title</label>
-                    <div class="col-sm-8">
-                     <label for="Title" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.Deviation.Title</label>
-                    </div>
+                <div class="form-group row popup-frm">
+                    <label for="Title" class="col-sm-12 col-form-label">Title</label>
+                    
+                     <label for="Title" class="col-sm-12 col-form-label pop-value-title">@SelectedAlertDeviationRecord.Deviation.Title</label>
+                    
                  </div>
 
-                 <div class="form-group row">
-                    <label for="ReasonforManufacturingDeviation" class="col-sm-4 col-form-label" style="font-weight:bold">Reason for Manufacturing Deviation</label>
-                    <div class="col-sm-8">
-                     <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.Deviation.ReasonforManufacturingDeviation</label>
-                    </div>
+                 <div class="form-group row popup-frm">
+                    <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label">Reason for Manufacturing Deviation</label>
+                   
+                     <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.Deviation.ReasonforManufacturingDeviation</label>
+                    
                  </div>
 
-                 <div class="form-group row">
-                        <div class="row">
-                            <label class="col-md-6 col-form-label" style="font-weight:bold">Location</label>
-                        </div>
+                 <div class="form-group row popup-frm">
+                       
                         <div class="form-group row">
                             <div class="col-md-12">
-                                <table width="100%">
+                                <table class="dev-tab" width="100%">
                                     <thead>
                                         <tr>
-                                            <th width="25%"></th>
+                                            <th width="25%">Location</th>
                                             <th width="15%">SVRART</th>
                                             <th width="15%">SEVE</th>
                                             <th width="15%">2</th>
@@ -344,10 +351,10 @@
                         </div>
                   </div>
 
-                <div class="form-group row">
-                    <label for="Title" class="col-sm-4 col-form-label" style="font-weight:bold">ECO Required</label>
-                    <div class="col-sm-8">
-                        <label for="ECORequired" class="col-sm-12 col-form-label">:&ensp;
+                <div class="form-group row popup-frm">
+                    <label for="Title" class="col-sm-12 col-form-label">ECO Required</label>
+                   
+                        <label for="ECORequired" class="col-sm-12 col-form-label pop-value">
                             @if (SelectedAlertDeviationRecord.Deviation.ECORequired)
                             {
                                 <text>Yes</text>
@@ -357,54 +364,53 @@
                                  <text>No</text>
                             }
                      </label>
-                    </div>
+                    
                </div>
 
                 @if (SelectedAlertDeviationRecord.Deviation.ECORequired)
                 {
-                    <div class="form-group row">
-                        <label for="ECONumber" class="col-sm-4 col-form-label" style="font-weight:bold">ECO Number</label>
-                        <div class="col-sm-8">
-                            <label for="ECONumber" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.Deviation.ECONumber</label>
-                        </div>
+                    <div class="form-group row popup-frm">
+                        <label for="ECONumber" class="col-sm-12 col-form-label">ECO Number</label>
+                        
+                         <label for="ECONumber" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.Deviation.ECONumber</label>
+                        
                     </div>
                 }
 
-                 <div class="form-group row">
-                    <label for="CommentCorrectiveAction" class="col-sm-4 col-form-label" style="font-weight:bold">Comment Corrective Action</label>
-                    <div class="col-sm-8">
-                     <label for="CommentCorrectiveAction" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.Deviation.CommentCorrectiveAction</label>
-                    </div>
+                 <div class="form-group row popup-frm">
+                    <label for="CommentCorrectiveAction" class="col-sm-12 col-form-label">Comment Corrective Action</label>
+                    
+                     <label for="CommentCorrectiveAction" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.Deviation.CommentCorrectiveAction</label>
+                    
                  </div>
 
-                 <div class="form-group row">
-                    <label for="DateCreated" class="col-sm-4 col-form-label" style="font-weight:bold">Date Created</label>
-                    <div class="col-sm-8">
-                        <label for="DateCreated" class="col-sm-12 col-form-label">:&ensp;
+                 <div class="form-group row popup-frm">
+                    <label for="DateCreated" class="col-sm-12 col-form-label">Date Created</label>
+                    
+                        <label for="DateCreated" class="col-sm-12 col-form-label pop-value">
                             @if (SelectedAlertDeviationRecord.Deviation != null && SelectedAlertDeviationRecord.Deviation.DateCreated != null)
                             {
                                 @SelectedAlertDeviationRecord.Deviation.DateCreated.Value.ToString("dd-MM-yyyy")
                             }
                      </label>
-                    </div>
+                    
                  </div>
 
-                 <div class="form-group row">
-                    <label for="MasterPartNumber" class="col-sm-4 col-form-label" style="font-weight:bold">Master Part Number</label>
-                    <div class="col-sm-8">
-                     <label for="MasterPartNumber" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.MasterPartNumber</label>
-                    </div>
+                 <div class="form-group row popup-frm">
+                    <label for="MasterPartNumber" class="col-sm-12 col-form-label">Master Part Number</label>
+                    <label for="MasterPartNumber" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.MasterPartNumber</label>
+                    
                  </div>
 
-                 <div class="form-group row">
-                    <label for="MasterPartDescription" class="col-sm-4 col-form-label" style="font-weight:bold">Master Part Description</label>
-                    <div class="col-sm-8">
-                     <label for="MasterPartDescription" class="col-sm-12 col-form-label">:&ensp;@SelectedAlertDeviationRecord.MasterPartDescription</label>
+                 <div class="form-group row popup-frm">
+                    <label for="MasterPartDescription" class="col-sm-12 col-form-label">Master Part Description</label>
+                   
+                     <label for="MasterPartDescription" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.MasterPartDescription</label>
                     </div>
-                 </div>
+                
             }
 
-            <div class="form-row">
+            <div class="form-row popup-frm">
                 <div class="col-md-12 m-0 p-0" style="text-align: right;">
                     <TelerikButton OnClick="(()=>ClearAlertDeviationSelection())">Close</TelerikButton>
                 </div>

@@ -10,48 +10,106 @@
 @inject PartStatusService PartStatusService
 @inject FailureCodeService FailureCodeService
 
-<h3>Repair</h3>
-@if (AddParts == null)
-{
-     <TelerikGrid Data="@GridData"
-             Pageable="true"
-             Sortable="true"
-             FilterMode="@GridFilterMode.FilterRow">
+
+<div class="row alerts-row">
+    <div class="col-md-9">
+<h3 class="alert-title"><i class="fa-solid fa-hammer"></i> Repair</h3>
+</div>
+ <div class="col-md-3 add-alrert-btn">
         <GridToolBar>
             <TelerikButton Icon="add" OnClick="(() => SelectRecord(null))">Add new Repair</TelerikButton>
         </GridToolBar>
+   </div>
+</div>
+
+<hr />
+
+@if (AddParts == null)
+{
+    <h3 class="alert-table-title">Listed Alerts</h3> 
+     <div class="al-table">
+    <TelerikGrid Data="@GridData"
+             Pageable="true"
+             Sortable="true"
+             FilterMode="@GridFilterMode.FilterRow">
+        
         <GridColumns>
             <GridColumn Field="@(nameof(Entities.Repair.UpdateDate))" Title="Update Date" DisplayFormat="{0:dd-MM-yyyy}"/>
             <GridColumn Field="@(nameof(Entities.Repair.Description))" Title="Description" Filterable="false"/>
             <GridColumn Field="@(nameof(Entities.Repair.PartSerialNumber))" Title="Serial Number" Filterable="false"/>
-            <GridCommandColumn Width="150px">
-                 <GridCommandButton Icon="edit" OnClick="@((args)=> SelectRecord(args.Item as Entities.Repair))"></GridCommandButton>
-                 <GridCommandButton Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Entities.Repair))"></GridCommandButton>
+            <GridCommandColumn Width="100px">
+                 <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Entities.Repair))"><i class="fal fa-edit"></i></GridCommandButton>
+                 <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Entities.Repair))"></GridCommandButton>
             </GridCommandColumn>
         </GridColumns>
     </TelerikGrid>
+    </div>
 }
 
 @if (AddParts != null)
 {
-    <br/>
-<div class="form-group row">
-    <div class="col-sm-7">
-        <div class="row">
+    
+<div class="form-group row inspection">
+    <div class="col-sm-5 left-serial">
 
-            <div class="col-sm-7">
+        <div class="current-inspection">
+        <h3>History</h3>
+       <TelerikGrid Data="@MyData"
+        Pageable="true" Sortable="true"
+        Resizable="true">
+        <GridColumns>
+              <!---<GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false"/>---->
+                <GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false">
+                <HeaderTemplate>
+                <span><i class="fa-solid fa-barcode" style="color: #11515E;"></i> Serial Number</span>
+                </HeaderTemplate>
+                </GridColumn>
+
+                <GridColumn Field="@(nameof(Models.Parts.UpdateDate))" Title="Update Date" Groupable="false">
+                <HeaderTemplate>
+                <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Update Date</span>
+                </HeaderTemplate>
+                </GridColumn>
+
+              <!----<GridColumn Field="@(nameof(Models.Parts.UpdateDate))" Title="Date Updated" Groupable="false">
+                    <Template>
+                          @{
+                              var parts = context as Models.Parts;
+                              if (parts != null && !parts.UpdateDate.Equals(DateTime.MinValue))
+                              {
+                                  @parts.UpdateDate.ToString("dd/MM/yyyy @ h:mm")
+                              }
+                          }
+                    </Template>
+              </GridColumn>---->
+              <GridCommandColumn Width="10%">
+              <GridCommandButton Icon="" OnClick="@((args)=> btnHistoryGridEyeOnClick(args.Item as Models.Parts))"><i class="fa-solid fa-chevron-right" style="color: #69A3AF;"></i></GridCommandButton>
+              </GridCommandColumn>
+        </GridColumns>
+      </TelerikGrid>
+    </div>
+        
+
+        
+    </div><!----left column end---->
+      
+    
+     <div class=" col-sm-7 right-scroll-column">
+
+          <div class="row">
+
+            <div class="col-sm-9 left-input">
                 <TelerikTextBox id="txtSerialSearch" Class="form-control col-sm-12" @bind-Value="SerialNumber"></TelerikTextBox>
             </div>
-            <div class=" col-sm-1">
-                <TelerikButton id="btnSearch" OnClick="@btnFindOnClick" ButtonType="@ButtonType.Submit">Find</TelerikButton>
+            <div class=" col-sm-3 b-btn">
+                <TelerikButton id="btnSearch" OnClick="@btnFindOnClick" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
             </div>
         </div>
-        <br />
-
-        <div class="row">
-            <div class="col-sm-6">
-                <label class="col-sm-2 col-form-label">Family :</label>
-                <label id="lblDescValue" class="col-sm-7 col-form-label">@(dataRepairModel !=null ? dataRepairModel.Family:string.Empty)</label>
+    
+         <div class="row">
+            <div class="col-sm-12">
+                <label class="col-sm-12 col-form-label">Family :</label>
+                <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b">@(dataRepairModel !=null ? dataRepairModel.Family:string.Empty)</label>
             </div>
         </div>
 
@@ -62,162 +120,97 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-7">
-                <label class="col-sm-3 col-form-label">Part Number :</label>
-                <label id="lblPartNumberValue" class="col-sm-7 col-form-label">@(dataRepairModel !=null ? dataRepairModel.PartNumber:string.Empty)</label>
+            <div class="col-sm-12">
+                <label class="col-sm-12 col-form-label">Part Number :</label>
+                <label id="lblPartNumberValue" class="col-sm-12 col-form-label right-value n-font">@(dataRepairModel !=null ? dataRepairModel.PartNumber:string.Empty)</label>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-8">
-                <label class="col-sm-3 col-form-label">Serial Number :</label>
-                <label id="lblSerialNumberValue" class="col-sm-7 col-form-label">@(dataRepairModel !=null ? dataRepairModel.SerialNumber:string.Empty)</label>
+            <div class="col-sm-12">
+                <label class="col-sm-12 col-form-label">Serial Number :</label>
+                <label id="lblSerialNumberValue" class="col-sm-12 col-form-label right-value n-font">@(dataRepairModel !=null ? dataRepairModel.SerialNumber:string.Empty)</label>
             </div>
         </div>
-    </div>
-      
-    <div class=" col-sm-5">
-        <h6>History</h6>
-       <TelerikGrid Data="@MyData"
-        Pageable="true" Sortable="true"
-        Resizable="true">
-        <GridColumns>
-              <GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false" Width="200px"/>
-              <GridColumn Field="@(nameof(Models.Parts.UpdateDate))" Title="Date Updated" Groupable="false" Width="70px">
-                    <Template>
-                          @{
-                              var parts = context as Models.Parts;
-                              if (parts != null && !parts.UpdateDate.Equals(DateTime.MinValue))
-                              {
-                                  @parts.UpdateDate.ToString("dd/MM/yyyy @ h:mm")
-                              }
-                          }
-                    </Template>
-              </GridColumn>
-              <GridCommandColumn Width="30px">
-              <GridCommandButton Icon="eye" OnClick="@((args)=> btnHistoryGridEyeOnClick(args.Item as Models.Parts))"></GridCommandButton>
-              </GridCommandColumn>
-        </GridColumns>
-      </TelerikGrid>
-    </div>
-</div>
 
-<br />
-<div class="row">
-    <div class="col-md-12">
+
+
         <EditForm EditContext="@ECAddPart">
         <DataAnnotationsValidator />
 
-        <div class="row">
+        
 
-            <div class="col-md-3">
-                <div class="form-group row">
-                    <div class="row">
-                        <label for="PartNumber" class="col-sm-8 col-form-label">Part Number</label>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-11">
-                            <TelerikTextBox @bind-Value="@AddParts.PartNumber" Class="form-control"></TelerikTextBox>
-                            <ValidationMessage For="@(() => AddParts.PartNumber)"></ValidationMessage>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="form-group row">
-                    <div class="row">
-                        <label for="SerialNumber" class="col-sm-8 col-form-label">Serial Number (optional)</label>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-11">
-                            <TelerikTextBox @bind-Value="@AddParts.SerialNumber" Class="form-control"></TelerikTextBox>
-                            <ValidationMessage For="@(() => AddParts.SerialNumber)"></ValidationMessage>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="form-group row">
-                    <div class="row">
-                        <label for="GLCodeId" class="col-sm-8 col-form-label">GL Code</label>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-11">
-                             <TelerikDropDownList Data="@dataGLCodeDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+          <div class="row">
+              <label for="PartNumber" class="col-sm-2 col-form-label">Part Number</label>
+              <div class="col-md-10">
+              <TelerikTextBox @bind-Value="@AddParts.PartNumber" Class="form-control"></TelerikTextBox>
+              <ValidationMessage For="@(() => AddParts.PartNumber)"></ValidationMessage>
+              </div>
+          </div>
+               
+          <div class="row">
+               <label for="SerialNumber" class="col-sm-2 col-form-label">Serial Number (optional)</label>
+               <div class="col-md-10">
+               <TelerikTextBox @bind-Value="@AddParts.SerialNumber" Class="form-control"></TelerikTextBox>
+               <ValidationMessage For="@(() => AddParts.SerialNumber)"></ValidationMessage>
+               </div>
+           </div>
+               
+             <div class="row">
+                   <label for="GLCodeId" class="col-sm-2 col-form-label">GL Code</label>
+                    <div class="col-md-10">
+                    <TelerikDropDownList Data="@dataGLCodeDropdown" class="col-sm-10" TextField="DropText" ValueField="DropValue"
                              @bind-Value="@AddParts.GLCodeId" DefaultText="GL Code">
                             </TelerikDropDownList>
                             <ValidationMessage For="@(() => AddParts.GLCodeId)"></ValidationMessage>
                         </div>
-                    </div>
-                </div>
-            </div>
+               </div>
+               
 
-        </div>
+             <div class="row">
+                     <label for="RepairDescription" class="col-sm-2 col-form-label">Repair Description</label>
+                      <div class="col-md-10">
+                      <textarea @bind-value="AddParts.RepairDescription" class="form-control" rows="3" @bind-value:event="oninput"></textarea>
+                      <ValidationMessage For="@(() => AddParts.RepairDescription)"></ValidationMessage>
+                      </div>
+              </div>
+              
 
-
-        <div class="row">
-
-            <div class="col-md-3">
-                <div class="form-group row">
-                    <div class="row">
-                        <label for="RepairDescription" class="col-sm-8 col-form-label">Repair Description</label>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-11">
-                             <textarea @bind-value="AddParts.RepairDescription" class="form-control" rows="3" @bind-value:event="oninput"></textarea>
-                            <ValidationMessage For="@(() => AddParts.RepairDescription)"></ValidationMessage>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="form-group row">
-                    <div class="row">
-                        <label for="FailureCodeId" class="col-sm-8 col-form-label">Failure Code</label>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-11">
-                             <TelerikDropDownList Data="@dataFailureCodesDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+           
+             <div class="row">
+                  <label for="FailureCodeId" class="col-sm-2 col-form-label">Failure Code</label>
+                  <div class="col-md-10">
+                  <TelerikDropDownList Data="@dataFailureCodesDropdown"  TextField="DropText" ValueField="DropValue"
                              @bind-Value="@AddParts.FailureCodeId" DefaultText="Failure Code">
                             </TelerikDropDownList>
                             <ValidationMessage For="@(() => AddParts.FailureCodeId)"></ValidationMessage>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                  </div>
+             </div>
+               
 
-             <div class="col-md-1">
-                <div class="form-group row">
-                    <div class="row">
-                        <label class="col-sm-8 col-form-label"><br/></label>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-11">
-                            <TelerikButton Class="SaveButton" Icon="add" OnClick="(()=> btnAddPartOnClick())"></TelerikButton>
-                        </div>
-                    </div>
-                </div>
-            </div>
+             <div class="row">
+                    <div class="col-md-12 add-reason-btn">
+                            <TelerikButton Class="SaveButton" OnClick="(()=> btnAddPartOnClick())"><i class="fa-light fa-plus"></i> Add Reason</TelerikButton>
+                     </div>
+              </div>
+               
+         </EditForm>
 
-        </div>
-        </EditForm>
-    </div>
-</div>
 
-<br />
-<div class="row">
+    </div><!---right column end--->
+</div><!----main row end-->
+
+
+<div class="row repair-description">
     <div class="col-md-12">
         <TelerikGrid Data="@MyData"
          Pageable="true" Sortable="true"
          Resizable="true">
             <GridColumns>
                 <GridColumn Field="@(nameof(Models.Parts.PartNumber))" Title="Part Number" Groupable="false" Width="80px"/>
-                <GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false" Width="200px"/>
-                <GridColumn Field="@(nameof(Models.Parts.Description))" Title="Description" Groupable="false" Width="140px"/>
-                <GridColumn Field="@(nameof(Models.Parts.GLCode))" Title="GL Code" Groupable="false" Width="100px"/>
-               <GridColumn Field=@nameof(Models.Parts.PartStatus) Title="Status" Width="60px">
+                <GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false" Width="100px"/>
+                <GridColumn Field="@(nameof(Models.Parts.Description))" Title="Description" Groupable="false" Width="200px"/>
+                <GridColumn Field="@(nameof(Models.Parts.GLCode))" Title="GL Code" Groupable="false" Width="150px"/>
+                <GridColumn Field=@nameof(Models.Parts.PartStatus) Title="Status" Width="100px">
                     <Template>
                         @{
                             var partStatus = context as Models.Parts;

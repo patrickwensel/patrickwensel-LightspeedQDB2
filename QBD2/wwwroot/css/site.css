@@ -315,13 +315,20 @@ nav#sidebar ul li i {
 }
 
 .inspection .right-scroll-column {
-    height: 600px;
+    /* height: 600px;*/
     overflow: hidden;
     overflow-y: scroll;
     border-left: 1px solid #0000001A;
     padding-left: 30px;
 }
 
+.inspection td.k-command-cell {
+    padding: 3px 0;
+}
+
+.k-pager-numbers .k-link {
+    color: #11515E !important;
+}
 /* width */
 ::-webkit-scrollbar {
     width: 1px;

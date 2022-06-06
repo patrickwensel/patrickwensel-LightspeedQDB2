@@ -6,211 +6,250 @@
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
 
+<div class="row alerts-row">
+    <div class="col-md-9">
+<h3 class="alert-title"><i class="fa fa-search"></i> Inspection</h3>
+</div>
 
+@if(!IsDisplayAddEditInspection)
+{
+   <div class="col-md-3 add-alrert-btn">
+       <TelerikButton Icon="add" OnClick="@(()=> findInspectionsDetail(null))">Add New Inspection</TelerikButton>
+   </div>
+}
+</div>
+<hr />
 
-<div class="form-group row inspection">
-    <div class="col-sm-4 left-serial">
-
-        <div class="row">
-
-            <div class="current-inspection">
-            <h3>Current Inspections</h3>
-            <TelerikGrid Data="@MyData"
-                     Pageable="true" 
-                     Sortable="true"
-                     Resizable="true"
-                     EditMode="Telerik.Blazor.GridEditMode.Inline"
-                     FilterMode="@GridFilterMode.FilterRow">
+@if (IsDisplayAddEditInspection == false)
+{
+    <div class="row">
+        <div class="current-inspection">
+        <h3 class="alert-table-title">Current Inspections</h3>
+        <div class="al-table">
+        <TelerikGrid Data="@MyData"
+                Pageable="true" 
+                Sortable="true"
+                Resizable="true"
+                FilterMode="@GridFilterMode.FilterRow"
+        >
+            
             <GridColumns>
                 <GridColumn Field="Part.SerialNumber" Title="Serial Number" Groupable="false" Filterable="true" Sortable="false">
-                <HeaderTemplate>
-                <span><i class="fa-solid fa-barcode" style="color: #11515E;"></i> Serial Number</span>
-                </HeaderTemplate>
+                    <HeaderTemplate>
+                        <span><i class="fa-solid fa-barcode" style="color: #11515E;"></i> Serial Number</span>
+                    </HeaderTemplate>
                 </GridColumn>
-                <!---<GridColumn Field="Part.SerialNumber" Title="Serial Number" Groupable="false" />--> 
-
-                <GridColumn Field="@(nameof(Entities.Inspection.UpdateDate))" Title="Update Date" Groupable="false" Sortable="true" Filterable="false">
-                <HeaderTemplate>
-                <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Update Date</span>
-                </HeaderTemplate>
+               <GridColumn Field="@(nameof(Entities.Inspection.UpdateDate))" Title="Update Date" Groupable="false" Sortable="true" Filterable="true">
+                    <HeaderTemplate>
+                        <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Update Date</span>
+                    </HeaderTemplate>
+                </GridColumn>
+                <GridColumn Field="Station.Name" Title="Status" Groupable="false" Sortable="true" Filterable="false">
+                    <HeaderTemplate>
+                        <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Status</span>
+                    </HeaderTemplate>
+                    <Template>
+                          @{
+                              var inspection = context as Entities.Inspection;
+                              if (inspection != null && inspection.Pass == true)
+                              {
+                                    <lable style="color:green">PASSED</lable>
+                              }
+                              else
+                              {
+                                    <lable style="color:red;">FAILED</lable>
+                              }
+                            }
+                    </Template>
                 </GridColumn>
 
-               <!---<i class="fa-solid fa-arrows-rotate"></i> <GridColumn Field="@(nameof(Entities.Inspection.UpdateDate))" Title="Update Date" Groupable="false" />---> 
+                <GridColumn Field="Station.Name" Title="Station" Groupable="false" Filterable="false" Sortable="false">
+                    <HeaderTemplate>
+                        <span><i class="fa-solid fa-barcode" style="color: #11515E;"></i> Station</span>
+                    </HeaderTemplate>
+                </GridColumn>
+
+                 <GridColumn Field="@(nameof(Entities.Inspection.GeneralComments))" Title="Comments" Groupable="false" Sortable="true" Filterable="false">
+                    <HeaderTemplate>
+                        <span><i class="fa-solid fa-comment" style="color: #11515E;"></i> Comments</span>
+                    </HeaderTemplate>
+                </GridColumn>
+
                 <GridCommandColumn Width="10%;">
-
-                    <GridCommandButton OnClick="@((args)=> findInspectionsDetail(args.Item as Entities.Inspection))"><i class="fa-solid fa-chevron-right" style="color: #69A3AF;"></i></GridCommandButton>
+                        <GridCommandButton OnClick="@((args)=> findInspectionsDetail(args.Item as Entities.Inspection))"><i class="fa-solid fa-chevron-right" style="color: #69A3AF;"></i></GridCommandButton>
                 </GridCommandColumn>
             </GridColumns>
         </TelerikGrid>
         </div>
-
-            
-        </div>
-        
-        
-       
     </div>
-
-    <div class=" col-sm-8 right-scroll-column">
-
-    <div class="row">
-        <div class="col-sm-9 left-input">
-                <TelerikTextBox id="txtSerialSearch" Class="form-control col-sm-12" @bind-Value="SerialNumber"></TelerikTextBox>
-            </div>
-            <div class=" col-sm-3 b-btn">
-                <TelerikButton id="btnSearch" OnClick="(()=>btnFindOnClick(true))" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
-        </div>
     </div>
+}
 
-   <div class="row class=">
-            <div class="col-sm-12">
-                <label class="col-sm-12 col-form-label">Desc :</label>
-                <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty) <i class="fa-solid fa-circle-xmark"></i></label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <label class="col-sm-12 col-form-label">Part Number :</label>
-                <label id="lblPartNumberValue" class="col-sm-12 col-form-label right-value n-font">@(dataInspectionModel !=null ? dataInspectionModel.PartNumber:string.Empty)</label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <label class="col-sm-12 col-form-label">Serial Number :</label>
-                <label id="lblSerialNumberValue" class="col-sm-12 col-form-label right-value n-font">@(dataInspectionModel !=null ? dataInspectionModel.SerialNumber:string.Empty)</label>
+@if (IsDisplayAddEditInspection)
+{
+    <div class="form-group row inspection">
+
+        <div class=" col-sm-12 right-scroll-column" style="border-left:unset!important;">
+
+            <div class="row">
+                <div class="col-sm-9 left-input">
+                    <TelerikTextBox id="txtSerialSearch" Class="form-control col-sm-12" @bind-Value="SerialNumber" PlaceHolder="Search for a Serial NUmber"></TelerikTextBox>
+                </div>
+                <div class=" col-sm-3 b-btn">
+                    <TelerikButton id="btnSearch" OnClick="(()=>btnFindOnClick(true))" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
+                </div>
             </div>
 
-        </div>
+            <div class="row class=">
+                <div class="col-sm-12">
+                    <label class="col-sm-12 col-form-label">Desc :</label>
+                    <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty) <i class="fa-solid fa-circle-xmark"></i></label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-12 col-form-label">Part Number :</label>
+                    <label id="lblPartNumberValue" class="col-sm-12 col-form-label right-value n-font">@(dataInspectionModel !=null ? dataInspectionModel.PartNumber:string.Empty)</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="col-sm-12 col-form-label">Serial Number :</label>
+                    <label id="lblSerialNumberValue" class="col-sm-12 col-form-label right-value n-font">@(dataInspectionModel !=null ? dataInspectionModel.SerialNumber:string.Empty)</label>
+                </div>
 
-        <div class="row">
+            </div>
 
-             <div class=" col-sm-12 alert-section">
-                <TelerikGrid Data=@GridAlertDeviationData Sortable="true" Pageable="false">
-                         <GridColumns>
+            <div class="row">
+
+                <div class=" col-sm-12 alert-section">
+                    <TelerikGrid Data=@GridAlertDeviationData Sortable="true" Pageable="false">
+                        <GridColumns>
                             <GridColumn Field=@nameof(AlertDeviationDetailModel.Title) Title="Alerts & Deviations" Filterable="false">
-                <HeaderTemplate>
-                <span><i class="fa-light fa-bell-exclamation" style="color: #11515E;"></i> Alerts & Deviations</span>
-                </HeaderTemplate>
-                </GridColumn>
+                                <HeaderTemplate>
+                                    <span><i class="fa-light fa-bell-exclamation" style="color: #11515E;"></i> Alerts & Deviations</span>
+                                </HeaderTemplate>
+                            </GridColumn>
                             <!----<GridColumn Field=@nameof(AlertDeviationDetailModel.Title) Title="Alerts & Deviations" Filterable="false">
-                             </GridColumn>---->
+                            </GridColumn>---->
                              <GridCommandColumn Width="60px">
                                 <GridCommandButton Icon="eye" OnClick="@((args)=> SelectAlertDeviationRecord(args.Item as AlertDeviationDetailModel))"></GridCommandButton>
-                             </GridCommandColumn>
-                         </GridColumns>
-                         <NoDataTemplate>
-                             <text>No Records Available</text>
-                         </NoDataTemplate>
+                            </GridCommandColumn>
+                        </GridColumns>
+                        <NoDataTemplate>
+                            <text>No Records Available</text>
+                        </NoDataTemplate>
                     </TelerikGrid>
-             </div>
+                </div>
 
-        </div>
+            </div>
 
-       
-        <div class="row station-section">
-            <label class="col-sm-2 col-form-label">Station</label>
 
-            <div class="col-sm-10">
-                <TelerikDropDownList Data="@dataStationDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+            <div class="row station-section">
+                <label class="col-sm-2 col-form-label">Station</label>
+
+                <div class="col-sm-10">
+                    <TelerikDropDownList Data="@dataStationDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
                                      @bind-Value="@DdlStationValue" DefaultText="Select Status ">
-                </TelerikDropDownList>
+                    </TelerikDropDownList>
+                </div>
+
             </div>
 
-        </div>
-
-        <div class="row">
-            <label class="col-sm-2 col-form-label">Status</label>
-            <div class="col-sm-10">
-                <!----<TelerikRadioGroup Data="@dataStatusOptions"
-                                   @bind-Value="@RdoStatusValue"
-                                   ValueField="@nameof(Models.DropDownBind.DropValue)"
-                                   TextField="@nameof(Models.DropDownBind.DropText)">
-                </TelerikRadioGroup>---->
+            <div class="row">
+                <label class="col-sm-2 col-form-label">Status</label>
+                <div class="col-sm-10">
+                    <!----<TelerikRadioGroup Data="@dataStatusOptions"
+                    @bind-Value="@RdoStatusValue"
+                    ValueField="@nameof(Models.DropDownBind.DropValue)"
+                    TextField="@nameof(Models.DropDownBind.DropText)">
+                    </TelerikRadioGroup>---->
                 <ul class="switch-btn">
-                   <li class="@AddActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(1))"><i class="fa-regular fa-circle-check"></i> Passed</li>
-                   <li class="failed @AddInActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(0))"><i class="fa-light fa-circle-xmark"></i> Failed</li>
-                </ul>
+                        <li class="@AddActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(1))"><i class="fa-regular fa-circle-check"></i> Passed</li>
+                        <li class="failed @AddInActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(0))"><i class="fa-light fa-circle-xmark"></i> Failed</li>
+                    </ul>
+                </div>
             </div>
-        </div>
 
-         @{
-            if (@RdoStatusValue == 0)
-            {
+            @{
+                if (@RdoStatusValue == 0)
+                {
 
-                <div class="row">
-                    <label class="col-sm-2 col-form-label">Primary</label>
-                    <div class="col-sm-10">
-                        <TelerikDropDownList Data="@dataFailurePrimaryDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                    <div class="row">
+                        <label class="col-sm-2 col-form-label">Primary</label>
+                        <div class="col-sm-10">
+                            <TelerikDropDownList Data="@dataFailurePrimaryDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
                                          @bind-Value="@DdlFailurePrimaryValue" DefaultText="Select Failure Primary" OnChange="@MyOnChangeHandler">
-                        </TelerikDropDownList>
-                    </div>
+                            </TelerikDropDownList>
+                        </div>
                     </div>
                     <div class="row">
-                    <label class="col-sm-2 col-form-label">Secondary</label>
-                    <div class="col-sm-10">
-                        <TelerikDropDownList Data="@dataFailureDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                        <label class="col-sm-2 col-form-label">Secondary</label>
+                        <div class="col-sm-10">
+                            <TelerikDropDownList Data="@dataFailureDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
                                          @bind-Value="@DdlFailureValue" DefaultText="Select Failure ">
-                        </TelerikDropDownList>
-                    </div>
-                    </div>
-                    <div class="row">
-                     <label class="col-sm-2 col-form-label">Comment</label>
-                    <div class="col-sm-10">
-                        <TelerikTextBox Class="form-control col-sm-11" @bind-Value="@FailureCommentValue"></TelerikTextBox>
-                    </div>
+                            </TelerikDropDownList>
+                        </div>
                     </div>
                     <div class="row">
-                    <div class="col-sm-12 add-reason-btn">
-                        <TelerikButton id="btnSearch" ButtonType="@ButtonType.Submit" OnClick="@btnAddOnClick"><i class="fa-light fa-plus"></i> Add Reason</TelerikButton>
+                        <label class="col-sm-2 col-form-label">Comment</label>
+                        <div class="col-sm-10">
+                            <TelerikTextBox Class="form-control col-sm-11" @bind-Value="@FailureCommentValue"></TelerikTextBox>
+                        </div>
                     </div>
+                    <div class="row">
+                        <div class="col-sm-12 add-reason-btn">
+                            <TelerikButton id="btnSearch" ButtonType="@ButtonType.Submit" OnClick="@btnAddOnClick"><i class="fa-light fa-plus"></i> Add Reason</TelerikButton>
+                        </div>
                     </div>
-                
 
-                   <div class="reason-section">
-                    <h3>Reasons</h3>
-                    <TelerikGrid Data="@dataFailureGrid"
+
+                    <div class="reason-section">
+                        <h3>Reasons</h3>
+                        <TelerikGrid Data="@dataFailureGrid"
                      Sortable="true"
                      Resizable="true"
                      EditMode="Telerik.Blazor.GridEditMode.Inline"
                      OnDelete=@DeleteHandler>
-                    <GridColumns>
-                        <GridColumn Field="FailurePrimaryName" Title="Primary" Groupable="false" />
-                        <GridColumn Field="FailureName" Title="Secondary" Groupable="false" />
-                        <GridColumn Field="Comment" Title="Comments" Groupable="false" />
-                        <GridCommandColumn Width="10%">
-                            <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
-                        </GridCommandColumn>
-                    </GridColumns>
-                    </TelerikGrid>
+                            <GridColumns>
+                                <GridColumn Field="FailurePrimaryName" Title="Primary" Groupable="false" />
+                                <GridColumn Field="FailureName" Title="Secondary" Groupable="false" />
+                                <GridColumn Field="Comment" Title="Comments" Groupable="false" />
+                                <GridCommandColumn Width="10%">
+                                    <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
+                                </GridCommandColumn>
+                            </GridColumns>
+                        </TelerikGrid>
                     </div>
-               
 
+
+                }
             }
-        }
-        <div class="row">
-            <label class="col-sm-2 col-form-label">General Comments</label>
-           
-            @{
-                if (dataInspection == null)
-                    dataInspection = new Models.Inspection();
-            }
-            <div class="col-sm-10 add-reason-btn">
-            <TelerikTextArea Id="txtGenerelComment" @bind-Value="@dataInspection.GeneralComments">
-            </TelerikTextArea>
+            <div class="row">
+                <label class="col-sm-2 col-form-label">General Comments</label>
+
+                @{
+                    if (dataInspection == null)
+                        dataInspection = new Models.Inspection();
+                }
+                <div class="col-sm-10 add-reason-btn">
+                    <TelerikTextArea Id="txtGenerelComment" @bind-Value="@dataInspection.GeneralComments">
+                    </TelerikTextArea>
+                </div>
             </div>
-        </div>
-        
-        <div class="row">
-            <div class="col-sm-12 save-btn">
-                <TelerikButton ButtonType="@ButtonType.Submit" OnClick="@btnSaveOnClick"><i class="fa-solid fa-floppy-disk"></i> Save</TelerikButton>               
+
+            <div class="row">
+                <div class="col-sm-12 save-btn">
+                    <TelerikButton ButtonType="@ButtonType.Submit" OnClick="@btnSaveOnClick"><i class="fa-solid fa-floppy-disk"></i> Save</TelerikButton>               
+                </div>
             </div>
+
         </div>
-        
+
+
+
     </div>
-
-
-
-</div>
+}
 
 @if(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)
 {
@@ -444,6 +483,8 @@
     public string AddActiveCssClass { get; set; } = "active";
     public string AddInActiveCssClass { get; set; } 
 
+    public bool IsDisplayAddEditInspection { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await GetGridData();
@@ -541,10 +582,15 @@
 
     async Task findInspectionsDetail(Entities.Inspection inspection)
     {
+        IsDisplayAddEditInspection = true;
         if (inspection != null && inspection.Part != null)
         {
             SerialNumber = inspection.Part.SerialNumber;
             SelectedDataInspection = await InspectionService.GetInspectionsById(inspection.InspectionId);
+            await btnFindOnClick(false);
+        }
+        else
+        {
             await btnFindOnClick(false);
         }
     }
@@ -638,6 +684,7 @@
         dataInspectionModel.InspectionFailedList = dataFailureGrid;
         if (await InspectionService.Save(dataInspectionModel))
         {
+            IsDisplayAddEditInspection = false;
             toastService.ShowInfo("Record Saved Successfully", "Info");
             NavigationManager.NavigateTo("Inspection", true);
         }

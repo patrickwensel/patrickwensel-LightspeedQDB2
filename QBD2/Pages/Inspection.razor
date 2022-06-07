@@ -80,8 +80,6 @@
     </div>
     </div>
 
-@if (IsDisplayAddEditInspection)
-{
     <div class="row">
         <div class="col-md-12">
 
@@ -254,7 +252,7 @@
 
         </div>
     </div>
-}
+
 
 @if(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)
 {
@@ -486,9 +484,7 @@
     string FailureCommentValue { get; set; }
 
     public string AddActiveCssClass { get; set; } = "active";
-    public string AddInActiveCssClass { get; set; } 
-
-    public bool IsDisplayAddEditInspection { get; set; }
+    public string AddInActiveCssClass { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -587,7 +583,6 @@
 
     async Task findInspectionsDetail(Entities.Inspection inspection)
     {
-        IsDisplayAddEditInspection = true;
         await JSRuntime.InvokeVoidAsync("openNav");
         if (inspection != null && inspection.Part != null)
         {
@@ -690,7 +685,6 @@
         dataInspectionModel.InspectionFailedList = dataFailureGrid;
         if (await InspectionService.Save(dataInspectionModel))
         {
-            IsDisplayAddEditInspection = false;
             toastService.ShowInfo("Record Saved Successfully", "Info");
             NavigationManager.NavigateTo("Inspection", true);
         }
@@ -735,9 +729,14 @@
 
     public async Task CloseAddEditInspectionWindow()
     {
+        dataInspectionModel = null;
+        SelectedDataInspection = null;
+        dataInspection = new Models.Inspection();
+        SerialNumber = string.Empty;
+        RdoStatusValue = 1;
+        DdlStationValue = dataInspection.StationId;
+        OnDataStatusChangeHandler(RdoStatusValue);
         await JSRuntime.InvokeVoidAsync("closeNav");
-        await GetGridData();
-        IsDisplayAddEditInspection = false;
-        NavigationManager.NavigateTo("Inspection");
+        StateHasChanged();
     }
  }

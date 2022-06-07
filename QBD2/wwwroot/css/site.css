@@ -17,7 +17,7 @@
     background-color: #DCDCDC;
     overflow-x: hidden;
     transition: 0.5s;
-    padding-top: 60px;
+    padding-top: 10px;
 }
     html, body {
     font-family: 'Effra', sans-serif;
@@ -336,6 +336,7 @@ nav#sidebar ul li i {
 
 .inspection td.k-command-cell {
     padding: 3px 0;
+    text-align: center;
 }
 
 .k-pager-numbers .k-link {
@@ -460,6 +461,7 @@ a.nav-link.active {
     position: absolute;
     right: 35px;
     top: 155px;
+    cursor: pointer;
 }
 
 span.k-icon.k-i-arrow-60-down.k-button-icon {
@@ -854,6 +856,7 @@ label.col-md-10.col-form-label.h-40.input-label {
     border-radius: 20px !important;
     background: none !important;
     margin-top: 15px;
+    position: unset !important;
 }
 
 .popup-frm button.telerik-blazor.k-button.k-button-solid.k-rounded-md.k-button-rectangle.k-button-md.k-button-solid-base {
@@ -895,7 +898,19 @@ label.col-md-10.col-form-label.h-40.input-label {
     padding-right: 10px;
 }
 
+div#mySidebar {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0;
+}
 
+    div#mySidebar .right-scroll-column {
+        background: #fbfbfb;
+        padding: 40px 40px;
+    }
+
+    div#mySidebar #lblDescValue svg.svg-inline--fa.fa-circle-xmark.fa-w-16 {
+        top: 110px;
+    }
 
 
 @media (min-width:320px) and (max-width: 767px) {

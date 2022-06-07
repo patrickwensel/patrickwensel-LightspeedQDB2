@@ -17,10 +17,13 @@
 
 function openNav() {
     setTimeout(() => {
-        document.getElementById("mySidebar").style.width = "850px";
+        document.getElementById("mySidebar").style.width = "100%";
     }, 2000);
 }
 
 function closeNav() {
-    document.getElementById("mySidebar").style.width = "0";
+     document.getElementById("mySidebar").style.width = "0";      
+    /*$('#mySidebar').animate({
+        left: '0px'
+    }, 2000, 'easeOutQuint');*/
 }

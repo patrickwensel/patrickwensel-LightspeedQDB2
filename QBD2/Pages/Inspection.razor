@@ -5,23 +5,19 @@
 @inject InspectionService InspectionService
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <div class="row alerts-row">
     <div class="col-md-9">
 <h3 class="alert-title"><i class="fa fa-search"></i> Inspection</h3>
 </div>
 
-@if(!IsDisplayAddEditInspection)
-{
    <div class="col-md-3 add-alrert-btn">
        <TelerikButton Icon="add" OnClick="@(()=> findInspectionsDetail(null))">Add New Inspection</TelerikButton>
    </div>
-}
 </div>
 <hr />
 
-@if (IsDisplayAddEditInspection == false)
-{
     <div class="row">
         <div class="current-inspection">
         <h3 class="alert-table-title">Current Inspections</h3>
@@ -44,7 +40,7 @@
                         <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Update Date</span>
                     </HeaderTemplate>
                 </GridColumn>
-                <GridColumn Field="Station.Name" Title="Status" Groupable="false" Sortable="true" Filterable="false">
+                <GridColumn Field="@(nameof(Entities.Inspection.Status))" Title="Status" Groupable="false" Sortable="true" Filterable="true">
                     <HeaderTemplate>
                         <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Status</span>
                     </HeaderTemplate>
@@ -53,17 +49,17 @@
                               var inspection = context as Entities.Inspection;
                               if (inspection != null && inspection.Pass == true)
                               {
-                                    <lable style="color:green">PASSED</lable>
+                                    <lable style="color:green">@inspection.Status</lable>
                               }
                               else
                               {
-                                    <lable style="color:red;">FAILED</lable>
+                                    <lable style="color:red;">@inspection.Status</lable>
                               }
                             }
                     </Template>
                 </GridColumn>
 
-                <GridColumn Field="Station.Name" Title="Station" Groupable="false" Filterable="false" Sortable="false">
+                <GridColumn Field="Station.Name" Title="Station" Groupable="false" Filterable="true" Sortable="false">
                     <HeaderTemplate>
                         <span><i class="fa-solid fa-barcode" style="color: #11515E;"></i> Station</span>
                     </HeaderTemplate>
@@ -83,10 +79,15 @@
         </div>
     </div>
     </div>
-}
 
 @if (IsDisplayAddEditInspection)
 {
+    <div class="row">
+        <div class="col-md-12">
+
+        
+
+    <div id="mySidebar" class="sidebar">
     <div class="form-group row inspection">
 
         <div class=" col-sm-12 right-scroll-column" style="border-left:unset!important;">
@@ -103,7 +104,7 @@
             <div class="row class=">
                 <div class="col-sm-12">
                     <label class="col-sm-12 col-form-label">Desc :</label>
-                    <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty) <i class="fa-solid fa-circle-xmark"></i></label>
+                    <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b" @onclick="(() => CloseAddEditInspectionWindow())">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty) <i class="fa-solid fa-circle-xmark" ></i></label>
                 </div>
             </div>
             <div class="row">
@@ -249,11 +250,15 @@
 
 
     </div>
+    </div>
+
+        </div>
+    </div>
 }
 
 @if(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)
 {
-        <TelerikWindow Visible="@(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)" Modal="true" Width="570px">
+        <TelerikWindow Visible="@(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)" Modal="true" Width="570px" Draggable="false" Left="1450px">
             <WindowTitle>
                 @{
                     
@@ -266,7 +271,7 @@
                         </div>
                         
 
-                        <div class="col-md-1"><i class="fa-light fa-circle-xmark"></i></div>
+                        <div class="col-md-1" @onclick="(()=>ClearAlertDeviationSelection())"><i class="fa-light fa-circle-xmark" ></i></div>
                         </div>
                     }
                     else if(SelectedAlertDeviationRecord.DeviationId > 0)
@@ -275,7 +280,7 @@
                         <div class="col-md-11">
                         <text><i class="fa-light fa-arrows-turn-to-dots" b-kq6mrvu7il=""></i> Deviation Detail</text>
                         </div>
-                         <div class="col-md-1"><i class="fa-light fa-circle-xmark"></i></div>
+                         <div class="col-md-1" @onclick="(()=>ClearAlertDeviationSelection())"><i class="fa-light fa-circle-xmark"></i></div>
                          </div>
                     }
                     </h5>
@@ -583,6 +588,7 @@
     async Task findInspectionsDetail(Entities.Inspection inspection)
     {
         IsDisplayAddEditInspection = true;
+        await JSRuntime.InvokeVoidAsync("openNav");
         if (inspection != null && inspection.Part != null)
         {
             SerialNumber = inspection.Part.SerialNumber;
@@ -725,5 +731,13 @@
             AddActiveCssClass = string.Empty;
             AddInActiveCssClass = "active";
         }
+    }
+
+    public async Task CloseAddEditInspectionWindow()
+    {
+        await JSRuntime.InvokeVoidAsync("closeNav");
+        await GetGridData();
+        IsDisplayAddEditInspection = false;
+        NavigationManager.NavigateTo("Inspection");
     }
  }

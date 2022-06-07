@@ -13,3 +13,14 @@
         });
     }, 2000);
 }
+
+
+function openNav() {
+    setTimeout(() => {
+        document.getElementById("mySidebar").style.width = "850px";
+    }, 2000);
+}
+
+function closeNav() {
+    document.getElementById("mySidebar").style.width = "0";
+}

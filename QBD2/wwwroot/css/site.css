@@ -7,7 +7,19 @@
     src: url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.woff") format("woff"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.svg#Effra") format("svg");
 }
 
-html, body {
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    background-color: #DCDCDC;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+    html, body {
     font-family: 'Effra', sans-serif;
     background: #f5f5f5;
 }

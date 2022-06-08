@@ -7,6 +7,10 @@
     src: url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.woff") format("woff"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/f41eeef7f001b066c10e8597ddf6eca2.svg#Effra") format("svg");
 }
 
+.blazored-toast-container {
+    z-index: 999999999999999 !important;
+}
+
 .sidebar {
     height: 100%;
     width: 0;

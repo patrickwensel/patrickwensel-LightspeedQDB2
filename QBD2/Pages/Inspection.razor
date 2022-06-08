@@ -42,7 +42,7 @@
                 </GridColumn>
                 <GridColumn Field="@(nameof(Entities.Inspection.Status))" Title="Status" Groupable="false" Sortable="true" Filterable="true">
                     <HeaderTemplate>
-                        <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Status</span>
+                        <span><i class="fa-duotone fa-wave-pulse" style="color: #11515E;"></i> Status</span>
                     </HeaderTemplate>
                     <Template>
                           @{
@@ -61,13 +61,13 @@
 
                 <GridColumn Field="Station.Name" Title="Station" Groupable="false" Filterable="true" Sortable="false">
                     <HeaderTemplate>
-                        <span><i class="fa-solid fa-barcode" style="color: #11515E;"></i> Station</span>
+                        <span><i class="fa-solid fa-arrow-trend-up" style="color: #11515E;"></i> Station</span>
                     </HeaderTemplate>
                 </GridColumn>
 
                  <GridColumn Field="@(nameof(Entities.Inspection.GeneralComments))" Title="Comments" Groupable="false" Sortable="true" Filterable="false">
                     <HeaderTemplate>
-                        <span><i class="fa-solid fa-comment" style="color: #11515E;"></i> Comments</span>
+                        <span><i class="fa-regular fa-comments" style="color: #11515E;"></i>Comments</span>
                     </HeaderTemplate>
                 </GridColumn>
 

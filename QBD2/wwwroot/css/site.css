@@ -906,11 +906,16 @@ div#mySidebar {
     div#mySidebar .right-scroll-column {
         background: #fbfbfb;
         padding: 40px 40px;
+        height: 100vh;
     }
 
     div#mySidebar #lblDescValue svg.svg-inline--fa.fa-circle-xmark.fa-w-16 {
         top: 110px;
     }
+
+.svg-inline--fa.fa-w-20 {
+    margin-right: 5px;
+}
 
 
 @media (min-width:320px) and (max-width: 767px) {

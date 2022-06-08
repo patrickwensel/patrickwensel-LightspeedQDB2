@@ -27,6 +27,18 @@ namespace QBD2.Data
         public DbSet<PartStatus> PartStatuses { get; set; }
         public DbSet<Repair> Repairs { get; set; }
 
+        public DbSet<ScarCarAttachment> ScarCarAttachments { get; set; }
+        public DbSet<ScarCarImpact> ScarCarImpacts { get; set; }
+        public DbSet<ScarCarResolution> ScarCarResolutions { get; set; }
+        public DbSet<ScarCarNote> ScarCarNotes { get; set; }
+        public DbSet<ScarCarProject> ScarCarProjects { get; set; }
+        public DbSet<ScarCarCategory> ScarCarCategories { get; set; }
+        public DbSet<ScarCarPriority> ScarCarPriorities { get; set; }
+        public DbSet<ScarCarStatus> ScarCarStatuses { get; set; }
+        public DbSet<ScarCar> ScarCar { get; set; }
+
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

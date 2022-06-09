@@ -1,8 +1,8 @@
-﻿@page "/manageglcode"
+﻿@page "/managescarcarimpact"
 @attribute [Authorize(Roles = "Admin")]
 @using QBD2.Services
 @using QBD2.Entities
-@inject GLCodeService GLCodeService
+@inject ScarCarImpactService ScarCarImpactService
 
 <style>
     .k-dialog-wrapper {
@@ -34,7 +34,9 @@ label.k-form-label {
     color: #fff;
 }
 </style>
-<h3>GL Code</h3>
+
+<h3>Scar Car Impact</h3>
+
 <TelerikGrid Data="@MyData" 
              Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
              Resizable="true" 
@@ -42,13 +44,12 @@ label.k-form-label {
              OnUpdate=@UpdateHandler
              OnDelete=@DeleteHandler
              OnCreate=@CreateHandler>
-             
              <GridToolBar>
-                <GridCommandButton Command="Add" Icon="add">Add a GL Code</GridCommandButton>
+                <GridCommandButton Command="Add" Icon="add">Add a Scar Car Impact</GridCommandButton>
             </GridToolBar>
             <GridColumns>
-                <GridColumn Field="@(nameof(GLCode.Name))" Title="Name" Groupable="false" />
-                        <GridCommandColumn>
+                <GridColumn Field="@(nameof(ScarCarImpact.Name))" Title="Name" Groupable="false" />
+                <GridCommandColumn>
                     <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
                     <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
                     <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
@@ -56,9 +57,10 @@ label.k-form-label {
                 </GridCommandColumn>
             </GridColumns>
 </TelerikGrid>
+
 @code {
 
-    List<GLCode> MyData { get; set; }
+    List<ScarCarImpact> MyData { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -67,38 +69,38 @@ label.k-form-label {
 
     async Task GetGridData()
     {
-        MyData = await GLCodeService.Read();
+        MyData = await ScarCarImpactService.Read();
     }
 
     async Task UpdateHandler(GridCommandEventArgs args)
     {
-        GLCode item = (GLCode)args.Item;
+        ScarCarImpact item = (ScarCarImpact)args.Item;
 
-        await GLCodeService.Update(item);
+        await ScarCarImpactService.Update(item);
 
         await GetGridData();
     }
 
     async Task DeleteHandler(GridCommandEventArgs args)
     {
-        GLCode item = (GLCode)args.Item;
+        ScarCarImpact item = (ScarCarImpact)args.Item;
 
-        await GLCodeService.Delete(item);
+        await ScarCarImpactService.Delete(item);
 
         await GetGridData();
     }
 
     async Task CreateHandler(GridCommandEventArgs args)
     {
-        GLCode item = (GLCode)args.Item;
+        ScarCarImpact item = (ScarCarImpact)args.Item;
 
-        await GLCodeService.Create(item);
+        await ScarCarImpactService.Create(item);
 
         await GetGridData();
     }
 
     async Task CancelHandler(GridCommandEventArgs args)
     {
-        GLCode item = (GLCode)args.Item;
+        ScarCarImpact item = (ScarCarImpact)args.Item;
     }
 }

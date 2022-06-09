@@ -52,6 +52,12 @@ builder.Services.AddScoped<FailureCodeService>();
 builder.Services.AddScoped<PartStatusService>();
 builder.Services.AddScoped<ApplicationSettings>();
 builder.Services.AddScoped<RepairService>();
+builder.Services.AddScoped<ScarCarImpactService>();
+builder.Services.AddScoped<ScarCarProjectService>();
+builder.Services.AddScoped<ScarCarCategoryService>();
+builder.Services.AddScoped<ScarCarPriorityService>();
+builder.Services.AddScoped<ScarCarStatusService>();
+builder.Services.AddScoped<ScarCarResolutionService>();
 builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformer>();
 
 #endregion

@@ -135,6 +135,48 @@ namespace QBD2.Data
 
             #endregion
 
+            #region ScarCarImpact
+            modelBuilder.Entity<ScarCarImpact>().HasData(new ScarCarImpact { ScarCarImpactId = 1, Name = "Low" });
+            modelBuilder.Entity<ScarCarImpact>().HasData(new ScarCarImpact { ScarCarImpactId = 2, Name = "Medium" });
+            modelBuilder.Entity<ScarCarImpact>().HasData(new ScarCarImpact { ScarCarImpactId = 3, Name = "High" });
+            #endregion
+
+            #region ScarCarProject
+            modelBuilder.Entity<ScarCarProject>().HasData(new ScarCarProject { ScarCarProjectId = 1, Name = "Process" });
+            modelBuilder.Entity<ScarCarProject>().HasData(new ScarCarProject { ScarCarProjectId = 2, Name = "Performance" });
+            modelBuilder.Entity<ScarCarProject>().HasData(new ScarCarProject { ScarCarProjectId = 3, Name = "Manufacturability" });
+            modelBuilder.Entity<ScarCarProject>().HasData(new ScarCarProject { ScarCarProjectId = 4, Name = "Test" });
+            #endregion
+
+            #region ScarCarCategory
+            modelBuilder.Entity<ScarCarCategory>().HasData(new ScarCarCategory { ScarCarCategoryId = 1, Name = "CIA" });
+            modelBuilder.Entity<ScarCarCategory>().HasData(new ScarCarCategory { ScarCarCategoryId = 2, Name = "CAR - Minor" });
+            modelBuilder.Entity<ScarCarCategory>().HasData(new ScarCarCategory { ScarCarCategoryId = 3, Name = "CAR - Major" });
+            modelBuilder.Entity<ScarCarCategory>().HasData(new ScarCarCategory { ScarCarCategoryId = 4, Name = "SCAR" });
+            modelBuilder.Entity<ScarCarCategory>().HasData(new ScarCarCategory { ScarCarCategoryId = 5, Name = "IAR" });
+            #endregion
+
+            #region ScarCarPriority
+            modelBuilder.Entity<ScarCarPriority>().HasData(new ScarCarPriority { ScarCarPriorityId = 1, Name = "1" });
+            modelBuilder.Entity<ScarCarPriority>().HasData(new ScarCarPriority { ScarCarPriorityId = 2, Name = "2" });
+            modelBuilder.Entity<ScarCarPriority>().HasData(new ScarCarPriority { ScarCarPriorityId = 3, Name = "3" });
+            modelBuilder.Entity<ScarCarPriority>().HasData(new ScarCarPriority { ScarCarPriorityId = 4, Name = "4" });
+            modelBuilder.Entity<ScarCarPriority>().HasData(new ScarCarPriority { ScarCarPriorityId = 5, Name = "5" });
+            modelBuilder.Entity<ScarCarPriority>().HasData(new ScarCarPriority { ScarCarPriorityId = 6, Name = "6" });
+            modelBuilder.Entity<ScarCarPriority>().HasData(new ScarCarPriority { ScarCarPriorityId = 7, Name = "7" });
+            modelBuilder.Entity<ScarCarPriority>().HasData(new ScarCarPriority { ScarCarPriorityId = 8, Name = "8" });
+            modelBuilder.Entity<ScarCarPriority>().HasData(new ScarCarPriority { ScarCarPriorityId = 9, Name = "9" });
+            modelBuilder.Entity<ScarCarPriority>().HasData(new ScarCarPriority { ScarCarPriorityId = 10, Name = "10" });
+            #endregion
+
+            #region ScarCarStatus
+            modelBuilder.Entity<ScarCarStatus>().HasData(new ScarCarStatus { ScarCarStatusId = 1, Name = "Active" });
+            modelBuilder.Entity<ScarCarStatus>().HasData(new ScarCarStatus { ScarCarStatusId = 2, Name = "New" });
+            modelBuilder.Entity<ScarCarStatus>().HasData(new ScarCarStatus { ScarCarStatusId = 3, Name = "Resolved" });
+            modelBuilder.Entity<ScarCarStatus>().HasData(new ScarCarStatus { ScarCarStatusId = 4, Name = "Closed" });
+            modelBuilder.Entity<ScarCarStatus>().HasData(new ScarCarStatus { ScarCarStatusId = 5, Name = "Deferred" });
+            #endregion
+
             ApplicationUser ohiduserApplicationUser = new()
             {
                 Id = "2e97b939-49c0-4e1e-8376-cb98348103bb", // primary key

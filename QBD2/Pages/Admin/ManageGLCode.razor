@@ -1,18 +1,49 @@
 ﻿@page "/manageglcode"
-@attribute [Authorize(Roles = "Admin")]
+@*@attribute [Authorize(Roles = "Admin")]*@
 @using QBD2.Services
 @using QBD2.Entities
 @inject GLCodeService GLCodeService
 
+<style>
+    .k-dialog-wrapper {
+    position: inherit;   
+}
+.k-centered {
+    transform: translate(5%, -250%);
+    width: 320px;
+}
+.k-window-titlebar.k-dialog-titlebar.k-header {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding: 10px 10px 20px 10px;
+}
+.k-window-content.k-dialog-content {
+    border-radius: 0;
+}
+label.k-form-label {
+    margin-right: 15px;
+}
+.k-form .k-form-field, .k-form .k-form-field-wrap {
+    display: inline-flex;
+    width: 100%;
+}
+.k-actions-start {
+    float: right;
+}
+.k-window-actions span {
+    color: #fff;
+}
+</style>
 <h3>GL Code</h3>
-
+<div class="manage-glCode">
 <TelerikGrid Data="@MyData" 
              Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
              Resizable="true" 
              EditMode="Telerik.Blazor.GridEditMode.Popup"
              OnUpdate=@UpdateHandler
              OnDelete=@DeleteHandler
-             OnCreate=@CreateHandler>
+             OnCreate=@CreateHandler Class="glCod">
+             
              <GridToolBar>
                 <GridCommandButton Command="Add" Icon="add">Add a GL Code</GridCommandButton>
             </GridToolBar>
@@ -26,7 +57,7 @@
                 </GridCommandColumn>
             </GridColumns>
 </TelerikGrid>
-
+</div>
 @code {
 
     List<GLCode> MyData { get; set; }

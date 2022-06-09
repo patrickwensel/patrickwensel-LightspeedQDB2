@@ -921,6 +921,10 @@ div#mySidebar {
     margin-right: 5px;
 }
 
+.manage-glCode .k-dialog-wrapper {   
+    position: inherit;
+}
+
 
 @media (min-width:320px) and (max-width: 767px) {
     .logo img {

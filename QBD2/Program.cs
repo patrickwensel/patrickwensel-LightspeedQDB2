@@ -52,6 +52,7 @@ builder.Services.AddScoped<FailureCodeService>();
 builder.Services.AddScoped<PartStatusService>();
 builder.Services.AddScoped<ApplicationSettings>();
 builder.Services.AddScoped<RepairService>();
+builder.Services.AddScoped<ScarCarService>();
 builder.Services.AddScoped<ScarCarImpactService>();
 builder.Services.AddScoped<ScarCarProjectService>();
 builder.Services.AddScoped<ScarCarCategoryService>();

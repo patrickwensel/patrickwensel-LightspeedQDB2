@@ -81,6 +81,11 @@ builder.Services.AddHangfireServer();
 var app = builder.Build();
 
 
+using (var scope = app.Services.GetService<IServiceScopeFactory>().CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.Migrate();
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");

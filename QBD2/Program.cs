@@ -59,6 +59,10 @@ builder.Services.AddScoped<ScarCarCategoryService>();
 builder.Services.AddScoped<ScarCarPriorityService>();
 builder.Services.AddScoped<ScarCarStatusService>();
 builder.Services.AddScoped<ScarCarResolutionService>();
+builder.Services.AddScoped<WorkOrderTypeService>();
+builder.Services.AddScoped<WorkOrderPriorityService>();
+builder.Services.AddScoped<WorkOrderStatusService>();
+builder.Services.AddScoped<WorkOrderService>();
 builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformer>();
 
 #endregion

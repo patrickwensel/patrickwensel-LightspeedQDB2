@@ -27,3 +27,11 @@ function closeNav() {
         left: '0px'
     }, 2000, 'easeOutQuint');*/
 }
+
+function ModelBodyOverflowShown() {
+    $('body').css('overflow', 'hidden');
+}
+
+function ModelBodyOverflowHidden() {
+    $('body').css('overflow', 'auto');
+}

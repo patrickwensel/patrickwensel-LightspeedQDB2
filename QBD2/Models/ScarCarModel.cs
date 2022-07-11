@@ -1,4 +1,5 @@
 ﻿using QBD2.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace QBD2.Models
 {
@@ -41,6 +42,7 @@ namespace QBD2.Models
     {
         public int ScarCarNoteId { get; set; }
 
+        [Required]
         public string Note { get; set; }
         public DateTime AddedDate { get; set; }
 

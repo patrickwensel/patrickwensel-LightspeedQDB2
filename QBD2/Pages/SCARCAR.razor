@@ -13,30 +13,57 @@
 @inject ScarCarCategoryService ScarCarCategoryService
 @inject ScarCarProjectService ScarCarProjectService
 @inject AuthenticationStateProvider AuthState
+@inject IJSRuntime JSRuntime
 
 <style>
-    .SaveButton {
-        float: right;
-        width: 100px;
-    }
+.SaveButton {
+      float: right;
+      width: 100px;
+}
+ .k-dialog-wrapper {
+    position: inherit;   
+}
+.k-centered {
+    transform: translate(5%, -300%);
+    width: 320px;
+}
+.k-window-titlebar.k-dialog-titlebar.k-header {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding: 10px 10px 20px 10px;
+}
+.k-window-content.k-dialog-content {
+    border-radius: 0;
+}
+label.k-form-label {
+    margin-right: 15px;
+}
+.k-form .k-form-field, .k-form .k-form-field-wrap {
+    display: inline-flex;
+    width: 100%;
+}
+.k-actions-start { 
+    float: right;
+}
+.k-window-actions span {
+    color: #fff;
+}
 </style>
 
 <div class="row alerts-row">
     <div class="col-md-9">
-        <h3 class="alert-title"><i class="fas fa-chevron-left"></i> <i class="fa fa-car" aria-hidden="true"></i> 
            @if (AddEditScarCarModel != null && AddEditScarCarModel.ScarCarId == 0)
            {
-               <text> Add New Scar Car</text>
+               <h3 class="alert-title"><label @onclick="(()=> btnCancelScarCarOnClick())"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add new Scar/Car</h3>
            }
            else if(AddEditScarCarModel != null && AddEditScarCarModel.ScarCarId > 0)
            {
-               <text> Edit Scar Car</text>
+               <h3 class="alert-title"><label @onclick="(()=> btnCancelScarCarOnClick())"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Edit Scar/Car</h3>
            }
            else
            {
-                <text> Scar Car</text>
+                <h3 class="alert-title"><i class="fa fa-car" aria-hidden="true"></i>&nbsp;&nbsp;SCAR/CAR</h3>
            }
-        </h3>
     </div>
     <div class="col-md-3 add-alrert-btn">
          @if (AddEditScarCarModel == null)
@@ -77,14 +104,14 @@
          <div class="form-group row m-tb">
             <label for="Title" class="col-md-2 col-form-label">Title </label>
             <div class="col-md-10">
-            <TelerikTextBox @bind-Value="@AddEditScarCarModel.Title" Class="form-control"></TelerikTextBox>
+            <TelerikTextBox @bind-Value="@AddEditScarCarModel.Title" Class="form-control" PlaceHolder="Set a title"></TelerikTextBox>
             <ValidationMessage For="@(() => AddEditScarCarModel.Title)"></ValidationMessage></div>
          </div>
 
         <div class="form-group row m-tb">          
             <label for="Description" class="col-md-2 col-form-label">Description</label>
             <div class="col-md-10">
-            <textarea @bind-value="AddEditScarCarModel.Description" class="form-control" rows="8" @bind-value:event="oninput"></textarea>
+            <textarea @bind-value="AddEditScarCarModel.Description" class="form-control" rows="8" @bind-value:event="oninput" placeholder="Type a description"></textarea>
             <ValidationMessage For="@(() => AddEditScarCarModel.Description)"></ValidationMessage>
             </div>
         </div>
@@ -121,7 +148,7 @@
            <label for="ScarCarImpactId" class="col-md-2 col-form-label">Scar Car Impact </label>
             <div class="col-md-4">
                  <TelerikDropDownList Data="@dataScarCarImpactDropdown"  TextField="DropText" ValueField="DropValue"
-                 @bind-Value="@AddEditScarCarModel.ScarCarImpactId" DefaultText="Scar Car Impact">
+                 @bind-Value="@AddEditScarCarModel.ScarCarImpactId" DefaultText="-select-">
                  </TelerikDropDownList>
                  <ValidationMessage For="@(() => AddEditScarCarModel.ScarCarImpactId)"></ValidationMessage>
             </div>
@@ -129,7 +156,7 @@
             <label for="ScarCarResolutionId" class="col-md-2 col-form-label">Scar Car Resolution </label>
             <div class="col-md-4">
                  <TelerikDropDownList Data="@dataScarCarResolutionDropdown"  TextField="DropText" ValueField="DropValue"
-                 @bind-Value="@AddEditScarCarModel.ScarCarResolutionId" DefaultText="Scar Car Resolution">
+                 @bind-Value="@AddEditScarCarModel.ScarCarResolutionId" DefaultText="-select-">
                  </TelerikDropDownList>
                  <ValidationMessage For="@(() => AddEditScarCarModel.ScarCarResolutionId)"></ValidationMessage>
             </div>
@@ -139,7 +166,7 @@
            <label for="ScarCarStatusId" class="col-md-2 col-form-label">Scar Car Status </label>
             <div class="col-md-4">
                  <TelerikDropDownList Data="@dataScarCarStatusesDropdown"  TextField="DropText" ValueField="DropValue"
-                 @bind-Value="@AddEditScarCarModel.ScarCarStatusId" DefaultText="Scar Car Status">
+                 @bind-Value="@AddEditScarCarModel.ScarCarStatusId" DefaultText="-select-">
                  </TelerikDropDownList>
                  <ValidationMessage For="@(() => AddEditScarCarModel.ScarCarStatusId)"></ValidationMessage>
             </div>
@@ -147,46 +174,40 @@
             <label for="ScarCarPriorityId" class="col-md-2 col-form-label">Scar Car Priority </label>
             <div class="col-md-4">
                  <TelerikDropDownList Data="@dataScarCarPrioritiesDropdown"  TextField="DropText" ValueField="DropValue"
-                 @bind-Value="@AddEditScarCarModel.ScarCarPriorityId" DefaultText="Scar Car Priority">
+                 @bind-Value="@AddEditScarCarModel.ScarCarPriorityId" DefaultText="-select-">
                  </TelerikDropDownList>
                  <ValidationMessage For="@(() => AddEditScarCarModel.ScarCarPriorityId)"></ValidationMessage>
             </div>
          </div>
 
           <div class="form-group row m-tb">
-           <label for="ScarCarCategoryId" class="col-md-2 col-form-label">Scar Car Category </label>
-            <div class="col-md-4">
-                 <TelerikDropDownList Data="@dataScarCarCategoriesDropdown"  TextField="DropText" ValueField="DropValue"
-                 @bind-Value="@AddEditScarCarModel.ScarCarCategoryId" DefaultText="Scar Car Category">
-                 </TelerikDropDownList>
-                 <ValidationMessage For="@(() => AddEditScarCarModel.ScarCarCategoryId)"></ValidationMessage>
-            </div>
           
             <label for="ScarCarProjectId" class="col-md-2 col-form-label">Scar Car Project </label>
             <div class="col-md-4">
                  <TelerikDropDownList Data="@dataScarCarProjectsDropdown"  TextField="DropText" ValueField="DropValue"
-                 @bind-Value="@AddEditScarCarModel.ScarCarProjectId" DefaultText="Scar Car Project">
+                 @bind-Value="@AddEditScarCarModel.ScarCarProjectId" DefaultText="-select-">
                  </TelerikDropDownList>
                  <ValidationMessage For="@(() => AddEditScarCarModel.ScarCarProjectId)"></ValidationMessage>
             </div>
-         </div>
-         
-         <div class="form-group row m-tb">          
-            <label for="ScarCarNoteValue" class="col-md-2 col-form-label">Note</label>
-            <div class="col-md-10">
-                <textarea @bind-value="ScarCarNoteValue" class="form-control" rows="4" @bind-value:event="oninput"></textarea>
-            </div>
-        </div>
 
-         <br />
+            <label for="ScarCarCategoryId" class="col-md-2 col-form-label">Scar Car Category </label>
+            <div class="col-md-4">
+                 <TelerikDropDownList Data="@dataScarCarCategoriesDropdown"  TextField="DropText" ValueField="DropValue"
+                 @bind-Value="@AddEditScarCarModel.ScarCarCategoryId" DefaultText="-select-">
+                 </TelerikDropDownList>
+                 <ValidationMessage For="@(() => AddEditScarCarModel.ScarCarCategoryId)"></ValidationMessage>
+            </div>
+
+         </div>
+         <hr/>
          <div class="row">
              <div class="col-sm-12 add-reason-btn">
-                 <TelerikButton id="btnSearch" ButtonType="@ButtonType.Button" OnClick="@btnAddNoteOnClick"><i class="fa-light fa-plus"></i> Add Note</TelerikButton>
+                 <TelerikButton id="btnAddNote" ButtonType="@ButtonType.Button" OnClick="@btnAddNoteOnClick"><i class="fa-light fa-plus"></i> Add A Note</TelerikButton>
              </div>
          </div>
         <br />
-         <div class="reason-section">
-             <h3>Notes</h3>
+        <h3 class="alert-table-title">Notes</h3> 
+        <div class="al-table">
              <TelerikGrid Data="@dataScarCarNoteGrid" Sortable="true" Resizable="true">
                  <GridColumns>
                      <GridColumn Field="Note" Title="Note" Groupable="false" />
@@ -203,13 +224,46 @@
             </TelerikGrid>
          </div>
         <br />
-        <div class="row">
-            <TelerikButton Class="SaveButton" ButtonType="ButtonType.Submit">Save</TelerikButton>
+        <div style="text-align:right!important">
+            <TelerikButton ButtonType="ButtonType.Button" @onclick="(()=> btnCancelScarCarOnClick())" >Cancel</TelerikButton>
+            &nbsp;
+            <TelerikButton Class="SaveButton" ButtonType="ButtonType.Submit" Icon="save">Save</TelerikButton>
         </div>
         <br />
     </EditForm>
     </div>
 }
+
+<TelerikWindow Visible="@(AddScarCarNote != null)" Modal="true" Width="573px" Draggable="false">
+	<WindowTitle>
+        <div class="row">
+            <div class="col-md-11">
+                <strong>Add a Note</strong>
+            </div>
+            <div class="col-md-1">
+                <TelerikButton OnClick="@ClearNoteSelection" ButtonType="@ButtonType.Button" Class="blue-btn"><i class="fa fa-times" title="Close"></i></TelerikButton>   
+            </div>
+        </div>
+	</WindowTitle>
+	<WindowContent>
+		<EditForm Model="@AddScarCarNote" OnValidSubmit="@SaveNote">
+			<DataAnnotationsValidator />
+                 <label for="Note" class="col-md-12 col-form-label">Write a note</label>
+                 <div class="form-group row m-tb">          
+                    <div class="col-md-12">
+                        <textarea @bind-value="AddScarCarNote.Note" class="form-control" rows="4" @bind-value:event="oninput" placeholder="Type a note to add"></textarea>
+                         <ValidationMessage For="@(() => AddScarCarNote.Note)"></ValidationMessage>
+                    </div>
+                 </div>
+				<br/>
+				<div style="text-align:right!important">
+                    <TelerikButton OnClick="(() => ClearNoteSelection())" ButtonType="@ButtonType.Button">Cancel</TelerikButton>
+					&nbsp;
+					<TelerikButton Icon="add" ButtonType="@ButtonType.Submit">Add Note</TelerikButton>
+				</div>
+		</EditForm>
+	</WindowContent>
+</TelerikWindow>
 
 @code 
 {
@@ -239,9 +293,9 @@
 
     List<Models.DropDownBind> dataScarCarProjectsDropdown { get; set; }
 
-    string UserId = string.Empty;
+    Models.ScarCarNote AddScarCarNote { get; set; }
 
-    string ScarCarNoteValue { get; set; }
+    string UserId = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -277,7 +331,6 @@
     public async Task SelectRecord(Models.ScarCarModel scarCar)
     {
         await GetDropDownData();
-        ScarCarNoteValue = string.Empty;
         OriginalRecord = null;
         if (scarCar != null)
         {
@@ -333,7 +386,6 @@
             {
                 toastService.ShowInfo("Record Saved Successfully.", "Info");
                 AddEditScarCarModel = null;
-                ScarCarNoteValue = string.Empty;
                 await GetScarCarGridData();
                 StateHasChanged();
             }
@@ -351,30 +403,23 @@
             await ScarCarService.Delete(item);
             await GetScarCarGridData();
         }
-     }
+    }
 
     async Task btnAddNoteOnClick()
     {
+        await JSRuntime.InvokeVoidAsync("ModelBodyOverflowShown");
         if (dataScarCarNoteGrid == null)
         {
             dataScarCarNoteGrid = new List<Models.ScarCarNote>();
         }
 
-        if (string.IsNullOrEmpty(ScarCarNoteValue))
-        {
-            toastService.ShowError("Please Enter Notes", "Error");
-            return;
-        }
 
-        dataScarCarNoteGrid.Add(new Models.ScarCarNote
+        AddScarCarNote = new Models.ScarCarNote()
         {
-            Note = ScarCarNoteValue,
-            AddedDate =DateTime.UtcNow,
-            ApplicationUserId = UserId,
-        });
+             AddedDate =DateTime.UtcNow,
+             ApplicationUserId = UserId
+        };
 
-        ScarCarNoteValue = string.Empty;
-        dataScarCarNoteGrid = new List<Models.ScarCarNote>(dataScarCarNoteGrid);
         StateHasChanged();
     }
 
@@ -384,4 +429,31 @@
         dataScarCarNoteGrid = new List<Models.ScarCarNote>(dataScarCarNoteGrid);
         StateHasChanged();
     }
+
+    public async Task SaveNote()
+    {
+        if (dataScarCarNoteGrid == null)
+        {
+            dataScarCarNoteGrid = new List<Models.ScarCarNote>();
+        }
+
+        dataScarCarNoteGrid.Add(AddScarCarNote);
+        dataScarCarNoteGrid = new List<Models.ScarCarNote>(dataScarCarNoteGrid);
+        StateHasChanged();
+        await ClearNoteSelection();
+    }
+
+    public async Task ClearNoteSelection()
+    {
+        await JSRuntime.InvokeVoidAsync("ModelBodyOverflowHidden");
+        AddScarCarNote = null;
+    }
+
+    public async Task btnCancelScarCarOnClick()
+    {
+         AddEditScarCarModel = null;
+         await GetScarCarGridData();
+         StateHasChanged();
+    }
+
 }

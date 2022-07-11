@@ -1,6 +1,261 @@
 ﻿@page "/workorder"
-<h3>Work Order</h3>
+@using QBD2.Models
+@using QBD2.Services
+@using QBD2.Entities
+@inject IToastService toastService
+@inject NavigationManager NavigationManager
+@inject WorkOrderPriorityService WorkOrderPriorityService
+@inject WorkOrderService WorkOrderService
+@inject WorkOrderStatusService WorkOrderStatusService
+@inject WorkOrderTypeService WorkOrderTypeService
+@inject IJSRuntime JSRuntime
+
+<style>
+.SaveButton {
+      float: right;
+      width: 100px;
+}
+ .k-dialog-wrapper {
+    position: inherit;   
+}
+.k-centered {
+    transform: translate(5%, -300%);
+    width: 320px;
+}
+.k-window-titlebar.k-dialog-titlebar.k-header {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding: 10px 10px 20px 10px;
+}
+.k-window-content.k-dialog-content {
+    border-radius: 0;
+}
+label.k-form-label {
+    margin-right: 15px;
+}
+.k-form .k-form-field, .k-form .k-form-field-wrap {
+    display: inline-flex;
+    width: 100%;
+}
+.k-actions-start { 
+    float: right;
+}
+.k-window-actions span {
+    color: #fff;
+}
+</style>
+
+<div class="row alerts-row">
+    <div class="col-md-9">
+        <h3 class="alert-title"><i class="fa fa-th-list" aria-hidden="true"></i>&nbsp;&nbsp;Work Order</h3>
+    </div>
+    <div class="col-md-3 add-alrert-btn">
+         @if (AddEditWorkOrderModel == null)
+         {
+              <TelerikButton Icon="add" OnClick="(() => SelectRecord(null))">Add New Work Order</TelerikButton>
+         }
+   </div>
+</div>
+<hr />
+
+ <h3 class="alert-table-title">Listed Work Orders</h3> 
+     <div class="al-table">
+            <TelerikGrid Data="@GridData"
+                     Pageable="true"
+                     Sortable="true"
+                     FilterMode="@GridFilterMode.FilterRow">
+                <GridColumns>
+                     <GridColumn Field="@(nameof(Models.WorkOrderModel.CreateDate))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}"/>
+                    <GridColumn Field="WorkOrderType.Name" Title="Work Order Type" Filterable="true"/>
+                    <GridColumn Field="WorkOrderStatus.Name" Title="Work Order Status" Filterable="true"/>
+                    <GridColumn Field="WorkOrderPriority.Name" Title="Work Order Priority" Filterable="true"/>
+                    <GridCommandColumn Width="100px">
+                         <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Models.WorkOrderModel))"><i class="fal fa-edit"></i></GridCommandButton>
+                         <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Models.WorkOrderModel))"></GridCommandButton>
+                     </GridCommandColumn>
+                </GridColumns>
+            </TelerikGrid>
+</div>
+
+<TelerikWindow Visible="@(AddEditWorkOrderModel != null)" Modal="true" Width="600px" Draggable="false">
+	<WindowTitle>
+		@{
+			if (AddEditWorkOrderModel.WorkOrderId == 0)
+			{
+				<strong>Add new Work Order</strong>
+			}
+			else
+			{
+				<strong>Edit Work Order</strong>
+			}
+		}
+	</WindowTitle>
+	<WindowContent>
+		<EditForm Model="@AddEditWorkOrderModel" OnValidSubmit="@HandleValidSubmit">
+			<DataAnnotationsValidator />
+
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group row">
+							<label for="WorkOrderTypeId" class="col-sm-4 col-form-label">Work Order Type </label>
+								<div class="col-sm-8">
+									<TelerikDropDownList @bind-Value="@AddEditWorkOrderModel.WorkOrderTypeId" Width="100%"
+								                         DefaultText="-select-" Data="@dataWorkOrderTypesDropdown" TextField="DropText" ValueField="DropValue" Class="form-control" Enabled="true">
+								    </TelerikDropDownList>
+								    <ValidationMessage For="@(() => AddEditWorkOrderModel.WorkOrderTypeId)" style="width:unset!important;"></ValidationMessage>
+								</div>
+						</div>
+					</div>
+				</div>
+
+                <div class="row">
+					<div class="col-md-12">
+						<div class="form-group row">
+							<label for="WorkOrderStatusId" class="col-sm-4 col-form-label">Work Order Status </label>
+								<div class="col-sm-8">
+									<TelerikDropDownList @bind-Value="@AddEditWorkOrderModel.WorkOrderStatusId" Width="100%"
+								                         DefaultText="-select-" Data="@dataWorkOrderStatusesDropdown" TextField="DropText" ValueField="DropValue" Class="form-control" Enabled="true">
+								    </TelerikDropDownList>
+								    <ValidationMessage For="@(() => AddEditWorkOrderModel.WorkOrderStatusId)" style="width:unset!important;"></ValidationMessage>
+								</div>
+						</div>
+					</div>
+				</div>
+
+                <div class="row">
+					<div class="col-md-12">
+						<div class="form-group row">
+							<label for="WorkOrderPriorityID" class="col-sm-4 col-form-label">Work Order Priority </label>
+								<div class="col-sm-8">
+									<TelerikDropDownList @bind-Value="@AddEditWorkOrderModel.WorkOrderPriorityID" Width="100%"
+								                         DefaultText="-select-" Data="@dataWorkOrderPrioritiesDropdown" TextField="DropText" ValueField="DropValue" Class="form-control" Enabled="true">
+								    </TelerikDropDownList>
+								    <ValidationMessage For="@(() => AddEditWorkOrderModel.WorkOrderPriorityID)" style="width:unset!important;"></ValidationMessage>
+								</div>
+						</div>
+					</div>
+				</div>
+
+				<br/>
+				<div class="form-row">
+					@{
+						if (AddEditWorkOrderModel.WorkOrderId == 0)
+						{
+							<TelerikButton Icon="save" ButtonType="@ButtonType.Submit">Save</TelerikButton>
+						}
+						else
+						{
+							<TelerikButton Icon="save" ButtonType="@ButtonType.Submit">Update</TelerikButton>
+						}
+					}
+					&nbsp;
+					<TelerikButton Icon="cancel" OnClick="(() => btnCancelScarCarOnClick())" ButtonType="@ButtonType.Button">Cancel</TelerikButton>
+				</div>
+		</EditForm>
+	</WindowContent>
+</TelerikWindow>
 
 @code {
 
+    List<Models.WorkOrderModel> GridData { get; set; }
+
+    List<Models.DropDownBind> dataWorkOrderTypesDropdown { get; set; }
+
+    List<Models.DropDownBind> dataWorkOrderPrioritiesDropdown { get; set; }
+
+    List<Models.DropDownBind> dataWorkOrderStatusesDropdown { get; set; }
+
+    AddEditWorkOrderModel AddEditWorkOrderModel { get; set; }
+
+    Models.WorkOrderModel OriginalRecord { get; set; }
+
+    EditContext ECAddEditWorkOrder { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetWorkOrderGridData();
+        base.OnInitialized();
+    }
+
+    async Task GetWorkOrderGridData()
+    {
+        GridData = await WorkOrderService.ReadWorkOrder();
+        StateHasChanged();
+    }
+
+    async Task GetDropDownData()
+    {
+        dataWorkOrderTypesDropdown =  WorkOrderTypeService.DropDownData();
+        dataWorkOrderPrioritiesDropdown = WorkOrderPriorityService.DropDownData();
+        dataWorkOrderStatusesDropdown = WorkOrderStatusService.DropDownData();
+    }
+
+    public async Task SelectRecord(Models.WorkOrderModel workOrder)
+    {
+        await JSRuntime.InvokeVoidAsync("ModelBodyOverflowShown");
+        await GetDropDownData();
+        OriginalRecord = null;
+        if (workOrder != null)
+        {
+            OriginalRecord = workOrder;
+            AddEditWorkOrderModel = new AddEditWorkOrderModel()
+            {
+                WorkOrderId = OriginalRecord.WorkOrderId,
+                WorkOrderTypeId = OriginalRecord.WorkOrderTypeId,
+                WorkOrderStatusId = OriginalRecord.WorkOrderStatusId,
+                WorkOrderPriorityID = OriginalRecord.WorkOrderPriorityID,
+                CreateDate = OriginalRecord.CreateDate
+            };
+        }
+        else
+        {
+            AddEditWorkOrderModel = new AddEditWorkOrderModel();
+            AddEditWorkOrderModel.WorkOrderId = 0;
+        }
+
+        if (AddEditWorkOrderModel != null)
+        {
+            ECAddEditWorkOrder = new EditContext(AddEditWorkOrderModel);
+        }
+        StateHasChanged();
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        if (AddEditWorkOrderModel != null)
+        {
+            var result = await WorkOrderService.Save(AddEditWorkOrderModel);
+            if (result != null)
+            {
+                if (result != null && result.Success)
+                {
+                    toastService.ShowInfo(result.Message, "Info");
+                    await btnCancelScarCarOnClick();
+                    await GetWorkOrderGridData();
+                    StateHasChanged();
+                }
+                else
+                {
+                    toastService.ShowError(result.Message, "Error");
+                }
+            }
+        }
+    }
+
+    public async Task DeleteRecord(Models.WorkOrderModel item)
+    {
+        if (item != null)
+        {
+            await WorkOrderService.Delete(item);
+            await GetWorkOrderGridData();
+        }
+    }
+
+    public async Task btnCancelScarCarOnClick()
+    {
+         AddEditWorkOrderModel = null;
+         await JSRuntime.InvokeVoidAsync("ModelBodyOverflowHidden");
+         await GetWorkOrderGridData();
+         StateHasChanged();
+    }
 }

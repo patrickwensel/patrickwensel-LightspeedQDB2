@@ -37,7 +37,10 @@ namespace QBD2.Data
         public DbSet<ScarCarStatus> ScarCarStatuses { get; set; }
         public DbSet<ScarCar> ScarCar { get; set; }
 
-
+        public DbSet<WorkOrder> WorkOrders { get; set; }
+        public DbSet<WorkOrderType> WorkOrderTypes { get; set; }
+        public DbSet<WorkOrderStatus> WorkOrderStatuses { get; set; }
+        public DbSet<WorkOrderPriority> WorkOrderPriorities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

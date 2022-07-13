@@ -27,5 +27,11 @@ namespace QBD2.Entities
         public virtual PartStatus PartStatus { get; set; }
 
         public DateTime UpdateDate { get; set; }
+
+        [ForeignKey("BuildStation")]
+        public int? BuildStationId { get; set; }
+        public virtual BuildStation BuildStation { get; set; }
+
+        public bool SerialNumberRequired { get; set; }
     }
 }

@@ -46,6 +46,8 @@ namespace QBD2.Data
         public DbSet<BuildTemplate> BuildTemplates { get; set; }
         public DbSet<BuildTemplatePart> BuildTemplateParts { get; set; }
 
+        public DbSet<WorkOrderPart> WorkOrderParts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -198,6 +200,7 @@ namespace QBD2.Data
 
             modelBuilder.Entity<MasterPart>().Property(m => m.ProductFamilyId).IsRequired(false);
             modelBuilder.Entity<Part>().Property(m => m.ParentPartId).IsRequired(false);
+            modelBuilder.Entity<Part>().Property(m => m.BuildStationId).IsRequired(false);
             //modelBuilder.Entity<Part>().Property(m => m.GLCodeId).IsRequired(false);
             //modelBuilder.Entity<Part>().Property(m => m.FailureCodeId).IsRequired(false);
             modelBuilder.Entity<MasterPart>().HasMany(x=>x.Deviations).WithOne(x => x.MasterPart).OnDelete(DeleteBehavior.NoAction);

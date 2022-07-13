@@ -1,0 +1,125 @@
+﻿@page "/managebuildtemplate"
+@attribute [Authorize(Roles = "Admin")]
+@using QBD2.Services
+@using QBD2.Entities
+@inject BuildTemplateService BuildTemplateService
+@inject MasterPartService MasterPartService
+
+<style>
+    .k-dialog-wrapper {
+    position: inherit;   
+}
+.k-centered {
+    transform: translate(5%, -300%);
+    width: 500px;
+}
+.k-window-titlebar.k-dialog-titlebar.k-header {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding: 10px 10px 20px 10px;
+}
+.k-window-content.k-dialog-content {
+    border-radius: 0;
+}
+label.k-form-label {
+    margin-right: 15px;
+}
+.k-form .k-form-field, .k-form .k-form-field-wrap {
+    display: inline-flex;
+    width: 100%;
+}
+.k-actions-start {
+    float: right;
+}
+.k-window-actions span {
+    color: #fff;
+}
+</style>
+
+<h3>Build Templates</h3>
+
+<TelerikGrid Data="@MyData" 
+             Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
+             Resizable="true" 
+             EditMode="Telerik.Blazor.GridEditMode.Popup"
+             OnUpdate=@UpdateHandler
+             OnDelete=@DeleteHandler
+             OnCreate=@CreateHandler>
+             <GridToolBar>
+                <GridCommandButton Command="Add" Icon="add">Add a Build Template</GridCommandButton>
+            </GridToolBar>
+            <GridColumns>
+                <GridColumn Field="@(nameof(BuildTemplate.Name))" Title="Name" Groupable="false" Filterable="false"/>
+                <GridColumn Field="MasterPart.PartNumber"  Title="Part" Groupable="false" >
+                    <EditorTemplate>
+                    @{
+                        var mycontext = context as BuildTemplate;
+                         <TelerikComboBox Data="@dataMasterPartDropdown" Class="form-control" Placeholder="-select-" TextField="DropText" ValueField="DropValue" @bind-Value="mycontext.MasterPartId" Filterable="true">
+								    </TelerikComboBox>
+					     <ValidationMessage For="@(() => mycontext.MasterPartId)" style="width:unset!important;"></ValidationMessage>
+                    }
+                </EditorTemplate>
+                </GridColumn>
+                  <GridCommandColumn>
+                    <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
+                    <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
+                    <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
+                    <GridCommandButton Command="Cancel" Icon="cancel" ShowInEdit="true">Cancel</GridCommandButton>
+                </GridCommandColumn>
+            </GridColumns>
+</TelerikGrid>
+
+@code {
+
+    List<BuildTemplate> MyData { get; set; }
+
+    List<Models.DropDownBind> dataMasterPartDropdown { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetGridData();
+    }
+
+    async Task GetDropDownData()
+    {
+        dataMasterPartDropdown = MasterPartService.DropDownData();
+    }
+
+    async Task GetGridData()
+    {
+        await GetDropDownData();
+        MyData = await BuildTemplateService.Read();
+    }
+
+    async Task UpdateHandler(GridCommandEventArgs args)
+    {
+        BuildTemplate item = (BuildTemplate)args.Item;
+
+        await BuildTemplateService.Update(item);
+
+        await GetGridData();
+    }
+
+    async Task DeleteHandler(GridCommandEventArgs args)
+    {
+        BuildTemplate item = (BuildTemplate)args.Item;
+
+        await BuildTemplateService.Delete(item);
+
+        await GetGridData();
+    }
+
+    async Task CreateHandler(GridCommandEventArgs args)
+    {
+        BuildTemplate item = (BuildTemplate)args.Item;
+
+        await BuildTemplateService.Create(item);
+
+        await GetGridData();
+    }
+
+    async Task CancelHandler(GridCommandEventArgs args)
+    {
+        BuildTemplate item = (BuildTemplate)args.Item;
+    }
+}

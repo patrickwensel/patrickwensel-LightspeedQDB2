@@ -17,5 +17,11 @@ namespace QBD2.Models
 
         [Required(ErrorMessage = "The Work Order Priority field is required.")]
         public int? WorkOrderPriorityID { get; set; }
+
+        [Required(ErrorMessage = "The Part field is required.")]
+        public int? BuildTemplateId { get; set; }
+
+        [Required(ErrorMessage = "The Quantity field is required.")]
+        public int? Quantity { get; set; }
     }
 }

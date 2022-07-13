@@ -1,0 +1,322 @@
+﻿@page "/buildtemplatepart"
+@using QBD2.Models
+@using QBD2.Services
+@using QBD2.Entities
+@inject IToastService toastService
+@inject NavigationManager NavigationManager
+@inject BuildTemplatePartService BuildTemplatePartService
+@inject BuildStationService BuildStationService
+@inject BuildTemplateService BuildTemplateService
+@inject MasterPartService MasterPartService
+@inject IJSRuntime JSRuntime
+
+<style>
+.SaveButton {
+      float: right;
+      width: 100px;
+}
+ .k-dialog-wrapper {
+    position: inherit;   
+}
+.k-centered {
+    transform: translate(5%, -300%);
+    width: 320px;
+}
+.k-window-titlebar.k-dialog-titlebar.k-header {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding: 10px 10px 20px 10px;
+}
+.k-window-content.k-dialog-content {
+    border-radius: 0;
+}
+label.k-form-label {
+    margin-right: 15px;
+}
+.k-form .k-form-field, .k-form .k-form-field-wrap {
+    display: inline-flex;
+    width: 100%;
+}
+.k-actions-start { 
+    float: right;
+}
+.k-window-actions span {
+    color: #fff;
+}
+</style>
+
+<div class="row alerts-row">
+    <div class="col-md-9">
+        <h3 class="alert-title"><i class="fa fa-gift" aria-hidden="true"></i>&nbsp;&nbsp;Build Template Part</h3>
+    </div>
+    <div class="col-md-3 add-alrert-btn">
+         @if (AddEditBuildTemplatePartModel == null)
+         {
+              <TelerikButton Icon="add" OnClick="(() => SelectRecord(null))">Add New Build Template Part</TelerikButton>
+         }
+   </div>
+</div>
+<hr />
+
+ <h3 class="alert-table-title">Listed Build Template Parts</h3> 
+     <div class="al-table">
+            <TelerikGrid Data="@GridData"
+                     Pageable="true"
+                     Sortable="true"
+                     FilterMode="@GridFilterMode.FilterRow">
+                <GridColumns>
+                    <GridColumn Field="MasterPart.PartNumber" Title="Part" Filterable="true"/>
+                    <GridColumn Field="BuildStation.Name" Title="Build Station" Filterable="true"/>
+                    <GridColumn Field="BuildTemplate.Name" Title="Build Template" Filterable="true"/>
+                    <GridColumn Field="@(nameof(Models.BuildTemplatePartModel.SerialNumberRequired))" Title="Serial Number Required" Groupable="false" Sortable="true" Filterable="false" Width="200px">
+                    <Template>
+                          @{
+                              var buildTemplatePartModel = context as Models.BuildTemplatePartModel;
+                              if (buildTemplatePartModel != null && buildTemplatePartModel.SerialNumberRequired == true)
+                              {
+                                    <lable style="color:green">Yes</lable>
+                              }
+                              else
+                              {
+                                    <lable style="color:red;">No</lable>
+                              }
+                            }
+                    </Template>
+                </GridColumn>
+                    <GridCommandColumn Width="100px">
+                         <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Models.BuildTemplatePartModel))"><i class="fal fa-edit"></i></GridCommandButton>
+                         <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Models.BuildTemplatePartModel))"></GridCommandButton>
+                     </GridCommandColumn>
+                </GridColumns>
+            </TelerikGrid>
+</div>
+
+<TelerikWindow Visible="@(AddEditBuildTemplatePartModel != null)" Modal="true" Width="600px" Draggable="false">
+	<WindowTitle>
+		@{
+			if (AddEditBuildTemplatePartModel.BuildTemplatePartId == 0)
+			{
+				<strong>Add new Build Template Part</strong>
+			}
+			else
+			{
+				<strong>Edit Build Template Part</strong>
+			}
+		}
+	</WindowTitle>
+	<WindowContent>
+		<EditForm Model="@AddEditBuildTemplatePartModel" OnValidSubmit="@HandleValidSubmit">
+			<DataAnnotationsValidator />
+
+             <div class="row">
+					<div class="col-md-12">
+						<div class="form-group row">
+							<label for="MasterPartId" class="col-sm-4 col-form-label">Part </label>
+								<div class="col-sm-8">
+                                    <TelerikComboBox Data="@dataMasterPartDropdown" Class="form-control" Placeholder="-select-" TextField="DropText" ValueField="DropValue" @bind-Value="AddEditBuildTemplatePartModel.MasterPartId" Filterable="true">
+								    </TelerikComboBox>
+								    <ValidationMessage For="@(() => AddEditBuildTemplatePartModel.MasterPartId)" style="width:unset!important;"></ValidationMessage>
+								</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group row">
+							<label for="BuildTemplateId" class="col-sm-4 col-form-label">Build Template </label>
+								<div class="col-sm-8">
+									<TelerikDropDownList @bind-Value="@AddEditBuildTemplatePartModel.BuildTemplateId" Width="100%"
+								                         DefaultText="-select-" Data="@dataBuildTemplatesDropdown" TextField="DropText" ValueField="DropValue" Class="form-control" Enabled="true">
+								    </TelerikDropDownList>
+								    <ValidationMessage For="@(() => AddEditBuildTemplatePartModel.BuildTemplateId)" style="width:unset!important;"></ValidationMessage>
+								</div>
+						</div>
+					</div>
+				</div>
+
+                <div class="row">
+					<div class="col-md-12">
+						<div class="form-group row">
+							<label for="BuildStationId" class="col-sm-4 col-form-label">Build Station </label>
+								<div class="col-sm-8">
+									<TelerikDropDownList @bind-Value="@AddEditBuildTemplatePartModel.BuildStationId" Width="100%"
+								                         DefaultText="-select-" Data="@dataBuildStationDropdown" TextField="DropText" ValueField="DropValue" Class="form-control" Enabled="true">
+								    </TelerikDropDownList>
+								    <ValidationMessage For="@(() => AddEditBuildTemplatePartModel.BuildStationId)" style="width:unset!important;"></ValidationMessage>
+								</div>
+						</div>
+					</div>
+				</div>
+
+                <div class="row">
+					<div class="col-md-12">
+						<div class="form-group row">
+							<label for="SerialNumberRequired" class="col-sm-4 col-form-label">Serial Number Required </label>
+								<div class="col-sm-8">
+                                    <ul class="switch-btn dev">
+                                        <li class="@AddActiveCssClass" @onclick="(() => OnSerialNumberRequiredChangeHandler(true))"> Yes</li>
+                                        <li class="@AddInActiveCssClass" @onclick="(() => OnSerialNumberRequiredChangeHandler(false))"> No</li>
+                                    </ul>
+								    <ValidationMessage For="@(() => AddEditBuildTemplatePartModel.SerialNumberRequired)" style="width:unset!important;"></ValidationMessage>
+								</div>
+						</div>
+					</div>
+				</div>
+
+				<br/>
+
+				<div class="form-row">
+					@{
+						if (AddEditBuildTemplatePartModel.BuildTemplatePartId == 0)
+						{
+							<TelerikButton Icon="save" ButtonType="@ButtonType.Submit">Save</TelerikButton>
+						}
+						else
+						{
+							<TelerikButton Icon="save" ButtonType="@ButtonType.Submit">Update</TelerikButton>
+						}
+					}
+					&nbsp;
+					<TelerikButton Icon="cancel" OnClick="(() => btnCancelBuildTemplatePartOnClick())" ButtonType="@ButtonType.Button">Cancel</TelerikButton>
+				</div>
+		</EditForm>
+	</WindowContent>
+</TelerikWindow>
+
+@code {
+
+    List<Models.BuildTemplatePartModel> GridData { get; set; }
+
+    List<Models.DropDownBind> dataBuildTemplatesDropdown { get; set; }
+
+    List<Models.DropDownBind> dataMasterPartDropdown { get; set; }
+
+    List<Models.DropDownBind> dataBuildStationDropdown { get; set; }
+
+    AddEditBuildTemplatePartModel AddEditBuildTemplatePartModel { get; set; }
+
+    Models.BuildTemplatePartModel OriginalRecord { get; set; }
+
+    EditContext ECAddEditWorkOrder { get; set; }
+
+    string AddActiveCssClass { get; set; } = "active";
+
+    string AddInActiveCssClass { get; set; } 
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetBuildTemplatePartGridData();
+        base.OnInitialized();
+    }
+
+    async Task GetBuildTemplatePartGridData()
+    {
+        GridData = await BuildTemplatePartService.ReadBuildTemplatePart();
+        StateHasChanged();
+    }
+
+    async Task GetDropDownData()
+    {
+        dataBuildTemplatesDropdown =  BuildTemplateService.DropDownData();
+        dataMasterPartDropdown = MasterPartService.DropDownData();
+        dataBuildStationDropdown = BuildStationService.DropDownData();
+    }
+
+    public async Task SelectRecord(Models.BuildTemplatePartModel buildTemplatePartModel)
+    {
+        await JSRuntime.InvokeVoidAsync("ModelBodyOverflowShown");
+        await GetDropDownData();
+        OriginalRecord = null;
+        if (buildTemplatePartModel != null)
+        {
+            OriginalRecord = buildTemplatePartModel;
+            AddEditBuildTemplatePartModel = new AddEditBuildTemplatePartModel()
+            {
+                BuildTemplatePartId = OriginalRecord.BuildTemplatePartId,
+                BuildTemplateId = OriginalRecord.BuildTemplateId,
+                MasterPartId = OriginalRecord.MasterPartId,
+                BuildStationId = OriginalRecord.BuildStationId,
+                SerialNumberRequired = OriginalRecord.SerialNumberRequired
+            };
+        }
+        else
+        {
+            AddEditBuildTemplatePartModel = new AddEditBuildTemplatePartModel();
+            AddEditBuildTemplatePartModel.BuildTemplatePartId = 0;
+        }
+
+        if (AddEditBuildTemplatePartModel.SerialNumberRequired == true)
+        {
+                AddActiveCssClass = "active";
+                AddInActiveCssClass = string.Empty;
+        }
+        else if(AddEditBuildTemplatePartModel.SerialNumberRequired == false)
+        { 
+                AddActiveCssClass = string.Empty;
+                AddInActiveCssClass = "active";
+        }
+
+        if (AddEditBuildTemplatePartModel != null)
+        {
+            ECAddEditWorkOrder = new EditContext(AddEditBuildTemplatePartModel);
+        }
+        StateHasChanged();
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        if (AddEditBuildTemplatePartModel != null)
+        {
+            var result = await BuildTemplatePartService.Save(AddEditBuildTemplatePartModel);
+            if (result != null)
+            {
+                if (result != null && result.Success)
+                {
+                    toastService.ShowInfo(result.Message, "Info");
+                    await btnCancelBuildTemplatePartOnClick();
+                    await GetBuildTemplatePartGridData();
+                    StateHasChanged();
+                }
+                else
+                {
+                    toastService.ShowError(result.Message, "Error");
+                }
+            }
+        }
+    }
+
+    public async Task DeleteRecord(Models.BuildTemplatePartModel item)
+    {
+        if (item != null)
+        {
+            await BuildTemplatePartService.Delete(item);
+            await GetBuildTemplatePartGridData();
+        }
+    }
+
+    public async Task btnCancelBuildTemplatePartOnClick()
+    {
+         AddEditBuildTemplatePartModel = null;
+         await JSRuntime.InvokeVoidAsync("ModelBodyOverflowHidden");
+         await GetBuildTemplatePartGridData();
+         StateHasChanged();
+    }
+
+
+    public async void OnSerialNumberRequiredChangeHandler(bool value)
+    {
+        if (value == true)
+        {
+            AddEditBuildTemplatePartModel.SerialNumberRequired = true;
+            AddActiveCssClass = "active";
+            AddInActiveCssClass = string.Empty;
+        }
+        else if(value == false)
+        { 
+            AddEditBuildTemplatePartModel.SerialNumberRequired = false;
+            AddActiveCssClass = string.Empty;
+            AddInActiveCssClass = "active";
+        }
+    }
+}

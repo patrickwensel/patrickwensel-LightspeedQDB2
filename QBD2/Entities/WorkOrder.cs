@@ -12,7 +12,6 @@ namespace QBD2.Entities
 
         public DateTime CreateDate { get; set; }
 
-
         [ForeignKey("WorkOrderType")]
         public int WorkOrderTypeId { get; set; }
         public virtual WorkOrderType WorkOrderType { get; set; }
@@ -24,5 +23,11 @@ namespace QBD2.Entities
         [ForeignKey("WorkOrderPriority")]
         public int WorkOrderPriorityID { get; set; }
         public virtual WorkOrderPriority WorkOrderPriority { get; set; }
+
+        [ForeignKey("BuildTemplate")]
+        public int BuildTemplateId { get; set; }
+        public virtual BuildTemplate BuildTemplate { get; set; }
+
+        public int Quantity { get; set; }
     }
 }

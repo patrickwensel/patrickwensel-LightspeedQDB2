@@ -16,5 +16,12 @@ namespace QBD2.Models
 
         public int WorkOrderPriorityID { get; set; }
         public virtual WorkOrderPriority WorkOrderPriority { get; set; }
+
+        public int BuildTemplateId { get; set; }
+        public virtual BuildTemplate BuildTemplate { get; set; }
+
+        public int Quantity { get; set; }
+
+        public string BuildTemplateMasterPartName { get; set; }
     }
 }

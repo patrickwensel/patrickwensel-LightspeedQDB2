@@ -8,6 +8,7 @@
 @inject WorkOrderService WorkOrderService
 @inject WorkOrderStatusService WorkOrderStatusService
 @inject WorkOrderTypeService WorkOrderTypeService
+@inject MasterPartService MasterPartService
 @inject IJSRuntime JSRuntime
 
 <style>
@@ -69,6 +70,8 @@ label.k-form-label {
                     <GridColumn Field="WorkOrderType.Name" Title="Work Order Type" Filterable="true"/>
                     <GridColumn Field="WorkOrderStatus.Name" Title="Work Order Status" Filterable="true"/>
                     <GridColumn Field="WorkOrderPriority.Name" Title="Work Order Priority" Filterable="true"/>
+                    <GridColumn Field="BuildTemplateMasterPartName" Title="Part" Filterable="true"/>
+                    <GridColumn Field="Quantity" Title="Quantity" Filterable="true"/>
                     <GridCommandColumn Width="100px">
                          <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Models.WorkOrderModel))"><i class="fal fa-edit"></i></GridCommandButton>
                          <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Models.WorkOrderModel))"></GridCommandButton>
@@ -136,6 +139,32 @@ label.k-form-label {
 					</div>
 				</div>
 
+                 <div class="row">
+					<div class="col-md-12">
+						<div class="form-group row">
+							<label for="MasterPartId" class="col-sm-4 col-form-label">Part </label>
+								<div class="col-sm-8">
+                                     <TelerikComboBox Data="@dataMasterPartsDropdown" Class="form-control" Placeholder="-select-" TextField="DropText" ValueField="DropValue" @bind-Value="AddEditWorkOrderModel.BuildTemplateId" Filterable="true">
+								    </TelerikComboBox>
+								    <ValidationMessage For="@(() => AddEditWorkOrderModel.BuildTemplateId)" style="width:unset!important;"></ValidationMessage>
+								</div>
+						</div>
+					</div>
+				</div>
+
+
+                <div class="row">
+					<div class="col-md-12">
+						<div class="form-group row">
+							<label for="Quantity" class="col-sm-4 col-form-label">Quantity </label>
+								<div class="col-sm-8">
+                                    <TelerikNumericTextBox @bind-Value="@AddEditWorkOrderModel.Quantity" Class="form-control"></TelerikNumericTextBox>
+								    <ValidationMessage For="@(() => AddEditWorkOrderModel.Quantity)" style="width:unset!important;"></ValidationMessage>
+								</div>
+						</div>
+					</div>
+				</div>
+
 				<br/>
 				<div class="form-row">
 					@{
@@ -165,6 +194,8 @@ label.k-form-label {
 
     List<Models.DropDownBind> dataWorkOrderStatusesDropdown { get; set; }
 
+    List<Models.DropDownBind> dataMasterPartsDropdown { get; set; }
+
     AddEditWorkOrderModel AddEditWorkOrderModel { get; set; }
 
     Models.WorkOrderModel OriginalRecord { get; set; }
@@ -188,6 +219,7 @@ label.k-form-label {
         dataWorkOrderTypesDropdown =  WorkOrderTypeService.DropDownData();
         dataWorkOrderPrioritiesDropdown = WorkOrderPriorityService.DropDownData();
         dataWorkOrderStatusesDropdown = WorkOrderStatusService.DropDownData();
+        dataMasterPartsDropdown = MasterPartService.GetBuildTemplateMasterPartDropDownData();
     }
 
     public async Task SelectRecord(Models.WorkOrderModel workOrder)
@@ -204,7 +236,9 @@ label.k-form-label {
                 WorkOrderTypeId = OriginalRecord.WorkOrderTypeId,
                 WorkOrderStatusId = OriginalRecord.WorkOrderStatusId,
                 WorkOrderPriorityID = OriginalRecord.WorkOrderPriorityID,
-                CreateDate = OriginalRecord.CreateDate
+                CreateDate = OriginalRecord.CreateDate,
+                Quantity = OriginalRecord.Quantity,
+                BuildTemplateId = OriginalRecord.BuildTemplateId
             };
         }
         else

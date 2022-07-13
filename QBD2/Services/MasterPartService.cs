@@ -40,5 +40,21 @@ namespace QBD2.Services
             var x = _context.MasterParts.ToList();
             return x;
         }
+
+        public List<Models.DropDownBind> DropDownData()
+        {
+            return _context.MasterParts.Select(p => new Models.DropDownBind { DropText = p.PartNumber, DropValue = p.MasterPartId }).ToList();
+        }
+
+        public List<Models.DropDownBind> GetBuildTemplateMasterPartDropDownData()
+        {
+            return (from mt in _context.MasterParts
+                    join bt in _context.BuildTemplates on mt.MasterPartId equals bt.MasterPartId
+                    select new Models.DropDownBind
+                    {
+                        DropText =  bt.Name + " " + mt.PartNumber,
+                        DropValue = bt.BuildTemplateId
+                    }).Distinct().ToList();
+        }
     }
 }

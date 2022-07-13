@@ -42,6 +42,10 @@ namespace QBD2.Data
         public DbSet<WorkOrderStatus> WorkOrderStatuses { get; set; }
         public DbSet<WorkOrderPriority> WorkOrderPriorities { get; set; }
 
+        public DbSet<BuildStation> BuildStations { get; set; }
+        public DbSet<BuildTemplate> BuildTemplates { get; set; }
+        public DbSet<BuildTemplatePart> BuildTemplateParts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

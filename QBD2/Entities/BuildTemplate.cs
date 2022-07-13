@@ -8,5 +8,11 @@ namespace QBD2.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int BuildTemplateId { get; set; }
+
+        public string Name { get; set; }
+
+        [ForeignKey("MasterPart")]
+        public int MasterPartId { get; set; }
+        public virtual MasterPart MasterPart { get; set; }
     }
 }

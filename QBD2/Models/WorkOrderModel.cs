@@ -23,5 +23,9 @@ namespace QBD2.Models
         public int Quantity { get; set; }
 
         public string BuildTemplateMasterPartName { get; set; }
+
+        public List<WorkOrderPart> WorkOrderPartList { get; set; }
+
+        public List<Part> PartsList { get; set; }
     }
 }

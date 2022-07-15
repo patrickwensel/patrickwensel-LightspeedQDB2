@@ -60,25 +60,96 @@ label.k-form-label {
 <hr />
 
  <h3 class="alert-table-title">Listed Work Orders</h3> 
-     <div class="al-table">
-            <TelerikGrid Data="@GridData"
-                     Pageable="true"
-                     Sortable="true"
-                     FilterMode="@GridFilterMode.FilterRow">
-                <GridColumns>
-                     <GridColumn Field="@(nameof(Models.WorkOrderModel.CreateDate))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}"/>
-                    <GridColumn Field="WorkOrderType.Name" Title="Work Order Type" Filterable="true"/>
-                    <GridColumn Field="WorkOrderStatus.Name" Title="Work Order Status" Filterable="true"/>
-                    <GridColumn Field="WorkOrderPriority.Name" Title="Work Order Priority" Filterable="true"/>
-                    <GridColumn Field="BuildTemplateMasterPartName" Title="Part" Filterable="true"/>
-                    <GridColumn Field="Quantity" Title="Quantity" Filterable="true"/>
-                    <GridCommandColumn Width="100px">
-                         <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Models.WorkOrderModel))"><i class="fal fa-edit"></i></GridCommandButton>
-                         <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Models.WorkOrderModel))"></GridCommandButton>
-                     </GridCommandColumn>
-                </GridColumns>
-            </TelerikGrid>
-</div>
+ <div class="al-table">
+       <TelerikGrid Data="@GridData"
+                Pageable="true"
+                Sortable="true"
+                FilterMode="@GridFilterMode.FilterRow">
+           <DetailTemplate>
+              @{
+                  var workOrderModel = context as Models.WorkOrderModel;
+                  <TelerikGrid Data="workOrderModel.PartsList" Pageable="true" PageSize="5">
+                      <GridColumns>
+                          <GridColumn Field="PartId" Title="Part">
+                          <Template Context="myContext">
+                          @{
+                                var part = myContext as Part;
+                                if (part != null)
+                                {
+                                      <lable>@part.PartId</lable>   
+                                }
+                           }
+                          </Template>
+                          </GridColumn>
+                          <GridColumn Field="SerialNumber" Title="Serial Number">
+                          <Template Context="myContext">
+                          @{
+                                var part = myContext as Part;
+                                if (part != null)
+                                {
+                                      <lable>@part.SerialNumber</lable>
+                                }
+                           }
+                          </Template>
+                          </GridColumn>
+                          <GridColumn Field="BuildStation.Name>" Title="Build Station">
+                          <Template Context="myContext">
+                          @{
+                                var part = myContext as Part;
+                                if (part != null && part.BuildStation != null)
+                                {
+                                      <lable>@part.BuildStation.Name</lable>
+                                }
+                           }
+                          </Template>
+                          </GridColumn>
+                          <GridColumn Field="PartStatus.Name>" Title="Part Status">
+                          <Template Context="myContext">
+                          @{
+                                var part = myContext as Part;
+                                if (part != null && part.PartStatus != null)
+                                {
+                                      <lable>@part.PartStatus.Name</lable>
+                                }
+                           }
+                          </Template>
+                          </GridColumn>
+                          <GridColumn Field="SerialNumberRequired>" Title="Serial Number Required">
+                          <Template Context="myContext">
+                          @{
+                                var part = myContext as Part;
+                                if (part != null)
+                                {
+                                    if (part != null && part.SerialNumberRequired == true)
+                                    {
+                                        <lable style="color:green">Yes</lable>
+                                    }
+                                    else
+                                    {
+                                          <lable style="color:red;">No</lable>
+                                    }
+                                }
+                           }
+                          </Template>
+                          </GridColumn>
+                      </GridColumns>
+                  </TelerikGrid>
+              }
+           </DetailTemplate>
+           <GridColumns>
+                <GridColumn Field="@(nameof(Models.WorkOrderModel.CreateDate))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}"/>
+               <GridColumn Field="WorkOrderType.Name" Title="Work Order Type" Filterable="true"/>
+               <GridColumn Field="WorkOrderStatus.Name" Title="Work Order Status" Filterable="true"/>
+               <GridColumn Field="WorkOrderPriority.Name" Title="Work Order Priority" Filterable="true"/>
+               <GridColumn Field="BuildTemplateMasterPartName" Title="Part" Filterable="true"/>
+               <GridColumn Field="Quantity" Title="Quantity" Filterable="true"/>
+               <GridCommandColumn Width="100px">
+                    <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Models.WorkOrderModel))"><i class="fal fa-edit"></i></GridCommandButton>
+                    <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Models.WorkOrderModel))"></GridCommandButton>
+                </GridCommandColumn>
+           </GridColumns>
+       </TelerikGrid>
+ </div>
 
 <TelerikWindow Visible="@(AddEditWorkOrderModel != null)" Modal="true" Width="600px" Draggable="false">
 	<WindowTitle>

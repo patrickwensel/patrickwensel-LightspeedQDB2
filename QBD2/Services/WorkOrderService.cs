@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QBD2.Data;
+using QBD2.Entities;
 
 namespace QBD2.Services
 {
@@ -14,14 +15,14 @@ namespace QBD2.Services
 
         public async Task<List<Models.WorkOrderModel>> ReadWorkOrder()
         {
-            List<Models.WorkOrderModel> WorkOrderModelList = new List<Models.WorkOrderModel>();
-            WorkOrderModelList = await (from wo in _context.WorkOrders
+            List<Models.WorkOrderModel> workOrderModelList = new List<Models.WorkOrderModel>();
+            workOrderModelList = await (from wo in _context.WorkOrders
                                         join wot in _context.WorkOrderTypes on wo.WorkOrderTypeId equals wot.WorkOrderTypeId
                                         join wos in _context.WorkOrderStatuses on wo.WorkOrderStatusId equals wos.WorkOrderStatusId
                                         join wop in _context.WorkOrderPriorities on wo.WorkOrderPriorityID equals wop.WorkOrderPriorityId
                                         join bt in _context.BuildTemplates on wo.BuildTemplateId equals bt.BuildTemplateId
                                         select new Models.WorkOrderModel
-                                        { 
+                                        {
                                             WorkOrderId = wo.WorkOrderId,
                                             CreateDate = wo.CreateDate,
                                             WorkOrderTypeId = wo.WorkOrderTypeId,
@@ -33,9 +34,17 @@ namespace QBD2.Services
                                             BuildTemplateId = wo.BuildTemplateId,
                                             BuildTemplate = bt,
                                             Quantity = wo.Quantity,
-                                            BuildTemplateMasterPartName = bt.Name + " " + bt.MasterPart.PartNumber
+                                            BuildTemplateMasterPartName = bt.Name + " " + bt.MasterPart.PartNumber,
+                                            WorkOrderPartList = _context.WorkOrderParts.Include(b=>b.WorkOrder).Include(a=>a.Part).Include(c=>c.Part.ParentPart).Include(d=>d.Part.PartStatus).Include(d => d.Part.BuildStation).Where(x => x.WorkOrderId == wo.WorkOrderId).ToList()
                                         }).ToListAsync();
-            return WorkOrderModelList;
+
+            foreach (var item in workOrderModelList)
+            {
+                var workOrderParts = await _context.WorkOrderParts.Where(x => x.WorkOrderId == item.WorkOrderId).Select(x => x.PartId).ToListAsync();
+                item.PartsList = _context.Parts.Include(c => c.ParentPart).Include(d => d.PartStatus).Include(e => e.BuildStation).Include(f=>f.MasterPart).Where(x => workOrderParts.Contains(x.PartId)).ToList();
+            }
+
+            return workOrderModelList;
         }
 
         public async Task<Models.ApiResponse> Save(Models.AddEditWorkOrderModel addEditWorkOrderModel)
@@ -77,6 +86,37 @@ namespace QBD2.Services
                         Quantity = addEditWorkOrderModel.Quantity.Value
                     };
                     _context.WorkOrders.Add(objWorkOrder);
+
+                    await _context.SaveChangesAsync();
+                    if (objWorkOrder != null && objWorkOrder.WorkOrderId > 0 && objWorkOrder.Quantity > 0)
+                    {
+                        var buildTemplate = await _context.BuildTemplates.Where(x => x.BuildTemplateId == objWorkOrder.BuildTemplateId).FirstOrDefaultAsync();
+                        var buildTemplatePart = await _context.BuildTemplateParts.Where(x => x.BuildTemplateId == addEditWorkOrderModel.BuildTemplateId.Value).FirstOrDefaultAsync();
+                        var parts = await _context.Parts.Where(x => x.MasterPartId == buildTemplatePart.MasterPartId).ToListAsync();
+
+                        for (int i = 1; i <= objWorkOrder.Quantity; i++)
+                        {
+                            Part part = new Part();
+                            part.SerialNumber = "";
+                            part.MasterPartId = buildTemplatePart.MasterPartId;
+                            part.UpdateDate = DateTime.Now;
+                            part.PartStatusId = 1;
+                            if (buildTemplatePart != null)
+                            {
+                                part.BuildStationId = buildTemplatePart.BuildStationId;
+                                part.SerialNumberRequired = buildTemplatePart.SerialNumberRequired;
+                            }
+                           
+                            _context.Parts.Add(part);
+                            _context.SaveChanges();
+
+                            WorkOrderPart workOrderPart = new WorkOrderPart();
+                            workOrderPart.WorkOrderId = objWorkOrder.WorkOrderId;
+                            workOrderPart.PartId = part.PartId;
+                            _context.WorkOrderParts.Add(workOrderPart);
+                            _context.SaveChanges();
+                        }
+                    }
                 }
 
                 await _context.SaveChangesAsync();

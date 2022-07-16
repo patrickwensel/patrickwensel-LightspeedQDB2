@@ -12,8 +12,8 @@ using QBD2.Data;
 namespace QBD2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220530073125_AddSeedDataForStation")]
-    partial class AddSeedDataForStation
+    [Migration("20220716162502_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -268,6 +268,76 @@ namespace QBD2.Migrations
                     b.HasIndex("MasterPartId");
 
                     b.ToTable("Alerts");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.BuildStation", b =>
+                {
+                    b.Property<int>("BuildStationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BuildStationId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BuildStationId");
+
+                    b.ToTable("BuildStations");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.BuildTemplate", b =>
+                {
+                    b.Property<int>("BuildTemplateId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BuildTemplateId"), 1L, 1);
+
+                    b.Property<int>("MasterPartId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BuildTemplateId");
+
+                    b.HasIndex("MasterPartId");
+
+                    b.ToTable("BuildTemplates");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.BuildTemplatePart", b =>
+                {
+                    b.Property<int>("BuildTemplatePartId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BuildTemplatePartId"), 1L, 1);
+
+                    b.Property<int>("BuildStationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BuildTemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MasterPartId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("SerialNumberRequired")
+                        .HasColumnType("bit");
+
+                    b.HasKey("BuildTemplatePartId");
+
+                    b.HasIndex("BuildStationId");
+
+                    b.HasIndex("BuildTemplateId");
+
+                    b.HasIndex("MasterPartId");
+
+                    b.ToTable("BuildTemplateParts");
                 });
 
             modelBuilder.Entity("QBD2.Entities.Deviation", b =>
@@ -583,64 +653,6 @@ namespace QBD2.Migrations
                     b.HasIndex("ProductFamilyId");
 
                     b.ToTable("MasterParts");
-
-                    b.HasData(
-                        new
-                        {
-                            MasterPartId = 1,
-                            Description = "Delta Zulu GA",
-                            Itemno = "800000250012",
-                            PartNumber = "800-00025-001.2",
-                            ProductFamilyId = 1
-                        },
-                        new
-                        {
-                            MasterPartId = 2,
-                            Description = "ASSY, PCB, ANR, LEFT",
-                            PartNumber = "200-00062-000"
-                        },
-                        new
-                        {
-                            MasterPartId = 3,
-                            Description = "Faceplate, Left",
-                            PartNumber = "303-00059-100"
-                        },
-                        new
-                        {
-                            MasterPartId = 4,
-                            Description = "ASSY, PCB, ANR, RIGHT",
-                            PartNumber = "200-00048-000"
-                        },
-                        new
-                        {
-                            MasterPartId = 5,
-                            Description = "Faceplate, Right",
-                            PartNumber = "303-00060-100"
-                        },
-                        new
-                        {
-                            MasterPartId = 6,
-                            Description = "PCBA, Control Box Lower",
-                            PartNumber = "200-00060-000"
-                        },
-                        new
-                        {
-                            MasterPartId = 7,
-                            Description = "CONTROL BOX UPPER BOARD",
-                            PartNumber = "200-00043-000"
-                        },
-                        new
-                        {
-                            MasterPartId = 8,
-                            Description = "ANR Mic - Grooved, Aluminum",
-                            PartNumber = "120-00008-101"
-                        },
-                        new
-                        {
-                            MasterPartId = 9,
-                            Description = "DRIVER",
-                            PartNumber = "119-00002-100"
-                        });
                 });
 
             modelBuilder.Entity("QBD2.Entities.Part", b =>
@@ -650,6 +662,9 @@ namespace QBD2.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PartId"), 1L, 1);
+
+                    b.Property<int?>("BuildStationId")
+                        .HasColumnType("int");
 
                     b.Property<int>("MasterPartId")
                         .HasColumnType("int");
@@ -664,10 +679,15 @@ namespace QBD2.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("SerialNumberRequired")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("PartId");
+
+                    b.HasIndex("BuildStationId");
 
                     b.HasIndex("MasterPartId");
 
@@ -676,106 +696,6 @@ namespace QBD2.Migrations
                     b.HasIndex("PartStatusId");
 
                     b.ToTable("Parts");
-
-                    b.HasData(
-                        new
-                        {
-                            PartId = 1,
-                            MasterPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "808000406",
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 2,
-                            MasterPartId = 2,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "71534*000135",
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 3,
-                            MasterPartId = 3,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "L51210055",
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 4,
-                            MasterPartId = 4,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "71543*000080",
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 5,
-                            MasterPartId = 5,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "R50210586",
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 6,
-                            MasterPartId = 6,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "71528*000047",
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 7,
-                            MasterPartId = 7,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "54658*000908",
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 8,
-                            MasterPartId = 8,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "2976833306*20210731037*A209601*2021-12-09*2Y*1*S*++*2801-20211207142***1",
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 9,
-                            MasterPartId = 9,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "2972833301*2792-20210413013*A219101*2021-12-20*8",
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 10,
-                            MasterPartId = 8,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "2976833306*20210731037*A209601*2021-12-09*2Y*1*S*++*2801-20211207142***1",
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 11,
-                            MasterPartId = 9,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "2972833301*2792-20210413013*A219101*2021-12-20*8",
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
                 });
 
             modelBuilder.Entity("QBD2.Entities.PartAlert", b =>
@@ -912,6 +832,381 @@ namespace QBD2.Migrations
                     b.ToTable("Repairs");
                 });
 
+            modelBuilder.Entity("QBD2.Entities.ScarCar", b =>
+                {
+                    b.Property<int>("ScarCarId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScarCarId"), 1L, 1);
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Containment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("OpenDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RootCause")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ScarCarCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ScarCarImpactId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ScarCarPriorityId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ScarCarProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ScarCarResolutionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ScarCarStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ScarCarId");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("ScarCarCategoryId");
+
+                    b.HasIndex("ScarCarImpactId");
+
+                    b.HasIndex("ScarCarPriorityId");
+
+                    b.HasIndex("ScarCarProjectId");
+
+                    b.HasIndex("ScarCarResolutionId");
+
+                    b.HasIndex("ScarCarStatusId");
+
+                    b.ToTable("ScarCar");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.ScarCarAttachment", b =>
+                {
+                    b.Property<int>("ScarCarAttachmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScarCarAttachmentId"), 1L, 1);
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ScarCarId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ScarCarAttachmentId");
+
+                    b.HasIndex("ScarCarId");
+
+                    b.ToTable("ScarCarAttachments");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.ScarCarCategory", b =>
+                {
+                    b.Property<int>("ScarCarCategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScarCarCategoryId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ScarCarCategoryId");
+
+                    b.ToTable("ScarCarCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            ScarCarCategoryId = 1,
+                            Name = "CIA"
+                        },
+                        new
+                        {
+                            ScarCarCategoryId = 2,
+                            Name = "CAR - Minor"
+                        },
+                        new
+                        {
+                            ScarCarCategoryId = 3,
+                            Name = "CAR - Major"
+                        },
+                        new
+                        {
+                            ScarCarCategoryId = 4,
+                            Name = "SCAR"
+                        },
+                        new
+                        {
+                            ScarCarCategoryId = 5,
+                            Name = "IAR"
+                        });
+                });
+
+            modelBuilder.Entity("QBD2.Entities.ScarCarImpact", b =>
+                {
+                    b.Property<int>("ScarCarImpactId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScarCarImpactId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ScarCarImpactId");
+
+                    b.ToTable("ScarCarImpacts");
+
+                    b.HasData(
+                        new
+                        {
+                            ScarCarImpactId = 1,
+                            Name = "Low"
+                        },
+                        new
+                        {
+                            ScarCarImpactId = 2,
+                            Name = "Medium"
+                        },
+                        new
+                        {
+                            ScarCarImpactId = 3,
+                            Name = "High"
+                        });
+                });
+
+            modelBuilder.Entity("QBD2.Entities.ScarCarNote", b =>
+                {
+                    b.Property<int>("ScarCarProjectId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScarCarProjectId"), 1L, 1);
+
+                    b.Property<DateTime>("AddedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ScarCarId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ScarCarProjectId");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("ScarCarId");
+
+                    b.ToTable("ScarCarNotes");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.ScarCarPriority", b =>
+                {
+                    b.Property<int>("ScarCarPriorityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScarCarPriorityId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ScarCarPriorityId");
+
+                    b.ToTable("ScarCarPriorities");
+
+                    b.HasData(
+                        new
+                        {
+                            ScarCarPriorityId = 1,
+                            Name = "1"
+                        },
+                        new
+                        {
+                            ScarCarPriorityId = 2,
+                            Name = "2"
+                        },
+                        new
+                        {
+                            ScarCarPriorityId = 3,
+                            Name = "3"
+                        },
+                        new
+                        {
+                            ScarCarPriorityId = 4,
+                            Name = "4"
+                        },
+                        new
+                        {
+                            ScarCarPriorityId = 5,
+                            Name = "5"
+                        },
+                        new
+                        {
+                            ScarCarPriorityId = 6,
+                            Name = "6"
+                        },
+                        new
+                        {
+                            ScarCarPriorityId = 7,
+                            Name = "7"
+                        },
+                        new
+                        {
+                            ScarCarPriorityId = 8,
+                            Name = "8"
+                        },
+                        new
+                        {
+                            ScarCarPriorityId = 9,
+                            Name = "9"
+                        },
+                        new
+                        {
+                            ScarCarPriorityId = 10,
+                            Name = "10"
+                        });
+                });
+
+            modelBuilder.Entity("QBD2.Entities.ScarCarProject", b =>
+                {
+                    b.Property<int>("ScarCarProjectId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScarCarProjectId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ScarCarProjectId");
+
+                    b.ToTable("ScarCarProjects");
+
+                    b.HasData(
+                        new
+                        {
+                            ScarCarProjectId = 1,
+                            Name = "Process"
+                        },
+                        new
+                        {
+                            ScarCarProjectId = 2,
+                            Name = "Performance"
+                        },
+                        new
+                        {
+                            ScarCarProjectId = 3,
+                            Name = "Manufacturability"
+                        },
+                        new
+                        {
+                            ScarCarProjectId = 4,
+                            Name = "Test"
+                        });
+                });
+
+            modelBuilder.Entity("QBD2.Entities.ScarCarResolution", b =>
+                {
+                    b.Property<int>("ScarCarResolutionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScarCarResolutionId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ScarCarResolutionId");
+
+                    b.ToTable("ScarCarResolutions");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.ScarCarStatus", b =>
+                {
+                    b.Property<int>("ScarCarStatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScarCarStatusId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ScarCarStatusId");
+
+                    b.ToTable("ScarCarStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            ScarCarStatusId = 1,
+                            Name = "Active"
+                        },
+                        new
+                        {
+                            ScarCarStatusId = 2,
+                            Name = "New"
+                        },
+                        new
+                        {
+                            ScarCarStatusId = 3,
+                            Name = "Resolved"
+                        },
+                        new
+                        {
+                            ScarCarStatusId = 4,
+                            Name = "Closed"
+                        },
+                        new
+                        {
+                            ScarCarStatusId = 5,
+                            Name = "Deferred"
+                        });
+                });
+
             modelBuilder.Entity("QBD2.Entities.Station", b =>
                 {
                     b.Property<int>("StationId")
@@ -941,6 +1236,119 @@ namespace QBD2.Migrations
                         });
                 });
 
+            modelBuilder.Entity("QBD2.Entities.WorkOrder", b =>
+                {
+                    b.Property<int>("WorkOrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkOrderId"), 1L, 1);
+
+                    b.Property<int>("BuildTemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WorkOrderPriorityID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WorkOrderStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WorkOrderTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("WorkOrderId");
+
+                    b.HasIndex("BuildTemplateId");
+
+                    b.HasIndex("WorkOrderPriorityID");
+
+                    b.HasIndex("WorkOrderStatusId");
+
+                    b.HasIndex("WorkOrderTypeId");
+
+                    b.ToTable("WorkOrders");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.WorkOrderPart", b =>
+                {
+                    b.Property<int>("WorkOrderPartId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkOrderPartId"), 1L, 1);
+
+                    b.Property<int>("PartId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WorkOrderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("WorkOrderPartId");
+
+                    b.HasIndex("PartId");
+
+                    b.HasIndex("WorkOrderId");
+
+                    b.ToTable("WorkOrderParts");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.WorkOrderPriority", b =>
+                {
+                    b.Property<int>("WorkOrderPriorityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkOrderPriorityId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("WorkOrderPriorityId");
+
+                    b.ToTable("WorkOrderPriorities");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.WorkOrderStatus", b =>
+                {
+                    b.Property<int>("WorkOrderStatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkOrderStatusId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("WorkOrderStatusId");
+
+                    b.ToTable("WorkOrderStatuses");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.WorkOrderType", b =>
+                {
+                    b.Property<int>("WorkOrderTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkOrderTypeId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("WorkOrderTypeId");
+
+                    b.ToTable("WorkOrderTypes");
+                });
+
             modelBuilder.Entity("QBD2.Entities.ApplicationRole", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityRole");
@@ -951,14 +1359,14 @@ namespace QBD2.Migrations
                         new
                         {
                             Id = "22b3bff1-cfd2-4075-a90f-827380656873",
-                            ConcurrencyStamp = "73d7a493-9ee9-4879-9dfa-c6d7ea4e9654",
+                            ConcurrencyStamp = "315524be-76b6-4f5a-8b7a-984d1c7c5173",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "e4e7188b-6ecb-4278-aeee-17271f20d7ce",
-                            ConcurrencyStamp = "c5c6f450-764d-40e6-a830-20f7a898d8cc",
+                            ConcurrencyStamp = "a66120c8-cad3-4bed-9cc8-b8be83758813",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -972,6 +1380,24 @@ namespace QBD2.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "2e97b939-49c0-4e1e-8376-cb98348103bb",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "a38ea1e2-2b9b-4e98-86b5-c82772a103bc",
+                            Email = "pwensel@hotmail.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "PWENSEL@HOTMAIL.COM",
+                            NormalizedUserName = "PWENSEL@HOTMAIL.COM",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "277b511b-7a8a-4c44-83bf-6afaedaf2b90",
+                            TwoFactorEnabled = false,
+                            UserName = "pwensel@hotmail.com",
+                            ADLogin = "DESKTOP-1HVSAG6\\pwens"
+                        });
                 });
 
             modelBuilder.Entity("QBD2.Entities.ApplicationUserRole", b =>
@@ -979,6 +1405,13 @@ namespace QBD2.Migrations
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUserRole<string>");
 
                     b.HasDiscriminator().HasValue("ApplicationUserRole");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "2e97b939-49c0-4e1e-8376-cb98348103bb",
+                            RoleId = "e4e7188b-6ecb-4278-aeee-17271f20d7ce"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1039,6 +1472,44 @@ namespace QBD2.Migrations
                         .HasForeignKey("MasterPartId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("MasterPart");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.BuildTemplate", b =>
+                {
+                    b.HasOne("QBD2.Entities.MasterPart", "MasterPart")
+                        .WithMany()
+                        .HasForeignKey("MasterPartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MasterPart");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.BuildTemplatePart", b =>
+                {
+                    b.HasOne("QBD2.Entities.BuildStation", "BuildStation")
+                        .WithMany()
+                        .HasForeignKey("BuildStationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.BuildTemplate", "BuildTemplate")
+                        .WithMany()
+                        .HasForeignKey("BuildTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.MasterPart", "MasterPart")
+                        .WithMany("BuildTemplateParts")
+                        .HasForeignKey("MasterPartId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("BuildStation");
+
+                    b.Navigation("BuildTemplate");
 
                     b.Navigation("MasterPart");
                 });
@@ -1118,6 +1589,10 @@ namespace QBD2.Migrations
 
             modelBuilder.Entity("QBD2.Entities.Part", b =>
                 {
+                    b.HasOne("QBD2.Entities.BuildStation", "BuildStation")
+                        .WithMany()
+                        .HasForeignKey("BuildStationId");
+
                     b.HasOne("QBD2.Entities.MasterPart", "MasterPart")
                         .WithMany()
                         .HasForeignKey("MasterPartId")
@@ -1133,6 +1608,8 @@ namespace QBD2.Migrations
                         .HasForeignKey("PartStatusId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("BuildStation");
 
                     b.Navigation("MasterPart");
 
@@ -1206,6 +1683,149 @@ namespace QBD2.Migrations
                     b.Navigation("Part");
                 });
 
+            modelBuilder.Entity("QBD2.Entities.ScarCar", b =>
+                {
+                    b.HasOne("QBD2.Entities.ApplicationUser", "AssignedUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.ScarCarCategory", "ScarCarCategory")
+                        .WithMany()
+                        .HasForeignKey("ScarCarCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.ScarCarImpact", "ScarCarImpact")
+                        .WithMany()
+                        .HasForeignKey("ScarCarImpactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.ScarCarPriority", "ScarCarPriority")
+                        .WithMany()
+                        .HasForeignKey("ScarCarPriorityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.ScarCarProject", "ScarCarProject")
+                        .WithMany()
+                        .HasForeignKey("ScarCarProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.ScarCarResolution", "ScarCarResolution")
+                        .WithMany()
+                        .HasForeignKey("ScarCarResolutionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.ScarCarStatus", "ScarCarStatus")
+                        .WithMany()
+                        .HasForeignKey("ScarCarStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssignedUser");
+
+                    b.Navigation("ScarCarCategory");
+
+                    b.Navigation("ScarCarImpact");
+
+                    b.Navigation("ScarCarPriority");
+
+                    b.Navigation("ScarCarProject");
+
+                    b.Navigation("ScarCarResolution");
+
+                    b.Navigation("ScarCarStatus");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.ScarCarAttachment", b =>
+                {
+                    b.HasOne("QBD2.Entities.ScarCar", "ScarCar")
+                        .WithMany("ScarCarAttachments")
+                        .HasForeignKey("ScarCarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ScarCar");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.ScarCarNote", b =>
+                {
+                    b.HasOne("QBD2.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.ScarCar", "ScarCar")
+                        .WithMany("ScarCarNotes")
+                        .HasForeignKey("ScarCarId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ScarCar");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.WorkOrder", b =>
+                {
+                    b.HasOne("QBD2.Entities.BuildTemplate", "BuildTemplate")
+                        .WithMany()
+                        .HasForeignKey("BuildTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.WorkOrderPriority", "WorkOrderPriority")
+                        .WithMany()
+                        .HasForeignKey("WorkOrderPriorityID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.WorkOrderStatus", "WorkOrderStatus")
+                        .WithMany()
+                        .HasForeignKey("WorkOrderStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.WorkOrderType", "WorkOrderType")
+                        .WithMany()
+                        .HasForeignKey("WorkOrderTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BuildTemplate");
+
+                    b.Navigation("WorkOrderPriority");
+
+                    b.Navigation("WorkOrderStatus");
+
+                    b.Navigation("WorkOrderType");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.WorkOrderPart", b =>
+                {
+                    b.HasOne("QBD2.Entities.Part", "Part")
+                        .WithMany()
+                        .HasForeignKey("PartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QBD2.Entities.WorkOrder", "WorkOrder")
+                        .WithMany("WorkOrderParts")
+                        .HasForeignKey("WorkOrderId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Part");
+
+                    b.Navigation("WorkOrder");
+                });
+
             modelBuilder.Entity("QBD2.Entities.ApplicationUserRole", b =>
                 {
                     b.HasOne("QBD2.Entities.ApplicationRole", "Role")
@@ -1244,6 +1864,8 @@ namespace QBD2.Migrations
                 {
                     b.Navigation("Alerts");
 
+                    b.Navigation("BuildTemplateParts");
+
                     b.Navigation("Deviations");
                 });
 
@@ -1255,6 +1877,18 @@ namespace QBD2.Migrations
             modelBuilder.Entity("QBD2.Entities.PartStatus", b =>
                 {
                     b.Navigation("Parts");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.ScarCar", b =>
+                {
+                    b.Navigation("ScarCarAttachments");
+
+                    b.Navigation("ScarCarNotes");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.WorkOrder", b =>
+                {
+                    b.Navigation("WorkOrderParts");
                 });
 
             modelBuilder.Entity("QBD2.Entities.ApplicationRole", b =>

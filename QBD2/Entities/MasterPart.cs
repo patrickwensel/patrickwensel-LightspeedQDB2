@@ -21,5 +21,7 @@ namespace QBD2.Entities
 
         public virtual List<Alert> Alerts { get; set; }
 
+        public virtual List<BuildTemplatePart> BuildTemplateParts { get; set; }
+
     }
 }

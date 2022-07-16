@@ -12,6 +12,8 @@ namespace QBD2.Entities
 
         public DateTime CreateDate { get; set; }
 
+        public virtual List<WorkOrderPart>  WorkOrderParts { get; set; }
+
         [ForeignKey("WorkOrderType")]
         public int WorkOrderTypeId { get; set; }
         public virtual WorkOrderType WorkOrderType { get; set; }

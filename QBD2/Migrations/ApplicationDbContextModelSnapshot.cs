@@ -651,64 +651,6 @@ namespace QBD2.Migrations
                     b.HasIndex("ProductFamilyId");
 
                     b.ToTable("MasterParts");
-
-                    b.HasData(
-                        new
-                        {
-                            MasterPartId = 1,
-                            Description = "Delta Zulu GA",
-                            Itemno = "800000250012",
-                            PartNumber = "800-00025-001.2",
-                            ProductFamilyId = 1
-                        },
-                        new
-                        {
-                            MasterPartId = 2,
-                            Description = "ASSY, PCB, ANR, LEFT",
-                            PartNumber = "200-00062-000"
-                        },
-                        new
-                        {
-                            MasterPartId = 3,
-                            Description = "Faceplate, Left",
-                            PartNumber = "303-00059-100"
-                        },
-                        new
-                        {
-                            MasterPartId = 4,
-                            Description = "ASSY, PCB, ANR, RIGHT",
-                            PartNumber = "200-00048-000"
-                        },
-                        new
-                        {
-                            MasterPartId = 5,
-                            Description = "Faceplate, Right",
-                            PartNumber = "303-00060-100"
-                        },
-                        new
-                        {
-                            MasterPartId = 6,
-                            Description = "PCBA, Control Box Lower",
-                            PartNumber = "200-00060-000"
-                        },
-                        new
-                        {
-                            MasterPartId = 7,
-                            Description = "CONTROL BOX UPPER BOARD",
-                            PartNumber = "200-00043-000"
-                        },
-                        new
-                        {
-                            MasterPartId = 8,
-                            Description = "ANR Mic - Grooved, Aluminum",
-                            PartNumber = "120-00008-101"
-                        },
-                        new
-                        {
-                            MasterPartId = 9,
-                            Description = "DRIVER",
-                            PartNumber = "119-00002-100"
-                        });
                 });
 
             modelBuilder.Entity("QBD2.Entities.Part", b =>
@@ -752,117 +694,6 @@ namespace QBD2.Migrations
                     b.HasIndex("PartStatusId");
 
                     b.ToTable("Parts");
-
-                    b.HasData(
-                        new
-                        {
-                            PartId = 1,
-                            MasterPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "808000406",
-                            SerialNumberRequired = false,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 2,
-                            MasterPartId = 2,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "71534*000135",
-                            SerialNumberRequired = false,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 3,
-                            MasterPartId = 3,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "L51210055",
-                            SerialNumberRequired = false,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 4,
-                            MasterPartId = 4,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "71543*000080",
-                            SerialNumberRequired = false,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 5,
-                            MasterPartId = 5,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "R50210586",
-                            SerialNumberRequired = false,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 6,
-                            MasterPartId = 6,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "71528*000047",
-                            SerialNumberRequired = false,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 7,
-                            MasterPartId = 7,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "54658*000908",
-                            SerialNumberRequired = false,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 8,
-                            MasterPartId = 8,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "2976833306*20210731037*A209601*2021-12-09*2Y*1*S*++*2801-20211207142***1",
-                            SerialNumberRequired = false,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 9,
-                            MasterPartId = 9,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "2972833301*2792-20210413013*A219101*2021-12-20*8",
-                            SerialNumberRequired = false,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 10,
-                            MasterPartId = 8,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "2976833306*20210731037*A209601*2021-12-09*2Y*1*S*++*2801-20211207142***1",
-                            SerialNumberRequired = false,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            PartId = 11,
-                            MasterPartId = 9,
-                            ParentPartId = 1,
-                            PartStatusId = 1,
-                            SerialNumber = "2972833301*2792-20210413013*A219101*2021-12-20*8",
-                            SerialNumberRequired = false,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
                 });
 
             modelBuilder.Entity("QBD2.Entities.PartAlert", b =>
@@ -1526,14 +1357,14 @@ namespace QBD2.Migrations
                         new
                         {
                             Id = "22b3bff1-cfd2-4075-a90f-827380656873",
-                            ConcurrencyStamp = "0fee12c9-02c2-4c13-a2b2-fe487835c2a0",
+                            ConcurrencyStamp = "315524be-76b6-4f5a-8b7a-984d1c7c5173",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "e4e7188b-6ecb-4278-aeee-17271f20d7ce",
-                            ConcurrencyStamp = "738c58f2-2b60-4218-883e-14f39337c201",
+                            ConcurrencyStamp = "a66120c8-cad3-4bed-9cc8-b8be83758813",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -1547,6 +1378,24 @@ namespace QBD2.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "2e97b939-49c0-4e1e-8376-cb98348103bb",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "a38ea1e2-2b9b-4e98-86b5-c82772a103bc",
+                            Email = "pwensel@hotmail.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "PWENSEL@HOTMAIL.COM",
+                            NormalizedUserName = "PWENSEL@HOTMAIL.COM",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "277b511b-7a8a-4c44-83bf-6afaedaf2b90",
+                            TwoFactorEnabled = false,
+                            UserName = "pwensel@hotmail.com",
+                            ADLogin = "DESKTOP-1HVSAG6\\pwens"
+                        });
                 });
 
             modelBuilder.Entity("QBD2.Entities.ApplicationUserRole", b =>
@@ -1554,6 +1403,13 @@ namespace QBD2.Migrations
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUserRole<string>");
 
                     b.HasDiscriminator().HasValue("ApplicationUserRole");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "2e97b939-49c0-4e1e-8376-cb98348103bb",
+                            RoleId = "e4e7188b-6ecb-4278-aeee-17271f20d7ce"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1644,9 +1500,9 @@ namespace QBD2.Migrations
                         .IsRequired();
 
                     b.HasOne("QBD2.Entities.MasterPart", "MasterPart")
-                        .WithMany()
+                        .WithMany("BuildTemplateParts")
                         .HasForeignKey("MasterPartId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("BuildStation");
@@ -1906,7 +1762,7 @@ namespace QBD2.Migrations
                     b.HasOne("QBD2.Entities.ScarCar", "ScarCar")
                         .WithMany("ScarCarNotes")
                         .HasForeignKey("ScarCarId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("ScarCar");
@@ -1958,9 +1814,9 @@ namespace QBD2.Migrations
                         .IsRequired();
 
                     b.HasOne("QBD2.Entities.WorkOrder", "WorkOrder")
-                        .WithMany()
+                        .WithMany("WorkOrderParts")
                         .HasForeignKey("WorkOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Part");
@@ -2006,6 +1862,8 @@ namespace QBD2.Migrations
                 {
                     b.Navigation("Alerts");
 
+                    b.Navigation("BuildTemplateParts");
+
                     b.Navigation("Deviations");
                 });
 
@@ -2024,6 +1882,11 @@ namespace QBD2.Migrations
                     b.Navigation("ScarCarAttachments");
 
                     b.Navigation("ScarCarNotes");
+                });
+
+            modelBuilder.Entity("QBD2.Entities.WorkOrder", b =>
+                {
+                    b.Navigation("WorkOrderParts");
                 });
 
             modelBuilder.Entity("QBD2.Entities.ApplicationRole", b =>

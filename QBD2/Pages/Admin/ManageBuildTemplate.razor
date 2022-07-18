@@ -120,8 +120,11 @@ label.k-form-label {
 						<div class="form-group row">
 							<label for="MasterPartId" class="col-sm-4 col-form-label">Part </label>
 								<div class="col-sm-8">
-                                    <TelerikComboBox Data="@dataMasterPartDropdown" Class="form-control" Placeholder="-select-" TextField="DropText" ValueField="DropValue" @bind-Value="AddEditBuildTemplateModel.MasterPartId" Filterable="true">
-								    </TelerikComboBox>
+                                     <TelerikAutoComplete Data="@MasterParts" @bind-Value="@selectedMasterPart" Class="form-control"
+                                        ValueField="@(nameof(MasterPart.PartNumber) )"
+                                        Filterable="true" MinLength="3"
+                                        OnChange="@MyOnChangeHandler"
+                                        ClearButton="true"/>
 								    <ValidationMessage For="@(() => AddEditBuildTemplateModel.MasterPartId)" style="width:unset!important;"></ValidationMessage>
 								</div>
 						</div>
@@ -183,9 +186,11 @@ label.k-form-label {
 
     List<Models.BuildTemplateModel> MyData1 { get; set; }
 
-    List<Models.DropDownBind> dataMasterPartDropdown { get; set; }
+    IEnumerable<MasterPart> MasterParts { get; set; }
 
     List<Models.DropDownBind> dataBuildStationDropdown { get; set; }
+
+    string selectedMasterPart { get; set; }
 
     AddEditBuildTemplateModel AddEditBuildTemplateModel { get; set; }
 
@@ -204,7 +209,7 @@ label.k-form-label {
 
     async Task GetDropDownData()
     {
-        dataMasterPartDropdown = MasterPartService.DropDownData();
+        MasterParts = MasterPartService.GetAllMasterParts();
         dataBuildStationDropdown = BuildStationService.DropDownData();
     }
 
@@ -274,13 +279,13 @@ label.k-form-label {
 
         if (AddEditBuildTemplateModel.SerialNumberRequired == true)
         {
-                AddActiveCssClass = "active";
-                AddInActiveCssClass = string.Empty;
+            AddActiveCssClass = "active";
+            AddInActiveCssClass = string.Empty;
         }
         else if(AddEditBuildTemplateModel.SerialNumberRequired == false)
         { 
-                AddActiveCssClass = string.Empty;
-                AddInActiveCssClass = "active";
+            AddActiveCssClass = string.Empty;
+            AddInActiveCssClass = "active";
         }
 
         if (AddEditBuildTemplateModel != null)
@@ -294,6 +299,12 @@ label.k-form-label {
     {
         if (AddEditBuildTemplateModel != null)
         {
+            if (AddEditBuildTemplateModel.MasterPartId == 0)
+            {
+                toastService.ShowError("Please Select Master Part", "Error");
+                return;
+            }
+
             var result = await BuildTemplateService.Save(AddEditBuildTemplateModel);
             if (result != null)
             {
@@ -323,8 +334,9 @@ label.k-form-label {
 
     public async Task btnCancelBuildTemplateOnClick()
     {
-         AddEditBuildTemplateModel = null;
-         await JSRuntime.InvokeVoidAsync("ModelBodyOverflowHidden");
+        AddEditBuildTemplateModel = null;
+        selectedMasterPart = null;
+        await JSRuntime.InvokeVoidAsync("ModelBodyOverflowHidden");
          await GetGridData();
          StateHasChanged();
     }
@@ -342,6 +354,22 @@ label.k-form-label {
             AddEditBuildTemplateModel.SerialNumberRequired = false;
             AddActiveCssClass = string.Empty;
             AddInActiveCssClass = "active";
+        }
+    }
+
+    private void MyOnChangeHandler(object theUserChoice)
+    {
+        var result = string.Format("The user confirmed: {0}", (string)theUserChoice);
+
+        MasterPart selectedMasterPart = MasterParts.Where(x => x.PartNumber == (string)theUserChoice).FirstOrDefault();
+        if(selectedMasterPart != null)
+        {
+            if (AddEditBuildTemplateModel == null)
+            {
+                AddEditBuildTemplateModel = new AddEditBuildTemplateModel();
+            }
+            AddEditBuildTemplateModel.MasterPartId = selectedMasterPart.MasterPartId;
+            StateHasChanged();
         }
     }
 }

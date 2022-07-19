@@ -10,6 +10,8 @@ using QBD2.Entities;
 using Microsoft.Extensions.Options;
 using static QBD2.Models.Enum;
 using Microsoft.WindowsAzure.Storage.Blob;
+using System.Text.RegularExpressions;
+//using System.Text.RegularExpressions;
 
 namespace QBD2.Services
 {
@@ -162,174 +164,263 @@ namespace QBD2.Services
 
         public async Task<AddPartsToExcelUploadModel> ProcessExcelFile(string fileName)
         {
-            AddPartsToExcelUploadModel addPartsToExcelUploadModel = new AddPartsToExcelUploadModel();
-            addPartsToExcelUploadModel.AddPartsToExcelUploadError = new List<AddPartsToExcelUploadError>();
-            addPartsToExcelUploadModel.Parts = new List<Part>();
-            List<ExcelRow> excelRows = new List<ExcelRow>();
-            if (fileName.EndsWith(".xls"))
+
+            try
             {
-                using (FileStream FileStream = File.OpenRead(fileName))
+                AddPartsToExcelUploadModel addPartsToExcelUploadModel = new AddPartsToExcelUploadModel();
+                addPartsToExcelUploadModel.AddPartsToExcelUploadError = new List<AddPartsToExcelUploadError>();
+                addPartsToExcelUploadModel.Parts = new List<Part>();
+                List<ExcelRow> excelRows = new List<ExcelRow>();
+                if (fileName.EndsWith(".xls"))
                 {
-                    System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-                    DataSet dsexcelRecords = new DataSet();
-                    IExcelDataReader reader = null;
-                    //if (fileName.EndsWith(".xls"))
-                    reader = ExcelReaderFactory.CreateBinaryReader(FileStream);
-                    //else if (fileName.EndsWith(".xlsx"))
-                    //    reader = ExcelReaderFactory.CreateOpenXmlReader(FileStream);
-
-                    dsexcelRecords = reader.AsDataSet();
-                    if (reader != null)
+                    using (FileStream FileStream = File.OpenRead(fileName))
                     {
-                        reader.Close();
-                    }
+                        System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+                        DataSet dsexcelRecords = new DataSet();
+                        IExcelDataReader reader = null;
+                        //if (fileName.EndsWith(".xls"))
+                        reader = ExcelReaderFactory.CreateBinaryReader(FileStream);
+                        //else if (fileName.EndsWith(".xlsx"))
+                        //    reader = ExcelReaderFactory.CreateOpenXmlReader(FileStream);
 
-                    if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
-                    {
-                        DataTable dtRecords = dsexcelRecords.Tables[0];
-                        if (dtRecords.Rows.Count > 1 && dtRecords.TableName == "As_Built")
+                        dsexcelRecords = reader.AsDataSet();
+                        if (reader != null)
                         {
-                            for (int i = 1; i < dtRecords.Rows.Count; i++)
+                            reader.Close();
+                        }
+
+                        if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
+                        {
+                            DataTable dtRecords = dsexcelRecords.Tables[0];
+                            if (dtRecords.Rows.Count > 1 && dtRecords.TableName == "As_Built")
                             {
-                                var user = new Models.ExcelRow
+                                for (int i = 1; i < dtRecords.Rows.Count; i++)
                                 {
-                                    ProductFamily = Convert.ToString(dtRecords.Rows[i][0]),
-                                    Date = Convert.ToString(dtRecords.Rows[i][1]),
-                                    PN = Convert.ToString(dtRecords.Rows[i][2]),
-                                    SN = Convert.ToString(dtRecords.Rows[i][3]),
-                                    PartDescription = Convert.ToString(dtRecords.Rows[i][4]),
-                                    PartNumber = Convert.ToString(dtRecords.Rows[i][5]),
-                                    SerialNumber = Convert.ToString(dtRecords.Rows[i][6]),
-                                };
-                                excelRows.Add(user);
+                                    var user = new Models.ExcelRow
+                                    {
+                                        ProductFamily = Convert.ToString(dtRecords.Rows[i][0]),
+                                        Date = Convert.ToString(dtRecords.Rows[i][1]),
+                                        PN = Convert.ToString(dtRecords.Rows[i][2]),
+                                        SN = Convert.ToString(dtRecords.Rows[i][3]),
+                                        PartDescription = Convert.ToString(dtRecords.Rows[i][4]),
+                                        PartNumber = Convert.ToString(dtRecords.Rows[i][5]),
+                                        SerialNumber = Convert.ToString(dtRecords.Rows[i][6]),
+                                    };
+                                    excelRows.Add(user);
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            if (excelRows.Count > 0)
-            {
-                //List<string> distinctMasterParts = new List<string>();
-                var distinctMasterParts = excelRows.Select(m => new { m.PN }).Distinct().ToList();
-
-                foreach (var part in distinctMasterParts)
+                if (excelRows.Count > 0)
                 {
-                    // is it in the Mater Parts table
-                    MasterPart masterPart = _context.MasterParts.Where(p => p.PartNumber == part.PN).FirstOrDefault();
+                    //List<string> distinctMasterParts = new List<string>();
+                    var distinctMasterParts = excelRows.Select(m => new { m.PN }).Distinct().ToList();
 
-                    //if not, throw an error
-                    if (masterPart == null)
+
+                    foreach (var part in distinctMasterParts)
                     {
-                        AddPartsToExcelUploadError addPartsToExcelUploadError = new AddPartsToExcelUploadError
+                        // is it in the Mater Parts table
+                        MasterPart masterPart = _context.MasterParts.Where(p => p.PartNumber == part.PN).FirstOrDefault();
+
+                        //if not, throw an error
+                        if (masterPart == null)
                         {
-                            Error = "Master Part number: " + part.PN + " is not in Sage"
-                        };
+                            AddPartsToExcelUploadError addPartsToExcelUploadError = new AddPartsToExcelUploadError
+                            {
+                                Error = "Master Part number: " + part.PN + " is not in Sage"
+                            };
 
-                        addPartsToExcelUploadModel.AddPartsToExcelUploadError.Add(addPartsToExcelUploadError);
-                    }
-                    else
-                    {
-
-                        //if it is, get a list of distinct PNs
-
-                        var distinctPartSerialNumbers = excelRows.Where(z => z.PN == part.PN).Select(m => new { m.SN }).Distinct().ToList();
-
-                        //loop over PNs and make sure they are in Sage with the correct ItemNum
-
-                        foreach (var serialNumber in distinctPartSerialNumbers)
+                            addPartsToExcelUploadModel.AddPartsToExcelUploadError.Add(addPartsToExcelUploadError);
+                        }
+                        else
                         {
-                            SerialNumberSearchResult serialNumberSearchResult = await _serialNumberService.GetSerialNumberFromSage(masterPart.Itemno, Convert.ToInt32(serialNumber.SN));
-                            //If not, throw an error
-                            if (serialNumberSearchResult.IsInSage == false)
-                            {
-                                AddPartsToExcelUploadError addPartsToExcelUploadError = new AddPartsToExcelUploadError
-                                {
-                                    Error = "Serial number: " + serialNumber.SN + " is not in Sage"
-                                };
 
-                                addPartsToExcelUploadModel.AddPartsToExcelUploadError.Add(addPartsToExcelUploadError);
-                            }
-                            else
+                            //if it is, get a list of distinct PNs
+
+                            var distinctPartSerialNumbers = excelRows.Where(z => z.PN == part.PN).Select(m => new { m.SN }).Distinct().ToList();
+
+                            //loop over PNs and make sure they are in Sage with the correct ItemNum
+
+                            foreach (var serialNumber in distinctPartSerialNumbers)
                             {
-                                // if they are in Sage, check if they are in the Parts list
-                                var partFromQDB = _context.Parts.Where(p => p.SerialNumber.ToLower() == serialNumber.SN.ToLower() && p.MasterPartId == masterPart.MasterPartId).FirstOrDefault();
-                                if (partFromQDB == null)
+                                SerialNumberSearchResult serialNumberSearchResult = await _serialNumberService.GetSerialNumberFromSage(masterPart.Itemno, Convert.ToInt32(serialNumber.SN));
+                                //If not, throw an error
+                                if (serialNumberSearchResult.IsInSage == false)
                                 {
-                                    //If not add them to the parts list
-                                    partFromQDB = new Entities.Part
+                                    AddPartsToExcelUploadError addPartsToExcelUploadError = new AddPartsToExcelUploadError
                                     {
-                                        SerialNumber = serialNumber.SN,
-                                        MasterPartId = masterPart.MasterPartId,
-                                        PartStatusId = 1,
-                                        ParentPartId = null,
-                                        UpdateDate = DateTime.Now
+                                        Error = "Serial number: " + serialNumber.SN + " is not in Sage"
                                     };
-                                    _context.Parts.Add(partFromQDB);
-                                    await _context.SaveChangesAsync();
 
-                                    // Add Parts in to inspection record
-                                    var station = await _context.Stations.Where(x => x.Name.ToLower() == "Seveco".ToLower()).FirstOrDefaultAsync();
-                                    if (!_context.Inspections.Any(x => x.Pass == true && x.GeneralComments.ToLower() == "Seveco".ToLower() &&
-                                         x.PartId == partFromQDB.PartId && x.StationId == station.StationId))
-                                    {
-                                        Entities.Inspection inspection = new Entities.Inspection();
-                                        inspection.Pass = true;
-                                        inspection.GeneralComments = "Seveco";
-                                        inspection.PartId = partFromQDB.PartId;
-                                        inspection.StationId = station.StationId;
-                                        inspection.UpdateDate = DateTime.Now;
-                                        _context.Inspections.Add(inspection);
-                                        await _context.SaveChangesAsync();
-                                    }
+                                    addPartsToExcelUploadModel.AddPartsToExcelUploadError.Add(addPartsToExcelUploadError);
                                 }
-
-                                var childParts = excelRows.Where(q => q.SN == serialNumber.SN && q.PN == part.PN && q.PartNumber != null && q.SerialNumber != null).ToList();
-                                var partsList = new List<Entities.Part>();
-                                foreach (var childItem in childParts)
+                                else
                                 {
-                                    // Loop over all the child parts and see if they are in the Parts table
-                                    //Child parts do not need to be in Sage
-                                    Part childPartFromQDB = _context.Parts.Where(p => p.SerialNumber.ToLower() == childItem.SerialNumber.ToLower() && p.MasterPartId == masterPart.MasterPartId  && p.ParentPartId == partFromQDB.PartId).FirstOrDefault();
-
-                                    //If they are in the Parts table already, update the values
-                                    if (childPartFromQDB == null)
+                                    // if they are in Sage, check if they are in the Parts list
+                                    var partFromQDB = _context.Parts.Where(p => p.SerialNumber.ToLower() == serialNumber.SN.ToLower() && p.MasterPartId == masterPart.MasterPartId).FirstOrDefault();
+                                    if (partFromQDB == null)
                                     {
-                                        //If they are not in the Parts table, add them
-                                        var childPart = new Entities.Part
+                                        //If not add them to the parts list
+                                        partFromQDB = new Entities.Part
                                         {
-                                            SerialNumber = childItem.SerialNumber,
+                                            SerialNumber = serialNumber.SN,
                                             MasterPartId = masterPart.MasterPartId,
                                             PartStatusId = 1,
-                                            ParentPartId = partFromQDB.PartId,
+                                            ParentPartId = null,
                                             UpdateDate = DateTime.Now
                                         };
+                                        _context.Parts.Add(partFromQDB);
+                                        await _context.SaveChangesAsync();
 
-                                        partsList.Add(childPart);
-
-                                    }
-                                }
-
-                                if (partsList.Count > 0)
-                                {
-                                    _context.Parts.AddRange(partsList);
-                                    await _context.SaveChangesAsync();
-
-                                    foreach (var item in partsList)
-                                    {
                                         // Add Parts in to inspection record
                                         var station = await _context.Stations.Where(x => x.Name.ToLower() == "Seveco".ToLower()).FirstOrDefaultAsync();
-                                        if(!_context.Inspections.Any(x=>x.Pass == true && x.GeneralComments.ToLower() == "Seveco".ToLower() && 
-                                        x.PartId == item.PartId && x.StationId == station.StationId))
+                                        if (!_context.Inspections.Any(x => x.Pass == true && x.GeneralComments.ToLower() == "Seveco".ToLower() &&
+                                             x.PartId == partFromQDB.PartId && x.StationId == station.StationId))
                                         {
                                             Entities.Inspection inspection = new Entities.Inspection();
                                             inspection.Pass = true;
                                             inspection.GeneralComments = "Seveco";
-                                            inspection.PartId = item.PartId;
+                                            inspection.PartId = partFromQDB.PartId;
                                             inspection.StationId = station.StationId;
                                             inspection.UpdateDate = DateTime.Now;
                                             _context.Inspections.Add(inspection);
                                             await _context.SaveChangesAsync();
+                                        }
+                                    }
+
+                                    var childParts = excelRows.Where(q => q.SN == serialNumber.SN && q.PN == part.PN && q.PartNumber != null && q.SerialNumber != null).ToList();
+                                    var partsList = new List<Entities.Part>();
+                                    foreach (var childItem in childParts)
+                                    {
+                                        // Loop over all the child parts and see if they are in the Parts table
+                                        //Child parts do not need to be in Sage
+                                        Part childPartFromQDB = _context.Parts.Where(p => p.SerialNumber.ToLower() == childItem.SerialNumber.ToLower() && p.MasterPartId == masterPart.MasterPartId && p.ParentPartId == partFromQDB.PartId).FirstOrDefault();
+
+
+
+                                        //If they are in the Parts table already, update the values
+                                        if (childPartFromQDB == null)
+                                        {
+                                            var allMasterParts = _context.MasterParts.ToList();
+                                            int masterPartIdToUse;
+
+                                            List<MasterPart> masterPartsThatCouldMatch = new List<MasterPart>();
+
+                                            foreach (MasterPart mp in allMasterParts)
+                                            {
+                                                string partNumberWithoutVersion = mp.PartNumber;
+                                                int? y = mp.PartNumber.IndexOf('.');
+
+                                                if (y != -1)
+                                                {
+                                                    partNumberWithoutVersion = mp.PartNumber.Substring(0, mp.PartNumber.IndexOf('.'));
+                                                }
+
+                                                if (childItem.PartNumber == partNumberWithoutVersion)
+                                                {
+                                                    masterPartsThatCouldMatch.Add(mp);
+                                                }
+
+                                            }
+
+
+                                            //if not, throw an error
+                                            if (masterPartsThatCouldMatch.Count() == 0)
+                                            {
+                                                AddPartsToExcelUploadError addPartsToExcelUploadError = new AddPartsToExcelUploadError
+                                                {
+                                                    Error = "Master Part number: " + childItem.PartNumber + " is not in Sage"
+                                                };
+
+                                                addPartsToExcelUploadModel.AddPartsToExcelUploadError.Add(addPartsToExcelUploadError);
+                                            }
+                                            else
+                                            {
+                                                // if there is only 1, use it
+
+                                                if (masterPartsThatCouldMatch.Count() == 1)
+                                                {
+                                                    masterPartIdToUse = masterPartsThatCouldMatch.FirstOrDefault().MasterPartId;
+                                                }
+                                                else
+                                                {
+                                                    // if more than 1, loop over the parts that could match and find the highest rev number
+                                                    //is there a letter
+
+                                                    List<MasterPartRevision> masterPartRevisions = new List<MasterPartRevision>();
+
+                                                    foreach (MasterPart masterPart1 in masterPartsThatCouldMatch)
+                                                    {
+
+                                                        var letter = Regex.Match(masterPart1.PartNumber, @"[A-Za-z]+").Value;
+
+                                                        var y = masterPart1.PartNumber.Length;
+
+                                                        var x = masterPart1.PartNumber.IndexOf(letter);
+                                                        
+                                                        var revision = masterPart1.PartNumber.Substring(x+1);
+
+                                                        MasterPartRevision masterPartRevision = new MasterPartRevision
+                                                        {
+                                                            MasterPartId = masterPart1.MasterPartId,
+                                                            Letter = letter,
+                                                            Revision = Convert.ToInt32(revision)
+                                                        };
+
+                                                        masterPartRevisions.Add(masterPartRevision);
+
+
+                                                    }
+
+                                                    var maxObject = masterPartRevisions.OrderByDescending(item => item.Revision).First();
+
+                                                    masterPartIdToUse = maxObject.MasterPartId;
+
+                                                }
+
+
+
+
+
+                                                //If they are not in the Parts table, add them
+                                                var childPart = new Entities.Part
+                                                {
+                                                    SerialNumber = childItem.SerialNumber,
+                                                    MasterPartId = masterPartIdToUse,
+                                                    PartStatusId = 1,
+                                                    ParentPartId = partFromQDB.PartId,
+                                                    UpdateDate = DateTime.Now
+                                                };
+
+                                                partsList.Add(childPart);
+
+                                            }
+                                        }
+                                    }
+
+                                    if (partsList.Count > 0)
+                                    {
+                                        _context.Parts.AddRange(partsList);
+                                        await _context.SaveChangesAsync();
+
+                                        foreach (var item in partsList)
+                                        {
+                                            // Add Parts in to inspection record
+                                            var station = await _context.Stations.Where(x => x.Name.ToLower() == "Seveco".ToLower()).FirstOrDefaultAsync();
+                                            if (!_context.Inspections.Any(x => x.Pass == true && x.GeneralComments.ToLower() == "Seveco".ToLower() &&
+                                             x.PartId == item.PartId && x.StationId == station.StationId))
+                                            {
+                                                Entities.Inspection inspection = new Entities.Inspection();
+                                                inspection.Pass = true;
+                                                inspection.GeneralComments = "Seveco";
+                                                inspection.PartId = item.PartId;
+                                                inspection.StationId = station.StationId;
+                                                inspection.UpdateDate = DateTime.Now;
+                                                _context.Inspections.Add(inspection);
+                                                await _context.SaveChangesAsync();
+                                            }
                                         }
                                     }
                                 }
@@ -337,9 +428,13 @@ namespace QBD2.Services
                         }
                     }
                 }
-            }
 
-            return addPartsToExcelUploadModel;
+                return addPartsToExcelUploadModel;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         public class AddPartsToExcelUploadError
@@ -351,6 +446,14 @@ namespace QBD2.Services
         {
             public List<AddPartsToExcelUploadError> AddPartsToExcelUploadError { get; set; }
             public List<Part> Parts { get; set; }
+        }
+
+        internal class MasterPartRevision
+        {
+            public int MasterPartId { get; set; }
+            public string Letter { get; set; }
+            public int Revision { get; set; }
+                
         }
     }
 }

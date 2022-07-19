@@ -53,12 +53,12 @@ namespace QBD2.Services
 
             try
             {
-                if (CheckDuplicate(addEditWorkOrderModel.WorkOrderId, addEditWorkOrderModel.WorkOrderTypeId.Value, addEditWorkOrderModel.WorkOrderStatusId.Value, addEditWorkOrderModel.WorkOrderPriorityID.Value, addEditWorkOrderModel.BuildTemplateId.Value, addEditWorkOrderModel.Quantity.Value))
-                {
-                    apiResponse.Success = false;
-                    apiResponse.Message = "Duplicate record.";
-                    return apiResponse;
-                }
+                //if (CheckDuplicate(addEditWorkOrderModel.WorkOrderId, addEditWorkOrderModel.WorkOrderTypeId.Value, addEditWorkOrderModel.WorkOrderStatusId.Value, addEditWorkOrderModel.WorkOrderPriorityID.Value, addEditWorkOrderModel.BuildTemplateId.Value, addEditWorkOrderModel.Quantity.Value))
+                //{
+                //    apiResponse.Success = false;
+                //    apiResponse.Message = "Duplicate record.";
+                //    return apiResponse;
+                //}
 
                 var objWorkOrder = new Entities.WorkOrder();
                 if (addEditWorkOrderModel.WorkOrderId > 0)
@@ -91,24 +91,34 @@ namespace QBD2.Services
                     if (objWorkOrder != null && objWorkOrder.WorkOrderId > 0 && objWorkOrder.Quantity > 0)
                     {
                         var buildTemplate = await _context.BuildTemplates.Where(x => x.BuildTemplateId == objWorkOrder.BuildTemplateId).FirstOrDefaultAsync();
-                        var buildTemplatePart = await _context.BuildTemplateParts.Where(x => x.BuildTemplateId == addEditWorkOrderModel.BuildTemplateId.Value).FirstOrDefaultAsync();
-                        var parts = await _context.Parts.Where(x => x.MasterPartId == buildTemplatePart.MasterPartId).ToListAsync();
+                        var buildTemplateParts = await _context.BuildTemplateParts.Where(x => x.BuildTemplateId == addEditWorkOrderModel.BuildTemplateId.Value).ToListAsync();
 
                         for (int i = 1; i <= objWorkOrder.Quantity; i++)
                         {
                             Part part = new Part();
                             part.SerialNumber = "";
-                            part.MasterPartId = buildTemplatePart.MasterPartId;
+                            part.MasterPartId = buildTemplate.MasterPartId;
                             part.UpdateDate = DateTime.Now;
                             part.PartStatusId = 1;
-                            if (buildTemplatePart != null)
-                            {
-                                part.BuildStationId = buildTemplatePart.BuildStationId;
-                                part.SerialNumberRequired = buildTemplatePart.SerialNumberRequired;
-                            }
                            
                             _context.Parts.Add(part);
                             _context.SaveChanges();
+
+                            foreach (var buildTemplatePart in buildTemplateParts)
+                            {
+                                Part templatePart = new Part();
+                                templatePart.SerialNumber = "";
+                                templatePart.MasterPartId = buildTemplatePart.MasterPartId;
+                                templatePart.UpdateDate = DateTime.Now;
+                                templatePart.PartStatusId = 1;
+                                templatePart.BuildStationId = buildTemplatePart.BuildStationId;
+                                templatePart.SerialNumberRequired = buildTemplatePart.SerialNumberRequired;
+                                templatePart.ParentPartId = part.PartId;
+
+                                _context.Parts.Add(templatePart);
+                                _context.SaveChanges();
+
+                            }
 
                             WorkOrderPart workOrderPart = new WorkOrderPart();
                             workOrderPart.WorkOrderId = objWorkOrder.WorkOrderId;

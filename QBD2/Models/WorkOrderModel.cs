@@ -26,6 +26,6 @@ namespace QBD2.Models
 
         public List<WorkOrderPart> WorkOrderPartList { get; set; }
 
-        public List<Part> PartsList { get; set; }
+        public List<Parts> PartsList { get; set; }
     }
 }

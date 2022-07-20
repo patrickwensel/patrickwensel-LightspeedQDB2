@@ -65,15 +65,102 @@ label.k-form-label {
                 Pageable="true"
                 Sortable="true"
                 FilterMode="@GridFilterMode.FilterRow">
-           <DetailTemplate>
+           <DetailTemplate Context="context">
               @{
                   var workOrderModel = context as Models.WorkOrderModel;
                   <TelerikGrid Data="workOrderModel.PartsList" Pageable="true" PageSize="5">
+
+                        <DetailTemplate Context="childPartContext">
+                        @{
+                            <TelerikGrid Data="childPartContext.ChildParts" Pageable="true" PageSize="5">
+
+                                  <GridColumns>
+                                     <GridColumn Field="PartId" Title="Part">
+                                     <Template Context="myContext">
+                                     @{
+                                           var part = myContext as Parts;
+                                           if (part != null)
+                                           {
+                                                 <lable>@part.PartId</lable>   
+                                           }
+                                      }
+                                     </Template>
+                                     </GridColumn>
+                                     <GridColumn Field="SerialNumber" Title="Serial Number">
+                                     <Template Context="myContext">
+                                     @{
+                                           var part = myContext as Parts;
+                                           if (part != null)
+                                           {
+                                                 <lable>@part.SerialNumber</lable>
+                                           }
+                                      }
+                                     </Template>
+                                     </GridColumn>
+
+                                     <GridColumn Field="PartNumber" Title="Part Number">
+                                     <Template Context="myContext">
+                                     @{
+                                        var part = myContext as Parts;
+                                        if (part != null)
+                                        {
+                                            <lable>@part.PartNumber</lable>
+                                        }
+                                     }
+                                    </Template>
+                                    </GridColumn>
+
+                                     <GridColumn Field="Parts.BuildStations>" Title="Build Station">
+                                     <Template Context="myContext">
+                                     @{
+                                           var part = myContext as Parts;
+                                           if (part != null && part.BuildStations != null)
+                                           {
+                                                 <lable>@part.BuildStations</lable>
+                                           }
+                                      }
+                                     </Template>
+                                     </GridColumn>
+                                     <GridColumn Field="Parts.PartStatus>" Title="Part Status">
+                                     <Template Context="myContext">
+                                     @{
+                                           var part = myContext as Parts;
+                                           if (part != null && part.PartStatus != null)
+                                           {
+                                                 <lable>@part.PartStatus</lable>
+                                           }
+                                      }
+                                     </Template>
+                                     </GridColumn>
+                                     <GridColumn Field="Parts.SerialNumberRequired>" Title="Serial Number Required">
+                                     <Template Context="myContext">
+                                     @{
+                                           var part = myContext as Parts;
+                                           if (part != null)
+                                           {
+                                               if (part != null && part.SerialNumberRequired == true)
+                                               {
+                                                   <lable style="color:green">Yes</lable>
+                                               }
+                                               else
+                                               {
+                                                     <lable style="color:red;">No</lable>
+                                               }
+                                           }
+                                      }
+                                     </Template>
+                                     </GridColumn>
+                                 </GridColumns>
+
+                            </TelerikGrid>
+                        }
+                      </DetailTemplate>
+
                       <GridColumns>
                           <GridColumn Field="PartId" Title="Part">
                           <Template Context="myContext">
                           @{
-                                var part = myContext as Part;
+                                var part = myContext as Parts;
                                 if (part != null)
                                 {
                                       <lable>@part.PartId</lable>   
@@ -84,7 +171,7 @@ label.k-form-label {
                           <GridColumn Field="SerialNumber" Title="Serial Number">
                           <Template Context="myContext">
                           @{
-                                var part = myContext as Part;
+                                var part = myContext as Parts;
                                 if (part != null)
                                 {
                                       <lable>@part.SerialNumber</lable>
@@ -92,32 +179,45 @@ label.k-form-label {
                            }
                           </Template>
                           </GridColumn>
-                          <GridColumn Field="BuildStation.Name>" Title="Build Station">
+
+                          <GridColumn Field="PartNumber" Title="Part Number">
                           <Template Context="myContext">
                           @{
-                                var part = myContext as Part;
-                                if (part != null && part.BuildStation != null)
+                                var part = myContext as Parts;
+                                if (part != null)
                                 {
-                                      <lable>@part.BuildStation.Name</lable>
+                                      <lable>@part.PartNumber</lable>
                                 }
                            }
                           </Template>
                           </GridColumn>
-                          <GridColumn Field="PartStatus.Name>" Title="Part Status">
+
+                          <GridColumn Field="Parts.BuildStations>" Title="Build Station">
                           <Template Context="myContext">
                           @{
-                                var part = myContext as Part;
+                                var part = myContext as Parts;
+                                if (part != null && part.BuildStations != null)
+                                {
+                                      <lable>@part.BuildStations</lable>
+                                }
+                           }
+                          </Template>
+                          </GridColumn>
+                          <GridColumn Field="Parts.PartStatus>" Title="Part Status">
+                          <Template Context="myContext">
+                          @{
+                                var part = myContext as Parts;
                                 if (part != null && part.PartStatus != null)
                                 {
-                                      <lable>@part.PartStatus.Name</lable>
+                                      <lable>@part.PartStatus</lable>
                                 }
                            }
                           </Template>
                           </GridColumn>
-                          <GridColumn Field="SerialNumberRequired>" Title="Serial Number Required">
+                          <GridColumn Field="Parts.SerialNumberRequired>" Title="Serial Number Required">
                           <Template Context="myContext">
                           @{
-                                var part = myContext as Part;
+                                var part = myContext as Parts;
                                 if (part != null)
                                 {
                                     if (part != null && part.SerialNumberRequired == true)
@@ -137,15 +237,15 @@ label.k-form-label {
               }
            </DetailTemplate>
            <GridColumns>
-                <GridColumn Field="@(nameof(Models.WorkOrderModel.CreateDate))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}"/>
+               <GridColumn Field="@(nameof(Models.WorkOrderModel.CreateDate))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}"/>
                <GridColumn Field="WorkOrderType.Name" Title="Work Order Type" Filterable="true"/>
                <GridColumn Field="WorkOrderStatus.Name" Title="Work Order Status" Filterable="true"/>
                <GridColumn Field="WorkOrderPriority.Name" Title="Work Order Priority" Filterable="true"/>
-               <GridColumn Field="BuildTemplateMasterPartName" Title="Part" Filterable="true"/>
+               <GridColumn Field="BuildTemplateMasterPartName" Title="Build Template" Filterable="true"/>
                <GridColumn Field="Quantity" Title="Quantity" Filterable="true"/>
                <GridCommandColumn Width="100px">
-                    <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Models.WorkOrderModel))"><i class="fal fa-edit"></i></GridCommandButton>
-                    <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Models.WorkOrderModel))"></GridCommandButton>
+                    <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Models.WorkOrderModel))" Enabled="false"><i class="fal fa-edit"></i></GridCommandButton>
+                    <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Models.WorkOrderModel))" Enabled="false"></GridCommandButton>
                 </GridCommandColumn>
            </GridColumns>
        </TelerikGrid>

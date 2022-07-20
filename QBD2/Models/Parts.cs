@@ -19,7 +19,12 @@
         public int? FailureCodeId { get; set; }
         public string FailureCode { get; set; }
 
-        public List<Parts> ChildParts { get; set; } 
+        public int? BuildStationId { get; set; }
+        public string? BuildStations { get; set; }
+
+        public bool? SerialNumberRequired { get; set; }
+
+        public List<Parts> ChildParts { get; set; }
 
     }
 }

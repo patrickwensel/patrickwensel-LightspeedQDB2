@@ -30,8 +30,12 @@ namespace QBD2.Services
                                Description = mp.Description,
                                MasterPartId = mp.MasterPartId,
                                ParentPartId = p.ParentPartId,
-                               PartNumber = mp.PartNumber
-
+                               PartNumber = mp.PartNumber,
+                               PartStatusId = p.PartStatusId,
+                               PartStatus = p.PartStatus.Name,
+                               BuildStationId = p.BuildStationId,
+                               BuildStations = p.BuildStation.Name,
+                               SerialNumberRequired = p.SerialNumberRequired
                            }
                            ).ToListAsync();
 
@@ -43,14 +47,17 @@ namespace QBD2.Services
                                          where p.ParentPartId == item.PartId
                                          select new Parts
                                          {
-
                                              PartId = p.PartId,
                                              SerialNumber = p.SerialNumber,
                                              Description = mp.Description,
                                              MasterPartId = mp.MasterPartId,
                                              ParentPartId = p.ParentPartId,
-                                             PartNumber = mp.PartNumber
-
+                                             PartNumber = mp.PartNumber,
+                                             PartStatusId = p.PartStatusId,
+                                             PartStatus = p.PartStatus.Name,
+                                             BuildStationId = p.BuildStationId,
+                                             BuildStations = p.BuildStation.Name,
+                                             SerialNumberRequired = p.SerialNumberRequired
                                          }).ToListAsync();
             }
             return x;

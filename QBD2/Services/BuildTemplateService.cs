@@ -23,18 +23,15 @@ namespace QBD2.Services
         {
             List<Models.BuildTemplateModel> buildTemplateModelList = new List<Models.BuildTemplateModel>();
             buildTemplateModelList = await (from bt in _context.BuildTemplates
-                                                join btp in _context.BuildTemplateParts on bt.BuildTemplateId equals btp.BuildTemplateId
-                                                join mp in _context.MasterParts on btp.MasterPartId equals mp.MasterPartId
+                                                join mp in _context.MasterParts on bt.MasterPartId equals mp.MasterPartId
                                                 select new Models.BuildTemplateModel
                                                 {
-                                                    BuildTemplatePartId = btp.BuildTemplatePartId,
                                                     BuildTemplateId = bt.BuildTemplateId,
                                                     Name = bt.Name,
-                                                    MasterPartId = btp.MasterPartId,
+                                                    MasterPartId = bt.MasterPartId,
                                                     MasterPart = mp,
-                                                    BuildTemplatePart = _context.BuildTemplateParts.Include(a => a.BuildStation).Where(x => x.BuildTemplateId == bt.BuildTemplateId).FirstOrDefault()
+                                                    BuildTemplatePartList = _context.BuildTemplateParts.Include(a => a.BuildStation).Include(b=>b.BuildTemplate).Include(c=>c.MasterPart).Where(x => x.BuildTemplateId == bt.BuildTemplateId).ToList()
                                                 }).ToListAsync();
-
             return buildTemplateModelList;
         }
 
@@ -88,32 +85,51 @@ namespace QBD2.Services
                 }
                 else
                 {
-                    objBuildTemplate = new Entities.BuildTemplate()
+                    var part = await _context.Parts.Where(x => x.MasterPartId == addEditBuildTemplateModel.MasterPartId.Value && x.ParentPartId == null).FirstOrDefaultAsync();
+                    if (part != null)
                     {
-                        Name = addEditBuildTemplateModel.Name,
-                        MasterPartId = addEditBuildTemplateModel.MasterPartId.Value
-                    };
+                        var childParts = await _context.Parts.Where(x => x.ParentPartId == part.PartId).ToListAsync();
+                        objBuildTemplate = new Entities.BuildTemplate()
+                        {
+                            Name = addEditBuildTemplateModel.Name,
+                            MasterPartId = part.MasterPartId
+                        };
 
-                    _context.BuildTemplates.Add(objBuildTemplate);
-                    await _context.SaveChangesAsync();
-
-                    if (objBuildTemplate != null && objBuildTemplate.BuildTemplateId > 0)
-                    {
-                        var objBuildTemplatePart = new Entities.BuildTemplatePart();
-                        objBuildTemplatePart.BuildTemplateId = objBuildTemplate.BuildTemplateId;
-                        objBuildTemplatePart.MasterPartId = objBuildTemplate.MasterPartId;
-                        objBuildTemplatePart.BuildStationId = addEditBuildTemplateModel.BuildStationId.Value;
-                        objBuildTemplatePart.SerialNumberRequired = addEditBuildTemplateModel.SerialNumberRequired;
-
-                        _context.BuildTemplateParts.Add(objBuildTemplatePart);
+                        _context.BuildTemplates.Add(objBuildTemplate);
                         await _context.SaveChangesAsync();
+
+                        if (objBuildTemplate != null && objBuildTemplate.BuildTemplateId > 0)
+                        {
+                            foreach (var item in childParts)
+                            {
+                                var objBuildTemplatePart = new Entities.BuildTemplatePart();
+                                objBuildTemplatePart.BuildTemplateId = objBuildTemplate.BuildTemplateId;
+                                objBuildTemplatePart.MasterPartId = item.MasterPartId;
+                                objBuildTemplatePart.BuildStationId = addEditBuildTemplateModel.BuildStationId.Value;
+                                objBuildTemplatePart.SerialNumberRequired = addEditBuildTemplateModel.SerialNumberRequired;
+
+                                _context.BuildTemplateParts.Add(objBuildTemplatePart);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+
+                        await _context.SaveChangesAsync();
+
+                        apiResponse.Success = true;
+                        apiResponse.Message = "Record Saved Successfully.";
+                        return apiResponse;
                     }
+                    else
+                    {
+                        apiResponse.Success = false;
+                        apiResponse.Message = "Parent Part detail not found.";
+                        return apiResponse;
+                    }
+
                 }
 
-                await _context.SaveChangesAsync();
-
-                apiResponse.Success = true;
-                apiResponse.Message = "Record Saved Successfully.";
+                apiResponse.Success = false;
+                apiResponse.Message = "Please enter valid data.";
                 return apiResponse;
             }
             catch

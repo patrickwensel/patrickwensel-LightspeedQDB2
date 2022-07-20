@@ -13,5 +13,7 @@ namespace QBD2.Models
 
         public int BuildTemplatePartId { get; set; }
         public virtual BuildTemplatePart BuildTemplatePart { get; set; }
+
+        public List<BuildTemplatePart> BuildTemplatePartList { get; set; }
     }
 }

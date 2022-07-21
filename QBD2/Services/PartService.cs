@@ -370,6 +370,46 @@ namespace QBD2.Services
                 return false;
             }
         }
+
+        public async Task<ApiResponse> UpdatePartSerialNumber(EditPartModel editPartModel)
+        {
+            Models.ApiResponse apiResponse = new Models.ApiResponse();
+            try
+            {
+                if (editPartModel != null)
+                {
+                    var part = await _context.Parts.FindAsync(editPartModel.PartId);
+                    if (part != null)
+                    {
+                        part.SerialNumber = editPartModel.SerialNumber;
+                        _context.Entry(part).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+
+                        apiResponse.Success = true;
+                        apiResponse.Message = "Record updated Successfully.";
+                        return apiResponse;
+                    }
+                    else
+                    {
+                        apiResponse.Success = false;
+                        apiResponse.Message = "Please enter valid data.";
+                        return apiResponse;
+                    }
+                }
+                else
+                {
+                    apiResponse.Success = false;
+                    apiResponse.Message = " Please enter valid data.";
+                    return apiResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResponse.Success = false;
+                apiResponse.Message = "Record Not Saved ! Something Worng.";
+                return apiResponse;
+            }
+        }
     }
 
     public class AddPartsToDeviationError

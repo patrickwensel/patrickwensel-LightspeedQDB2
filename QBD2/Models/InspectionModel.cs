@@ -26,6 +26,8 @@
     {
         public int InspectionFailureId { get; set; }
         public string Comment { get; set; }
+        public int BuildStationFailureCodeId { get; set; }
+        public string BuildStationFailureCodeName { get; set; }
         public int FailureTypeId { get; set; }
         public string FailureName { get; set; }
         public int FailurePrimaryTypeId { get; set; }

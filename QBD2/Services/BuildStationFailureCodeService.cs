@@ -37,5 +37,10 @@ namespace QBD2.Services
             _context.BuildStationFailureCodes.Remove(buildStationFailureCode);
             await _context.SaveChangesAsync();
         }
+
+        public List<Models.DropDownBind> DropDownData()
+        {
+            return _context.BuildStationFailureCodes.Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.BuildStationFailureCodeId }).ToList();
+        }
     }
 }

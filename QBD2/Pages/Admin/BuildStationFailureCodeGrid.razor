@@ -1,0 +1,65 @@
+﻿@using QBD2.Services
+@using QBD2.Entities
+@inject BuildStationFailureCodeService BuildStationFailureCodeService
+@if (BuildStationFailureCodes == null)
+{
+    <div>Please wait...</div>
+}
+else
+{
+    <TelerikGrid Data="@BuildStationFailureCodes"
+             Pageable="true"
+             Sortable="true"
+             Resizable="true"
+             EditMode="Telerik.Blazor.GridEditMode.Popup"
+             OnUpdate=@UpdateHandler
+             OnDelete=@DeleteHandler
+             OnCreate=@CreateHandler>
+        <GridColumns>
+            <GridColumn Field="@nameof(BuildStationFailureCode.Name)"></GridColumn>
+            <GridCommandColumn>
+                <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
+                <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
+            </GridCommandColumn>
+        </GridColumns>
+        <GridToolBar>
+            <GridCommandButton Command="Add" Icon="add">Add a Failure Code</GridCommandButton>
+        </GridToolBar>
+    </TelerikGrid>
+}
+@code {
+    [Parameter] public int BuildStationId { get; set; }
+    public List<BuildStationFailureCode> BuildStationFailureCodes { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await GetGridData();
+    }
+
+    async Task GetGridData()
+    {
+        BuildStationFailureCodes = await BuildStationFailureCodeService.Read(BuildStationId);
+    }
+
+    async Task UpdateHandler(GridCommandEventArgs args)
+    {
+        BuildStationFailureCode item = (BuildStationFailureCode)args.Item;
+        await BuildStationFailureCodeService.Update(item);
+        await GetGridData();
+    }
+
+    async Task DeleteHandler(GridCommandEventArgs args)
+    {
+        BuildStationFailureCode item = (BuildStationFailureCode)args.Item;
+        await BuildStationFailureCodeService.Delete(item);
+        await GetGridData();
+    }
+
+    async Task CreateHandler(GridCommandEventArgs args)
+    {
+        BuildStationFailureCode item = (BuildStationFailureCode)args.Item;
+        item.BuildStationId = BuildStationId;
+        await BuildStationFailureCodeService.Create(item);
+        await GetGridData();
+    }
+}

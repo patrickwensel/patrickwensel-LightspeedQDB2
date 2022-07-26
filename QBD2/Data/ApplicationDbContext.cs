@@ -45,6 +45,7 @@ namespace QBD2.Data
         public DbSet<BuildStation> BuildStations { get; set; }
         public DbSet<BuildTemplate> BuildTemplates { get; set; }
         public DbSet<BuildTemplatePart> BuildTemplateParts { get; set; }
+        public DbSet<BuildStationFailureCode> BuildStationFailureCodes { get; set; }
 
         public DbSet<WorkOrderPart> WorkOrderParts { get; set; }
 

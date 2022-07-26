@@ -64,6 +64,7 @@ builder.Services.AddScoped<WorkOrderPriorityService>();
 builder.Services.AddScoped<WorkOrderStatusService>();
 builder.Services.AddScoped<WorkOrderService>();
 builder.Services.AddScoped<BuildStationService>();
+builder.Services.AddScoped<BuildStationFailureCodeService>();
 builder.Services.AddScoped<BuildTemplateService>();
 builder.Services.AddScoped<BuildTemplatePartService>();
 builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformer>();

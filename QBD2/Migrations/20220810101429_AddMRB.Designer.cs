@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QBD2.Data;
 
@@ -11,9 +12,10 @@ using QBD2.Data;
 namespace QBD2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220810101429_AddMRB")]
+    partial class AddMRB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -285,28 +287,6 @@ namespace QBD2.Migrations
                     b.ToTable("BuildStations");
                 });
 
-            modelBuilder.Entity("QBD2.Entities.BuildStationFailureCode", b =>
-                {
-                    b.Property<int>("BuildStationFailureCodeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BuildStationFailureCodeId"), 1L, 1);
-
-                    b.Property<int>("BuildStationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("BuildStationFailureCodeId");
-
-                    b.HasIndex("BuildStationId");
-
-                    b.ToTable("BuildStationFailureCodes");
-                });
-
             modelBuilder.Entity("QBD2.Entities.BuildTemplate", b =>
                 {
                     b.Property<int>("BuildTemplateId")
@@ -314,9 +294,6 @@ namespace QBD2.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BuildTemplateId"), 1L, 1);
-
-                    b.Property<int>("BuildStationId")
-                        .HasColumnType("int");
 
                     b.Property<int>("MasterPartId")
                         .HasColumnType("int");
@@ -326,8 +303,6 @@ namespace QBD2.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("BuildTemplateId");
-
-                    b.HasIndex("BuildStationId");
 
                     b.HasIndex("MasterPartId");
 
@@ -609,22 +584,17 @@ namespace QBD2.Migrations
                     b.Property<bool>("Pass")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("StationId")
+                    b.Property<int>("StationId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("WorkOrderId")
-                        .HasColumnType("int");
 
                     b.HasKey("InspectionId");
 
                     b.HasIndex("PartId");
 
                     b.HasIndex("StationId");
-
-                    b.HasIndex("WorkOrderId");
 
                     b.ToTable("Inspections");
                 });
@@ -637,22 +607,17 @@ namespace QBD2.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InspectionFailureId"), 1L, 1);
 
-                    b.Property<int?>("BuildStationFailureCodeId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("FailureTypeId")
+                    b.Property<int>("FailureTypeId")
                         .HasColumnType("int");
 
                     b.Property<int>("InspectionId")
                         .HasColumnType("int");
 
                     b.HasKey("InspectionFailureId");
-
-                    b.HasIndex("BuildStationFailureCodeId");
 
                     b.HasIndex("FailureTypeId");
 
@@ -1472,14 +1437,14 @@ namespace QBD2.Migrations
                         new
                         {
                             Id = "22b3bff1-cfd2-4075-a90f-827380656873",
-                            ConcurrencyStamp = "1485872a-45a9-4e93-9a48-cecbe2e4a612",
+                            ConcurrencyStamp = "73f40a2e-6f47-458c-b759-d6b757d25839",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "e4e7188b-6ecb-4278-aeee-17271f20d7ce",
-                            ConcurrencyStamp = "d17239d3-b23b-4279-91a9-bc7e9e4f5130",
+                            ConcurrencyStamp = "d2dfa465-0282-4d12-8850-58d92de49d2e",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -1499,14 +1464,14 @@ namespace QBD2.Migrations
                         {
                             Id = "2e97b939-49c0-4e1e-8376-cb98348103bb",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "3fe323b3-225e-4317-8e78-2705881595de",
+                            ConcurrencyStamp = "38bab316-32e7-46da-969e-c61d5cd06620",
                             Email = "pwensel@hotmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "PWENSEL@HOTMAIL.COM",
                             NormalizedUserName = "PWENSEL@HOTMAIL.COM",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a119500b-1e9e-4b2e-9a84-f60f9a0d460f",
+                            SecurityStamp = "1fa2abc4-e44b-4e84-a689-74c29b9561a3",
                             TwoFactorEnabled = false,
                             UserName = "pwensel@hotmail.com",
                             ADLogin = "DESKTOP-1HVSAG6\\pwens"
@@ -1589,32 +1554,13 @@ namespace QBD2.Migrations
                     b.Navigation("MasterPart");
                 });
 
-            modelBuilder.Entity("QBD2.Entities.BuildStationFailureCode", b =>
-                {
-                    b.HasOne("QBD2.Entities.BuildStation", "BuildStation")
-                        .WithMany()
-                        .HasForeignKey("BuildStationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BuildStation");
-                });
-
             modelBuilder.Entity("QBD2.Entities.BuildTemplate", b =>
                 {
-                    b.HasOne("QBD2.Entities.BuildStation", "BuildStation")
-                        .WithMany("BuildTemplates")
-                        .HasForeignKey("BuildStationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("QBD2.Entities.MasterPart", "MasterPart")
                         .WithMany()
                         .HasForeignKey("MasterPartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("BuildStation");
 
                     b.Navigation("MasterPart");
                 });
@@ -1682,36 +1628,28 @@ namespace QBD2.Migrations
 
                     b.HasOne("QBD2.Entities.Station", "Station")
                         .WithMany()
-                        .HasForeignKey("StationId");
-
-                    b.HasOne("QBD2.Entities.WorkOrder", "WorkOrder")
-                        .WithMany()
-                        .HasForeignKey("WorkOrderId");
+                        .HasForeignKey("StationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Part");
 
                     b.Navigation("Station");
-
-                    b.Navigation("WorkOrder");
                 });
 
             modelBuilder.Entity("QBD2.Entities.InspectionFailure", b =>
                 {
-                    b.HasOne("QBD2.Entities.BuildStationFailureCode", "BuildStationFailureCode")
-                        .WithMany()
-                        .HasForeignKey("BuildStationFailureCodeId");
-
                     b.HasOne("QBD2.Entities.FailureType", "FailureType")
                         .WithMany()
-                        .HasForeignKey("FailureTypeId");
+                        .HasForeignKey("FailureTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("QBD2.Entities.Inspection", "Inspection")
                         .WithMany("InspectionFailures")
                         .HasForeignKey("InspectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("BuildStationFailureCode");
 
                     b.Navigation("FailureType");
 
@@ -1999,11 +1937,6 @@ namespace QBD2.Migrations
             modelBuilder.Entity("QBD2.Entities.Alert", b =>
                 {
                     b.Navigation("PartAlerts");
-                });
-
-            modelBuilder.Entity("QBD2.Entities.BuildStation", b =>
-                {
-                    b.Navigation("BuildTemplates");
                 });
 
             modelBuilder.Entity("QBD2.Entities.Deviation", b =>

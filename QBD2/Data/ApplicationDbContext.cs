@@ -49,8 +49,21 @@ namespace QBD2.Data
 
         public DbSet<WorkOrderPart> WorkOrderParts { get; set; }
 
+        public DbSet<MRB> MRBs { get; set; }
+        public DbSet<MRBDisposition> MRBDispositions { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            #region MRBDisposition
+
+            modelBuilder.Entity<MRBDisposition>().HasData(new MRBDisposition { MRBDispositionId = 1, Name = "Review" });
+            modelBuilder.Entity<MRBDisposition>().HasData(new MRBDisposition { MRBDispositionId = 2, Name = "Rework" });
+            modelBuilder.Entity<MRBDisposition>().HasData(new MRBDisposition { MRBDispositionId = 3, Name = "Send to Vendor" });
+            modelBuilder.Entity<MRBDisposition>().HasData(new MRBDisposition { MRBDispositionId = 4, Name = "Scrap" });
+            modelBuilder.Entity<MRBDisposition>().HasData(new MRBDisposition { MRBDispositionId = 5, Name = "Eng Eval" });
+            modelBuilder.Entity<MRBDisposition>().HasData(new MRBDisposition { MRBDispositionId = 6, Name = "Use As Is" });
+
+            #endregion
 
             #region ProductFamily
 

@@ -6,6 +6,7 @@
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject BuildStationFailureCodeService BuildStationFailureCodeService
 
 <div class="row alerts-row">
     <div class="col-md-9">
@@ -173,20 +174,28 @@
             @{
                 if (@RdoStatusValue == 0)
                 {
+                    //<div class="row">
+                    //    <label class="col-sm-2 col-form-label">Primary</label>
+                    //    <div class="col-sm-10">
+                    //        <TelerikDropDownList Data="@dataFailurePrimaryDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                    //                     @bind-Value="@DdlFailurePrimaryValue" DefaultText="Select Failure Primary" OnChange="@MyOnChangeHandler">
+                    //        </TelerikDropDownList>
+                    //    </div>
+                    //</div>
+                    //<div class="row">
+                    //    <label class="col-sm-2 col-form-label">Secondary</label>
+                    //    <div class="col-sm-10">
+                    //        <TelerikDropDownList Data="@dataFailureDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                    //                     @bind-Value="@DdlFailureValue" DefaultText="Select Failure ">
+                    //        </TelerikDropDownList>
+                    //    </div>
+                    //</div>
 
                     <div class="row">
-                        <label class="col-sm-2 col-form-label">Primary</label>
+                        <label class="col-sm-2 col-form-label">Build Station Failure Code</label>
                         <div class="col-sm-10">
-                            <TelerikDropDownList Data="@dataFailurePrimaryDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
-                                         @bind-Value="@DdlFailurePrimaryValue" DefaultText="Select Failure Primary" OnChange="@MyOnChangeHandler">
-                            </TelerikDropDownList>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label class="col-sm-2 col-form-label">Secondary</label>
-                        <div class="col-sm-10">
-                            <TelerikDropDownList Data="@dataFailureDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
-                                         @bind-Value="@DdlFailureValue" DefaultText="Select Failure ">
+                            <TelerikDropDownList Data="@dataBuildStationFailureCodeDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                         @bind-Value="@DdlBuildStationFailureCodeValue" DefaultText="Select Build Station Failure Code">
                             </TelerikDropDownList>
                         </div>
                     </div>
@@ -211,8 +220,7 @@
                      EditMode="Telerik.Blazor.GridEditMode.Inline"
                      OnDelete=@DeleteHandler>
                             <GridColumns>
-                                <GridColumn Field="FailurePrimaryName" Title="Primary" Groupable="false" />
-                                <GridColumn Field="FailureName" Title="Secondary" Groupable="false" />
+                                <GridColumn Field="BuildStationFailureCodeName" Title="Build Station Failure Code Name" Groupable="false" />
                                 <GridColumn Field="Comment" Title="Comments" Groupable="false" />
                                 <GridCommandColumn Width="10%">
                                     <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
@@ -464,8 +472,9 @@
     List<Entities.Inspection> MyData { get; set; }
     List<Models.InspectionFailed> dataFailureGrid { get; set; }
 
-    List<Models.DropDownBind> dataFailurePrimaryDropdown { get; set; }
-    List<Models.DropDownBind> dataFailureDropdown { get; set; }
+    List<Models.DropDownBind> dataBuildStationFailureCodeDropdown { get; set; }
+    //List<Models.DropDownBind> dataFailurePrimaryDropdown { get; set; }
+    //List<Models.DropDownBind> dataFailureDropdown { get; set; }
     List<Models.DropDownBind> dataStatusOptions { get; set; }
     List<Models.DropDownBind> dataStationDropdown { get; set; }
     Models.InspectionModel dataInspectionModel { get; set; }
@@ -476,8 +485,9 @@
     public Models.AlertDeviationDetailModel SelectedAlertDeviationRecord { get; set; }
     public bool IsDisplayPopUpWindow { get; set; } = false;
 
-    int DdlFailurePrimaryValue { get; set; }
-    int DdlFailureValue { get; set; }
+    int DdlBuildStationFailureCodeValue { get; set; }
+    //int DdlFailurePrimaryValue { get; set; }
+    //int DdlFailureValue { get; set; }
     int RdoStatusValue { get; set; }
     int DdlStationValue { get; set; }
     string SerialNumber { get; set; }
@@ -513,7 +523,8 @@
 
     void GetDropDownData()
     {
-        dataFailurePrimaryDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureTypePrimary, null);
+        dataBuildStationFailureCodeDropdown = BuildStationFailureCodeService.DropDownData();
+        //dataFailurePrimaryDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureTypePrimary, null);
         dataStationDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.Station, null);
 
         dataStatusOptions = new List<Models.DropDownBind>();
@@ -522,27 +533,38 @@
 
 
     }
-    void MyOnChangeHandler()
-    {
-        dataFailureDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureType, DdlFailurePrimaryValue);
 
-    }
+    //void MyOnChangeHandler()
+    //{
+    //    dataFailureDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureType, DdlFailurePrimaryValue);
+
+    //}
+
     async Task btnAddOnClick()
     {
         if (dataFailureGrid == null)
         {
             dataFailureGrid = new List<Models.InspectionFailed>();
         }
-        if (DdlFailurePrimaryValue <= 0)
+
+        if (DdlBuildStationFailureCodeValue <= 0)
         {
-            toastService.ShowError("Please Select Failure Primary Type", "Error");
+            toastService.ShowError("Please Select Build Station Failure Code", "Error");
             return;
         }
-        if (DdlFailureValue <= 0)
-        {
-            toastService.ShowError("Please Select Failure Type", "Error");
-            return;
-        }
+
+        //if (DdlFailurePrimaryValue <= 0)
+        //{
+        //    toastService.ShowError("Please Select Failure Primary Type", "Error");
+        //    return;
+        //}
+
+        //if (DdlFailureValue <= 0)
+        //{
+        //    toastService.ShowError("Please Select Failure Type", "Error");
+        //    return;
+        //}
+
         if (string.IsNullOrEmpty(FailureCommentValue))
         {
             toastService.ShowError("Please Enter Comment", "Error");
@@ -550,7 +572,13 @@
         }
         if (dataFailureGrid.Count > 0)
         {
-            if (dataFailureGrid.Any(p => p.FailureTypeId == DdlFailureValue && p.FailurePrimaryTypeId == DdlFailurePrimaryValue))
+            //if (dataFailureGrid.Any(p => p.FailureTypeId == DdlFailureValue && p.FailurePrimaryTypeId == DdlFailurePrimaryValue))
+            //{
+            //    toastService.ShowError("Record Already there !", "Error");
+            //    return;
+            //}
+
+            if (dataFailureGrid.Any(p => p.BuildStationFailureCodeId == DdlBuildStationFailureCodeValue))
             {
                 toastService.ShowError("Record Already there !", "Error");
                 return;
@@ -560,16 +588,19 @@
         dataFailureGrid.Add(new Models.InspectionFailed
             {
                 Comment = FailureCommentValue,
-                FailurePrimaryTypeId = DdlFailurePrimaryValue,
-                FailureTypeId = DdlFailureValue,
-                FailurePrimaryName = dataFailurePrimaryDropdown.FirstOrDefault(p => p.DropValue == DdlFailurePrimaryValue).DropText,
-                FailureName = dataFailureDropdown.FirstOrDefault(p => p.DropValue == DdlFailureValue).DropText,
+                //FailurePrimaryTypeId = DdlFailurePrimaryValue,
+                //FailureTypeId = DdlFailureValue,
+                //FailurePrimaryName = dataFailurePrimaryDropdown.FirstOrDefault(p => p.DropValue == DdlFailurePrimaryValue).DropText,
+                //FailureName = dataFailureDropdown.FirstOrDefault(p => p.DropValue == DdlFailureValue).DropText,
+                BuildStationFailureCodeId = DdlBuildStationFailureCodeValue,
+                BuildStationFailureCodeName = dataBuildStationFailureCodeDropdown.FirstOrDefault(p => p.DropValue == DdlBuildStationFailureCodeValue).DropText,
 
             });
         FailureCommentValue = string.Empty;
-        DdlFailurePrimaryValue = 0;
-        DdlFailureValue = 0;
-        MyOnChangeHandler();
+        DdlBuildStationFailureCodeValue = 0;
+        //DdlFailurePrimaryValue = 0;
+        //DdlFailureValue = 0;
+        //MyOnChangeHandler();
         dataFailureGrid = new List<Models.InspectionFailed>(dataFailureGrid);
 
 

@@ -148,19 +148,20 @@ namespace QBD2.Services
                         InspectionItem.InspectionFailedList = await (from f in _context.InspectionFailures
                                                                      join i in _context.Inspections
                                                                      on f.InspectionId equals i.InspectionId
-                                                                     join t in _context.FailureTypes
-                                                                     on f.FailureTypeId equals t.FailureTypeId
-                                                                     join p in _context.FailureTypePrimaries
-                                                                     on t.FailureTypePrimaryId equals p.FailureTypePrimaryId
+                                                                     join t in _context.BuildStationFailureCodes
+                                                                     on f.BuildStationFailureCodeId equals t.BuildStationFailureCodeId
+                                                                     //join p in _context.FailureTypePrimaries
+                                                                     //on t.FailureTypePrimaryId equals p.FailureTypePrimaryId
                                                                      select new Models.InspectionFailed
                                                                      {
                                                                          InspectionFailureId = f.InspectionFailureId,
-                                                                         FailureTypeId = f.FailureTypeId,
+                                                                         //FailureTypeId = f.FailureTypeId,
                                                                          Comment = f.Comment,
                                                                          FailureName = t.Name,
-                                                                         FailurePrimaryName = p.Name,
-                                                                         FailurePrimaryTypeId = p.FailureTypePrimaryId
-
+                                                                         //FailurePrimaryName = p.Name,
+                                                                         //FailurePrimaryTypeId = p.FailureTypePrimaryId
+                                                                         BuildStationFailureCodeId = f.BuildStationFailureCodeId,
+                                                                         BuildStationFailureCodeName = t.Name,
                                                                      }
                                                                      ).ToListAsync();
                     }
@@ -229,7 +230,8 @@ namespace QBD2.Services
                             objList.Add(new InspectionFailure
                             {
                                 Comment = item.Comment,
-                                FailureTypeId = item.FailureTypeId,
+                                //FailureTypeId = item.FailureTypeId,
+                                BuildStationFailureCodeId = item.BuildStationFailureCodeId,
                                 InspectionId = objInspection.InspectionId
 
                             });
@@ -275,19 +277,21 @@ namespace QBD2.Services
                     inspection.InspectionFailedList = await (from f in _context.InspectionFailures
                                                                  join i in _context.Inspections
                                                                  on f.InspectionId equals i.InspectionId
-                                                                 join t in _context.FailureTypes
-                                                                 on f.FailureTypeId equals t.FailureTypeId
-                                                                 join p in _context.FailureTypePrimaries
-                                                                 on t.FailureTypePrimaryId equals p.FailureTypePrimaryId
+                                                                 join t in _context.BuildStationFailureCodes
+                                                                 on f.BuildStationFailureCodeId equals t.BuildStationFailureCodeId
+                                                                // join p in _context.FailureTypePrimaries
+                                                                // on t.FailureTypePrimaryId equals p.FailureTypePrimaryId
                                                                  where f.InspectionId == inspection.InspectionId
                                                                  select new Models.InspectionFailed
                                                                  {
                                                                      InspectionFailureId = f.InspectionFailureId,
-                                                                     FailureTypeId = f.FailureTypeId,
+                                                                     // FailureTypeId = f.FailureTypeId,
                                                                      Comment = f.Comment,
-                                                                     FailureName = t.Name,
-                                                                     FailurePrimaryName = p.Name,
-                                                                     FailurePrimaryTypeId = p.FailureTypePrimaryId
+                                                                     //FailureName = t.Name,
+                                                                     //FailurePrimaryName = p.Name,
+                                                                     //FailurePrimaryTypeId = p.FailureTypePrimaryId
+                                                                     BuildStationFailureCodeId = f.BuildStationFailureCodeId,
+                                                                     BuildStationFailureCodeName = t.Name,
                                                                  }
                                                                  ).ToListAsync();
                 }

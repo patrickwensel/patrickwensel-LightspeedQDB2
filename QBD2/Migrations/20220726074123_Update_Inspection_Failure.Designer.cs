@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QBD2.Data;
 
@@ -11,9 +12,10 @@ using QBD2.Data;
 namespace QBD2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220726074123_Update_Inspection_Failure")]
+    partial class Update_Inspection_Failure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -673,84 +675,6 @@ namespace QBD2.Migrations
                     b.HasIndex("ProductFamilyId");
 
                     b.ToTable("MasterParts");
-                });
-
-            modelBuilder.Entity("QBD2.Entities.MRB", b =>
-                {
-                    b.Property<int>("MRBId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MRBId"), 1L, 1);
-
-                    b.Property<string>("BarCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsComplete")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MRBDispositionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("MRBId");
-
-                    b.HasIndex("MRBDispositionId");
-
-                    b.ToTable("MRBs");
-                });
-
-            modelBuilder.Entity("QBD2.Entities.MRBDisposition", b =>
-                {
-                    b.Property<int>("MRBDispositionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MRBDispositionId"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("MRBDispositionId");
-
-                    b.ToTable("MRBDispositions");
-
-                    b.HasData(
-                        new
-                        {
-                            MRBDispositionId = 1,
-                            Name = "Review"
-                        },
-                        new
-                        {
-                            MRBDispositionId = 2,
-                            Name = "Rework"
-                        },
-                        new
-                        {
-                            MRBDispositionId = 3,
-                            Name = "Send to Vendor"
-                        },
-                        new
-                        {
-                            MRBDispositionId = 4,
-                            Name = "Scrap"
-                        },
-                        new
-                        {
-                            MRBDispositionId = 5,
-                            Name = "Eng Eval"
-                        },
-                        new
-                        {
-                            MRBDispositionId = 6,
-                            Name = "Use As Is"
-                        });
                 });
 
             modelBuilder.Entity("QBD2.Entities.Part", b =>
@@ -1694,17 +1618,6 @@ namespace QBD2.Migrations
                         .HasForeignKey("ProductFamilyId");
 
                     b.Navigation("ProductFamily");
-                });
-
-            modelBuilder.Entity("QBD2.Entities.MRB", b =>
-                {
-                    b.HasOne("QBD2.Entities.MRBDisposition", "MRBDisposition")
-                        .WithMany()
-                        .HasForeignKey("MRBDispositionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MRBDisposition");
                 });
 
             modelBuilder.Entity("QBD2.Entities.Part", b =>

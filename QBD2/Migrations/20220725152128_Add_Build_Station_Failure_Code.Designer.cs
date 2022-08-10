@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QBD2.Data;
 
@@ -11,9 +12,10 @@ using QBD2.Data;
 namespace QBD2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220725152128_Add_Build_Station_Failure_Code")]
+    partial class Add_Build_Station_Failure_Code
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -627,19 +629,19 @@ namespace QBD2.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InspectionFailureId"), 1L, 1);
 
-                    b.Property<int>("BuildStationFailureCodeId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FailureTypeId")
+                        .HasColumnType("int");
 
                     b.Property<int>("InspectionId")
                         .HasColumnType("int");
 
                     b.HasKey("InspectionFailureId");
 
-                    b.HasIndex("BuildStationFailureCodeId");
+                    b.HasIndex("FailureTypeId");
 
                     b.HasIndex("InspectionId");
 
@@ -673,84 +675,6 @@ namespace QBD2.Migrations
                     b.HasIndex("ProductFamilyId");
 
                     b.ToTable("MasterParts");
-                });
-
-            modelBuilder.Entity("QBD2.Entities.MRB", b =>
-                {
-                    b.Property<int>("MRBId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MRBId"), 1L, 1);
-
-                    b.Property<string>("BarCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsComplete")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MRBDispositionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("MRBId");
-
-                    b.HasIndex("MRBDispositionId");
-
-                    b.ToTable("MRBs");
-                });
-
-            modelBuilder.Entity("QBD2.Entities.MRBDisposition", b =>
-                {
-                    b.Property<int>("MRBDispositionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MRBDispositionId"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("MRBDispositionId");
-
-                    b.ToTable("MRBDispositions");
-
-                    b.HasData(
-                        new
-                        {
-                            MRBDispositionId = 1,
-                            Name = "Review"
-                        },
-                        new
-                        {
-                            MRBDispositionId = 2,
-                            Name = "Rework"
-                        },
-                        new
-                        {
-                            MRBDispositionId = 3,
-                            Name = "Send to Vendor"
-                        },
-                        new
-                        {
-                            MRBDispositionId = 4,
-                            Name = "Scrap"
-                        },
-                        new
-                        {
-                            MRBDispositionId = 5,
-                            Name = "Eng Eval"
-                        },
-                        new
-                        {
-                            MRBDispositionId = 6,
-                            Name = "Use As Is"
-                        });
                 });
 
             modelBuilder.Entity("QBD2.Entities.Part", b =>
@@ -1457,14 +1381,14 @@ namespace QBD2.Migrations
                         new
                         {
                             Id = "22b3bff1-cfd2-4075-a90f-827380656873",
-                            ConcurrencyStamp = "132d6063-5011-49cf-8500-170b4c3478d3",
+                            ConcurrencyStamp = "12936357-7ce4-4b98-acf1-7d56301a3c14",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "e4e7188b-6ecb-4278-aeee-17271f20d7ce",
-                            ConcurrencyStamp = "f7536f8a-bd2d-4e01-94f9-3d8689644c32",
+                            ConcurrencyStamp = "5b467704-f348-48c0-9efd-04b6f786d3e0",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -1484,14 +1408,14 @@ namespace QBD2.Migrations
                         {
                             Id = "2e97b939-49c0-4e1e-8376-cb98348103bb",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2791411d-600b-4c2e-a6f0-1174bf8db6a4",
+                            ConcurrencyStamp = "917b6ad9-34c4-4731-ae30-4f8f074359f5",
                             Email = "pwensel@hotmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "PWENSEL@HOTMAIL.COM",
                             NormalizedUserName = "PWENSEL@HOTMAIL.COM",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3e15cf2e-a1af-467d-8e75-f7978d83327d",
+                            SecurityStamp = "f4f2f6ff-5565-4ef2-ac52-29336d1f6b1a",
                             TwoFactorEnabled = false,
                             UserName = "pwensel@hotmail.com",
                             ADLogin = "DESKTOP-1HVSAG6\\pwens"
@@ -1670,9 +1594,9 @@ namespace QBD2.Migrations
 
             modelBuilder.Entity("QBD2.Entities.InspectionFailure", b =>
                 {
-                    b.HasOne("QBD2.Entities.BuildStationFailureCode", "BuildStationFailureCode")
+                    b.HasOne("QBD2.Entities.FailureType", "FailureType")
                         .WithMany()
-                        .HasForeignKey("BuildStationFailureCodeId")
+                        .HasForeignKey("FailureTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1682,7 +1606,7 @@ namespace QBD2.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("BuildStationFailureCode");
+                    b.Navigation("FailureType");
 
                     b.Navigation("Inspection");
                 });
@@ -1694,17 +1618,6 @@ namespace QBD2.Migrations
                         .HasForeignKey("ProductFamilyId");
 
                     b.Navigation("ProductFamily");
-                });
-
-            modelBuilder.Entity("QBD2.Entities.MRB", b =>
-                {
-                    b.HasOne("QBD2.Entities.MRBDisposition", "MRBDisposition")
-                        .WithMany()
-                        .HasForeignKey("MRBDispositionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MRBDisposition");
                 });
 
             modelBuilder.Entity("QBD2.Entities.Part", b =>

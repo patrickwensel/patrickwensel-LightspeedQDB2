@@ -29,7 +29,6 @@
 
   <ItemGroup>
 	<Folder Include="Components\" />
-	<Folder Include="Migrations\" />
     <Folder Include="ViewModels\" />
     <Folder Include="wwwroot\upload\" />
   </ItemGroup>

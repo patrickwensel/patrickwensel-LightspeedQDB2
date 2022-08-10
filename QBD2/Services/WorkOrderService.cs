@@ -42,81 +42,7 @@ namespace QBD2.Services
             {
                 var workOrderParts = await _context.WorkOrderParts.Where(x => x.WorkOrderId == item.WorkOrderId).Select(x => x.PartId).ToListAsync();
                 var part = await (from p in _context.Parts
-                                join mp in _context.MasterParts
-                                on p.MasterPartId equals mp.MasterPartId
-                                where p.ParentPartId == null && workOrderParts.Contains(p.PartId)
-                                select new Parts
-                                {
-                                    PartId = p.PartId,
-                                    SerialNumber = p.SerialNumber,
-                                    Description = mp.Description,
-                                    MasterPartId = mp.MasterPartId,
-                                    ParentPartId = p.ParentPartId,
-                                    PartNumber = mp.PartNumber,
-                                    PartStatusId = p.PartStatusId,
-                                    PartStatus = p.PartStatus.Name,
-                                    BuildStationId = p.BuildStationId,
-                                    BuildStations = p.BuildStation.Name,
-                                    SerialNumberRequired = p.SerialNumberRequired
-                                }).ToListAsync();
-
-                foreach (Parts partItems in part)
-                {
-                    partItems.ChildParts =   await (from p in _context.Parts
-                                             join mp in _context.MasterParts
-                                             on p.MasterPartId equals mp.MasterPartId
-                                             where p.ParentPartId == partItems.PartId
-                                             select new Parts
-                                             {
-                                                 PartId = p.PartId,
-                                                 SerialNumber = p.SerialNumber,
-                                                 Description = mp.Description,
-                                                 MasterPartId = mp.MasterPartId,
-                                                 ParentPartId = p.ParentPartId,
-                                                 PartNumber = mp.PartNumber,
-                                                 PartStatusId = p.PartStatusId,
-                                                 PartStatus = p.PartStatus.Name,
-                                                 BuildStationId = p.BuildStationId,
-                                                 BuildStations = p.BuildStation.Name,
-                                                 SerialNumberRequired = p.SerialNumberRequired
-                                             }).ToListAsync();
-                }
-                item.PartsList = part;
-            }
-
-            return workOrderModelList;
-        }
-
-        public async Task<Models.WorkOrderModel> GetWorkOrderByWorkOrderId(int workOrderId)
-        {
-            WorkOrderModel workOrderModel = new WorkOrderModel();
-            workOrderModel =  await (from wo in _context.WorkOrders
-                              join wot in _context.WorkOrderTypes on wo.WorkOrderTypeId equals wot.WorkOrderTypeId
-                              join wos in _context.WorkOrderStatuses on wo.WorkOrderStatusId equals wos.WorkOrderStatusId
-                              join wop in _context.WorkOrderPriorities on wo.WorkOrderPriorityID equals wop.WorkOrderPriorityId
-                              join bt in _context.BuildTemplates on wo.BuildTemplateId equals bt.BuildTemplateId
-                              where wo.WorkOrderId == workOrderId
-                              select new Models.WorkOrderModel
-                              {
-                                  WorkOrderId = wo.WorkOrderId,
-                                  CreateDate = wo.CreateDate,
-                                  WorkOrderTypeId = wo.WorkOrderTypeId,
-                                  WorkOrderType = wot,
-                                  WorkOrderStatusId = wo.WorkOrderStatusId,
-                                  WorkOrderStatus = wos,
-                                  WorkOrderPriorityID = wo.WorkOrderPriorityID,
-                                  WorkOrderPriority = wop,
-                                  BuildTemplateId = wo.BuildTemplateId,
-                                  BuildTemplate = bt,
-                                  Quantity = wo.Quantity,
-                                  BuildTemplateMasterPartName = bt.Name + " " + bt.MasterPart.PartNumber
-                              }).FirstOrDefaultAsync();
-
-            if (workOrderModel != null && workOrderModel.WorkOrderId > 0)
-            {
-                var workOrderParts = await _context.WorkOrderParts.Where(x => x.WorkOrderId == workOrderModel.WorkOrderId).Select(x => x.PartId).ToListAsync();
-                var part = await (from p in _context.Parts
-                                  join mp in _context.MasterParts
+                                  join mp in _context.MasterParts 
                                   on p.MasterPartId equals mp.MasterPartId
                                   where p.ParentPartId == null && workOrderParts.Contains(p.PartId)
                                   select new Parts
@@ -136,7 +62,7 @@ namespace QBD2.Services
 
                 foreach (Parts partItems in part)
                 {
-                    partItems.ChildParts = await (from p in _context.Parts
+                    partItems.ChildParts =   await (from p in _context.Parts
                                                   join mp in _context.MasterParts
                                                   on p.MasterPartId equals mp.MasterPartId
                                                   where p.ParentPartId == partItems.PartId
@@ -153,6 +79,86 @@ namespace QBD2.Services
                                                       BuildStationId = p.BuildStationId,
                                                       BuildStations = p.BuildStation.Name,
                                                       SerialNumberRequired = p.SerialNumberRequired
+                                                  }).ToListAsync();
+                }
+                item.PartsList = part;
+            }
+
+            return workOrderModelList;
+        }
+
+        public async Task<Models.WorkOrderModel> GetWorkOrderByWorkOrderId(int workOrderId)
+        {
+            WorkOrderModel workOrderModel = new WorkOrderModel();
+            workOrderModel =  await (from wo in _context.WorkOrders
+                                    join wot in _context.WorkOrderTypes on wo.WorkOrderTypeId equals wot.WorkOrderTypeId
+                                    join wos in _context.WorkOrderStatuses on wo.WorkOrderStatusId equals wos.WorkOrderStatusId
+                                    join wop in _context.WorkOrderPriorities on wo.WorkOrderPriorityID equals wop.WorkOrderPriorityId
+                                    join bt in _context.BuildTemplates on wo.BuildTemplateId equals bt.BuildTemplateId
+                                    where wo.WorkOrderId == workOrderId
+                                    select new Models.WorkOrderModel
+                                    {
+                                        WorkOrderId = wo.WorkOrderId,
+                                        CreateDate = wo.CreateDate,
+                                        WorkOrderTypeId = wo.WorkOrderTypeId,
+                                        WorkOrderType = wot,
+                                        WorkOrderStatusId = wo.WorkOrderStatusId,
+                                        WorkOrderStatus = wos,
+                                        WorkOrderPriorityID = wo.WorkOrderPriorityID,
+                                        WorkOrderPriority = wop,
+                                        BuildTemplateId = wo.BuildTemplateId,
+                                        BuildTemplate = bt,
+                                        Quantity = wo.Quantity,
+                                        BuildTemplateMasterPartName = bt.Name + " " + bt.MasterPart.PartNumber
+                                    }).FirstOrDefaultAsync();
+
+            if (workOrderModel != null && workOrderModel.WorkOrderId > 0)
+            {
+                var workOrderParts = await _context.WorkOrderParts.Where(x => x.WorkOrderId == workOrderModel.WorkOrderId).Select(x => x.PartId).ToListAsync();
+                var part = await (from p in _context.Parts
+                                  join mp in _context.MasterParts 
+                                  on p.MasterPartId equals mp.MasterPartId
+                                  join i in _context.Inspections on new { WorkOrderId = (int?)workOrderModel.WorkOrderId, PartId = p.PartId } equals new { WorkOrderId = i.WorkOrderId, PartId = i.PartId } into i_join
+                                  from i in i_join.DefaultIfEmpty()
+                                  where p.ParentPartId == null && workOrderParts.Contains(p.PartId)
+                                  select new Parts
+                                  {
+                                      PartId = p.PartId,
+                                      SerialNumber = p.SerialNumber,
+                                      Description = mp.Description,
+                                      MasterPartId = mp.MasterPartId,
+                                      ParentPartId = p.ParentPartId,
+                                      PartNumber = mp.PartNumber,
+                                      PartStatusId = p.PartStatusId,
+                                      PartStatus = p.PartStatus.Name,
+                                      BuildStationId = p.BuildStationId,
+                                      BuildStations = p.BuildStation.Name,
+                                      SerialNumberRequired = p.SerialNumberRequired,
+                                      InspectionStatus = (i.InspectionId > 0 ? (i.Pass ? "Passed" : "Failed") : "Non Inspectioned")
+                                  }).ToListAsync();
+
+                foreach (Parts partItems in part)
+                {
+                    partItems.ChildParts = await (from p in _context.Parts
+                                                  join mp in _context.MasterParts 
+                                                  on p.MasterPartId equals mp.MasterPartId
+                                                  join i in _context.Inspections on new { WorkOrderId = (int?)workOrderModel.WorkOrderId, PartId = p.PartId } equals new { WorkOrderId = i.WorkOrderId, PartId = i.PartId } into i_join
+                                                  from i in i_join.DefaultIfEmpty()
+                                                  where p.ParentPartId == partItems.PartId
+                                                  select new Parts
+                                                  {
+                                                      PartId = p.PartId,
+                                                      SerialNumber = p.SerialNumber,
+                                                      Description = mp.Description,
+                                                      MasterPartId = mp.MasterPartId,
+                                                      ParentPartId = p.ParentPartId,
+                                                      PartNumber = mp.PartNumber,
+                                                      PartStatusId = p.PartStatusId,
+                                                      PartStatus = p.PartStatus.Name,
+                                                      BuildStationId = p.BuildStationId,
+                                                      BuildStations = p.BuildStation.Name,
+                                                      SerialNumberRequired = p.SerialNumberRequired,
+                                                      InspectionStatus = (i.InspectionId > 0 ? (i.Pass ? "Passed" : "Failed") : "Non Inspectioned")
                                                   }).ToListAsync();
                 }
                 workOrderModel.PartsList = part;
@@ -214,7 +220,8 @@ namespace QBD2.Services
                             part.MasterPartId = buildTemplate.MasterPartId;
                             part.UpdateDate = DateTime.Now;
                             part.PartStatusId = 1;
-                           
+                            part.BuildStationId = buildTemplate.BuildStationId;
+                            part.SerialNumberRequired = true;
                             _context.Parts.Add(part);
                             _context.SaveChanges();
 
@@ -232,6 +239,12 @@ namespace QBD2.Services
                                 _context.Parts.Add(templatePart);
                                 _context.SaveChanges();
 
+                                if (!templatePart.SerialNumberRequired)
+                                {
+                                    templatePart.SerialNumber = $"U-{templatePart.PartId}";
+                                    _context.Entry(templatePart).State = EntityState.Modified;
+                                    await _context.SaveChangesAsync();
+                                }
                             }
 
                             WorkOrderPart workOrderPart = new WorkOrderPart();

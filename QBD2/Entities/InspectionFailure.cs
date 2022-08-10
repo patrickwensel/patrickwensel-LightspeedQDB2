@@ -14,12 +14,12 @@ namespace QBD2.Entities
         public int InspectionId { get; set; }
         public virtual Inspection Inspection { get; set; }
 
-        //[ForeignKey("FailureType")]
-        //public int FailureTypeId { get; set; }
-        //public virtual FailureType FailureType { get; set; }
+        [ForeignKey("FailureType")]
+        public int? FailureTypeId { get; set; }
+        public virtual FailureType FailureType { get; set; }
 
         [ForeignKey("BuildStationFailureCode")]
-        public int BuildStationFailureCodeId { get; set; }
+        public int? BuildStationFailureCodeId { get; set; }
         public virtual BuildStationFailureCode BuildStationFailureCode { get; set; }
     }
 }

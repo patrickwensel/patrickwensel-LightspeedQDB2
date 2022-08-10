@@ -30,23 +30,23 @@ namespace QBD2.Services
         {
             List<Models.AlertDeviationDetailModel> alertDeviationDetailModelList = new List<Models.AlertDeviationDetailModel>();
             var alerDetailtList = await (from a in _context.Alerts
-                                  join mp in _context.MasterParts
-                                  on a.MasterPartId equals mp.MasterPartId
-                                  where a.MasterPartId == masterPartId
-                                  select new Models.AlertDeviationDetailModel
-                                  {
-                                      AlertId = a.AlertId,
-                                      Title = a.Title,
-                                      Alert = a,
-                                      DeviationId = 0,
-                                      MasterPartId = a.MasterPartId,
-                                      MasterPartNumber = mp.PartNumber,
-                                      MasterPartDescription = mp.Description,
-                                      PartList = (from pa in  _context.PartAlerts
-                                                  join p in _context.Parts on pa.PartId equals p.PartId
-                                                  where pa.AlertId == a.AlertId
-                                                  select p).ToList()
-                                  }).ToListAsync();
+                                         join mp in _context.MasterParts
+                                         on a.MasterPartId equals mp.MasterPartId
+                                         where a.MasterPartId == masterPartId
+                                         select new Models.AlertDeviationDetailModel
+                                         {
+                                             AlertId = a.AlertId,
+                                             Title = a.Title,
+                                             Alert = a,
+                                             DeviationId = 0,
+                                             MasterPartId = a.MasterPartId,
+                                             MasterPartNumber = mp.PartNumber,
+                                             MasterPartDescription = mp.Description,
+                                             PartList = (from pa in  _context.PartAlerts
+                                                         join p in _context.Parts on pa.PartId equals p.PartId
+                                                         where pa.AlertId == a.AlertId
+                                                         select p).ToList()
+                                         }).ToListAsync();
 
             if(alerDetailtList != null && alerDetailtList.Count() > 0)
             {
@@ -54,23 +54,23 @@ namespace QBD2.Services
             }
 
             var deviationsDetailtList = await (from d in _context.Deviations
-                                         join mp in _context.MasterParts
-                                         on d.MasterPartId equals mp.MasterPartId
-                                         where d.MasterPartId == masterPartId
-                                         select new Models.AlertDeviationDetailModel
-                                         {
-                                             DeviationId = d.DeviationId,
-                                             Title = d.Title,
-                                             Deviation = d,
-                                             AlertId = 0,
-                                             MasterPartId = d.MasterPartId,
-                                             MasterPartNumber = mp.PartNumber,
-                                             MasterPartDescription = mp.Description,
-                                             PartList = (from pd in _context.PartDeviations
-                                                         join p in _context.Parts on pd.PartId equals p.PartId
-                                                         where pd.DeviationId == d.DeviationId
-                                                         select p).ToList()
-                                         }
+                                               join mp in _context.MasterParts
+                                               on d.MasterPartId equals mp.MasterPartId
+                                               where d.MasterPartId == masterPartId
+                                               select new Models.AlertDeviationDetailModel
+                                               {
+                                                   DeviationId = d.DeviationId,
+                                                   Title = d.Title,
+                                                   Deviation = d,
+                                                   AlertId = 0,
+                                                   MasterPartId = d.MasterPartId,
+                                                   MasterPartNumber = mp.PartNumber,
+                                                   MasterPartDescription = mp.Description,
+                                                   PartList = (from pd in _context.PartDeviations
+                                                               join p in _context.Parts on pd.PartId equals p.PartId
+                                                               where pd.DeviationId == d.DeviationId
+                                                               select p).ToList()
+                                               }
                                   ).ToListAsync();
 
             if (deviationsDetailtList != null && deviationsDetailtList.Count() > 0)
@@ -137,6 +137,7 @@ namespace QBD2.Services
                                                            GeneralComments = i.GeneralComments,
                                                            Pass = i.Pass,
                                                            StationId = i.StationId,
+                                                           WorkOrderId = i.WorkOrderId,
                                                            InspectionId = i.InspectionId
 
                                                        }).FirstOrDefaultAsync();
@@ -146,24 +147,32 @@ namespace QBD2.Services
                     if (InspectionItem.Inspection != null)
                     {
                         InspectionItem.InspectionFailedList = await (from f in _context.InspectionFailures
-                                                                     join i in _context.Inspections
-                                                                     on f.InspectionId equals i.InspectionId
-                                                                     join t in _context.BuildStationFailureCodes
-                                                                     on f.BuildStationFailureCodeId equals t.BuildStationFailureCodeId
-                                                                     //join p in _context.FailureTypePrimaries
-                                                                     //on t.FailureTypePrimaryId equals p.FailureTypePrimaryId
+                                                                     join i in _context.Inspections on f.InspectionId equals i.InspectionId
+
+                                                                     join t in _context.FailureTypes on new { FailureTypeId = f.FailureTypeId }
+                                                                     equals new { FailureTypeId = (int?)t.FailureTypeId } into t_join
+                                                                     from t in t_join.DefaultIfEmpty()
+
+                                                                     join p in _context.FailureTypePrimaries on new { FailureTypePrimaryId = t.FailureTypePrimaryId }
+                                                                     equals new { FailureTypePrimaryId = p.FailureTypePrimaryId } into p_join
+                                                                     from p in p_join.DefaultIfEmpty()
+
+                                                                     join b in _context.BuildStationFailureCodes on new { BuildStationFailureCodeId = f.BuildStationFailureCodeId }
+                                                                     equals new { BuildStationFailureCodeId = (int?)b.BuildStationFailureCodeId } into b_join
+                                                                     from b in b_join.DefaultIfEmpty()
+
                                                                      select new Models.InspectionFailed
                                                                      {
                                                                          InspectionFailureId = f.InspectionFailureId,
-                                                                         //FailureTypeId = f.FailureTypeId,
+                                                                         FailureTypeId = f.FailureTypeId,
                                                                          Comment = f.Comment,
                                                                          FailureName = t.Name,
-                                                                         //FailurePrimaryName = p.Name,
-                                                                         //FailurePrimaryTypeId = p.FailureTypePrimaryId
+                                                                         FailurePrimaryName = p.Name,
+                                                                         FailurePrimaryTypeId = p.FailureTypePrimaryId,
                                                                          BuildStationFailureCodeId = f.BuildStationFailureCodeId,
-                                                                         BuildStationFailureCodeName = t.Name,
-                                                                     }
-                                                                     ).ToListAsync();
+                                                                         BuildStationFailureCodeName = b.Name
+
+                                                                     }).ToListAsync();
                     }
 
                 }
@@ -193,6 +202,7 @@ namespace QBD2.Services
                     objInspection.PartId = inspection.PartId;
                     objInspection.Pass = inspection.Pass;
                     objInspection.StationId = inspection.StationId;
+                    objInspection.WorkOrderId = inspection.WorkOrderId;
                     objInspection.GeneralComments = inspection.GeneralComments;
                     objInspection.UpdateDate = DateTime.Now;
 
@@ -206,6 +216,7 @@ namespace QBD2.Services
                         PartId = inspection.PartId,
                         Pass = inspection.Pass,
                         StationId = inspection.StationId,
+                        WorkOrderId = inspection.WorkOrderId,
                         GeneralComments = inspection.GeneralComments,
                         UpdateDate = DateTime.Now
                     };
@@ -230,7 +241,7 @@ namespace QBD2.Services
                             objList.Add(new InspectionFailure
                             {
                                 Comment = item.Comment,
-                                //FailureTypeId = item.FailureTypeId,
+                                FailureTypeId = item.FailureTypeId,
                                 BuildStationFailureCodeId = item.BuildStationFailureCodeId,
                                 InspectionId = objInspection.InspectionId
 
@@ -269,37 +280,137 @@ namespace QBD2.Services
                                         GeneralComments = i.GeneralComments,
                                         Pass = i.Pass,
                                         StationId = i.StationId,
+                                        WorkOrderId = i.WorkOrderId,
                                         InspectionId = i.InspectionId
                                     }).FirstOrDefaultAsync();
 
                 if (inspection != null)
                 {
                     inspection.InspectionFailedList = await (from f in _context.InspectionFailures
-                                                                 join i in _context.Inspections
-                                                                 on f.InspectionId equals i.InspectionId
-                                                                 join t in _context.BuildStationFailureCodes
-                                                                 on f.BuildStationFailureCodeId equals t.BuildStationFailureCodeId
-                                                                // join p in _context.FailureTypePrimaries
-                                                                // on t.FailureTypePrimaryId equals p.FailureTypePrimaryId
-                                                                 where f.InspectionId == inspection.InspectionId
-                                                                 select new Models.InspectionFailed
-                                                                 {
-                                                                     InspectionFailureId = f.InspectionFailureId,
-                                                                     // FailureTypeId = f.FailureTypeId,
-                                                                     Comment = f.Comment,
-                                                                     //FailureName = t.Name,
-                                                                     //FailurePrimaryName = p.Name,
-                                                                     //FailurePrimaryTypeId = p.FailureTypePrimaryId
-                                                                     BuildStationFailureCodeId = f.BuildStationFailureCodeId,
-                                                                     BuildStationFailureCodeName = t.Name,
-                                                                 }
-                                                                 ).ToListAsync();
+                                                             join i in _context.Inspections on f.InspectionId equals i.InspectionId
+
+                                                             join t in _context.FailureTypes on new { FailureTypeId = f.FailureTypeId }
+                                                             equals new { FailureTypeId = (int?)t.FailureTypeId } into t_join
+                                                             from t in t_join.DefaultIfEmpty()
+
+                                                             join p in _context.FailureTypePrimaries on new { FailureTypePrimaryId = t.FailureTypePrimaryId }
+                                                             equals new { FailureTypePrimaryId = p.FailureTypePrimaryId } into p_join
+                                                             from p in p_join.DefaultIfEmpty()
+
+                                                             join b in _context.BuildStationFailureCodes on new { BuildStationFailureCodeId = f.BuildStationFailureCodeId }
+                                                             equals new { BuildStationFailureCodeId = (int?)b.BuildStationFailureCodeId } into b_join
+                                                             from b in b_join.DefaultIfEmpty()
+
+                                                             where f.InspectionId == inspection.InspectionId
+                                                             select new Models.InspectionFailed
+                                                             {
+                                                                 InspectionFailureId = f.InspectionFailureId,
+                                                                 FailureTypeId = f.FailureTypeId,
+                                                                 BuildStationFailureCodeId = f.BuildStationFailureCodeId,
+                                                                 BuildStationFailureCodeName = b.Name,
+                                                                 Comment = f.Comment,
+                                                                 FailureName = t.Name,
+                                                                 FailurePrimaryName = p.Name,
+                                                                 FailurePrimaryTypeId = p.FailureTypePrimaryId
+                                                             }).ToListAsync();
                 }
             }
             catch (Exception e)
             {
             }
             return inspection;
+        }
+
+        public async Task<Models.Inspection> GetInspectionByWorkOrderIdAndPartId(int workOrderId, int partId)
+        {
+            var inspectionModel = new Models.Inspection();
+
+            var inspection = await _context.Inspections.FirstOrDefaultAsync(x => x.WorkOrderId == workOrderId && x.PartId == partId);
+            if (inspection != null)
+                inspectionModel = await GetInspectionsById(inspection.InspectionId);
+
+            if (inspectionModel == null)
+                inspectionModel = new Models.Inspection();
+
+
+
+            if (inspectionModel.InspectionFailedList != null && inspectionModel.InspectionFailedList.Count > 0)
+            {
+                inspectionModel.InspectionFailed = inspectionModel.InspectionFailedList[0];
+            }
+            else
+            {
+                inspectionModel.InspectionFailed = new Models.InspectionFailed();
+            }
+
+            return inspectionModel;
+        }
+
+        public async Task<bool> SaveWorkOrderInspection(Models.Inspection inspection)
+        {
+            try
+            {
+                Entities.Inspection objInspection = new Entities.Inspection();
+                if (inspection.InspectionId > 0)
+                {
+                    objInspection = await _context.Inspections.FirstOrDefaultAsync(x => x.InspectionId == inspection.InspectionId);
+                }
+                objInspection.Pass = inspection.Pass;
+                objInspection.GeneralComments = inspection.GeneralComments;
+                objInspection.PartId = inspection.PartId;
+                objInspection.StationId = inspection.StationId;
+                objInspection.WorkOrderId = inspection.WorkOrderId;
+                objInspection.UpdateDate = DateTime.Now;
+                if (inspection.InspectionId > 0)
+                {
+                    _context.Entry(objInspection).State = EntityState.Modified;
+                }
+                else
+                {
+                    _context.Inspections.Add(objInspection);
+                }
+                await _context.SaveChangesAsync();
+                inspection.InspectionId = objInspection.InspectionId;
+
+                Entities.InspectionFailure objInspectionFailure = new Entities.InspectionFailure();
+                if (inspection.InspectionFailed.InspectionFailureId > 0)
+                {
+                    objInspectionFailure = await _context.InspectionFailures.FirstOrDefaultAsync(x => x.InspectionFailureId == inspection.InspectionFailed.InspectionFailureId);
+                }
+
+                if (inspection.Pass)
+                {
+                    if (objInspectionFailure != null && objInspectionFailure.InspectionFailureId > 0)
+                    {
+                        _context.InspectionFailures.Remove(objInspectionFailure);
+                        await _context.SaveChangesAsync();
+                        inspection.InspectionFailed.InspectionFailureId = 0;
+                    }
+                }
+                else
+                {
+                    objInspectionFailure.Comment = inspection.InspectionFailed.Comment;
+                    objInspectionFailure.InspectionId = inspection.InspectionId;
+                    objInspectionFailure.BuildStationFailureCodeId = inspection.InspectionFailed.BuildStationFailureCodeId;
+                    objInspectionFailure.FailureTypeId = inspection.InspectionFailed.FailureTypeId;
+                    if (inspection.InspectionFailed.InspectionFailureId > 0)
+                    {
+                        _context.Entry(objInspectionFailure).State = EntityState.Modified;
+                    }
+                    else
+                    {
+                        _context.InspectionFailures.Add(objInspectionFailure);
+                    }
+                    await _context.SaveChangesAsync();
+                    inspection.InspectionFailed.InspectionFailureId = objInspectionFailure.InspectionFailureId;
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

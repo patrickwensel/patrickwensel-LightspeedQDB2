@@ -19,8 +19,13 @@ namespace QBD2.Entities
         public virtual Part Part { get; set; }
 
         [ForeignKey("Station")]
-        public int StationId { get; set; }
+        public int? StationId { get; set; }
         public virtual Station Station { get; set; }
+
+        [ForeignKey("WorkOrder")]
+        public int? WorkOrderId { get; set; }
+        public virtual WorkOrder WorkOrder { get; set; }
+
         public DateTime UpdateDate { get; set; }
 
         public string Status

@@ -25,6 +25,6 @@
         public bool? SerialNumberRequired { get; set; }
 
         public List<Parts> ChildParts { get; set; }
-
+        public string InspectionStatus { get; set; }
     }
 }

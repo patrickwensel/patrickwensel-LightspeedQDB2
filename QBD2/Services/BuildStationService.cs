@@ -39,9 +39,9 @@ namespace QBD2.Services
             await _context.SaveChangesAsync();
         }
 
-        public List<Models.DropDownBind> DropDownData()
+        public async Task<List<Models.DropDownBind>> DropDownData()
         {
-            return _context.BuildStations.Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.BuildStationId }).ToList();
+            return await _context.BuildStations.OrderBy(x => x.Name).Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.BuildStationId }).ToListAsync();
         }
     }
 }

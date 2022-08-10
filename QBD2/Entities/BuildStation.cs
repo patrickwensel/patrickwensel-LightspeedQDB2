@@ -10,5 +10,7 @@ namespace QBD2.Entities
         public int BuildStationId { get; set; }
 
         public string Name { get; set; }
+
+        public virtual List<BuildTemplate> BuildTemplates { get; set; }
     }
 }

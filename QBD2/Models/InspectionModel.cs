@@ -18,7 +18,9 @@
         public bool Pass { get; set; }
         public string GeneralComments { get; set; }
         public int PartId { get; set; }
-        public int StationId { get; set; }
+        public int? StationId { get; set; }
+        public int? WorkOrderId { get; set; }
+        public InspectionFailed InspectionFailed { get; set; }
         public List<InspectionFailed> InspectionFailedList { get; set; }
     }
 
@@ -26,11 +28,11 @@
     {
         public int InspectionFailureId { get; set; }
         public string Comment { get; set; }
-        public int BuildStationFailureCodeId { get; set; }
+        public int? BuildStationFailureCodeId { get; set; }
         public string BuildStationFailureCodeName { get; set; }
-        public int FailureTypeId { get; set; }
+        public int? FailureTypeId { get; set; }
         public string FailureName { get; set; }
-        public int FailurePrimaryTypeId { get; set; }
+        public int? FailurePrimaryTypeId { get; set; }
         public string FailurePrimaryName { get; set; }
 
     }

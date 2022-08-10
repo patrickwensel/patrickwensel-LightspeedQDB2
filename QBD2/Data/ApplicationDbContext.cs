@@ -186,6 +186,11 @@ namespace QBD2.Data
             modelBuilder.Entity<ScarCar>().HasMany(x => x.ScarCarNotes).WithOne(x => x.ScarCar).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<MasterPart>().HasMany(x => x.BuildTemplateParts).WithOne(x => x.MasterPart).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<WorkOrder>().HasMany(x => x.WorkOrderParts).WithOne(x => x.WorkOrder).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Inspection>().Property(m => m.StationId).IsRequired(false);
+            modelBuilder.Entity<Inspection>().Property(m => m.WorkOrderId).IsRequired(false);
+            modelBuilder.Entity<InspectionFailure>().Property(m => m.FailureTypeId).IsRequired(false);
+            modelBuilder.Entity<InspectionFailure>().Property(m => m.BuildStationFailureCodeId).IsRequired(false);
+            modelBuilder.Entity<BuildStation>().HasMany(s => s.BuildTemplates).WithOne(c => c.BuildStation).OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
 

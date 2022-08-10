@@ -10,454 +10,475 @@
 
 <div class="row alerts-row">
     <div class="col-md-9">
-<h3 class="alert-title"><i class="fa fa-search"></i> Inspection</h3>
-</div>
+        <h3 class="alert-title"><i class="fa fa-search"></i> Inspection</h3>
+    </div>
 
-   <div class="col-md-3 add-alrert-btn">
-       <TelerikButton Icon="add" OnClick="@(()=> findInspectionsDetail(null))">Add New Inspection</TelerikButton>
-   </div>
+    <div class="col-md-3 add-alrert-btn">
+        <TelerikButton Icon="add" OnClick="@(()=> findInspectionsDetail(null))">Add New Inspection</TelerikButton>
+    </div>
 </div>
 <hr />
 
-    <div class="row">
-        <div class="current-inspection">
+<div class="row">
+    <div class="current-inspection">
         <h3 class="alert-table-title">Current Inspections</h3>
         <div class="al-table">
-        <TelerikGrid Data="@MyData"
-                Pageable="true" 
-                Sortable="true"
-                Resizable="true"
-                FilterMode="@GridFilterMode.FilterRow"
-        >
-            
-            <GridColumns>
-                <GridColumn Field="Part.SerialNumber" Title="Serial Number" Groupable="false" Filterable="true" Sortable="false">
-                    <HeaderTemplate>
-                        <span><i class="fa-solid fa-barcode" style="color: #11515E;"></i> Serial Number</span>
-                    </HeaderTemplate>
-                </GridColumn>
-               <GridColumn Field="@(nameof(Entities.Inspection.UpdateDate))" Title="Update Date" Groupable="false" Sortable="true" Filterable="true">
-                    <HeaderTemplate>
-                        <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Update Date</span>
-                    </HeaderTemplate>
-                </GridColumn>
-                <GridColumn Field="@(nameof(Entities.Inspection.Status))" Title="Status" Groupable="false" Sortable="true" Filterable="true">
-                    <HeaderTemplate>
-                        <span><i class="fa-duotone fa-wave-pulse" style="color: #11515E;"></i> Status</span>
-                    </HeaderTemplate>
-                    <Template>
-                          @{
-                              var inspection = context as Entities.Inspection;
-                              if (inspection != null && inspection.Pass == true)
-                              {
+            <TelerikGrid Data="@MyData"
+                         Pageable="true"
+                         Sortable="true"
+                         Resizable="true"
+                         FilterMode="@GridFilterMode.FilterRow"
+            >
+
+                <GridColumns>
+                    <GridColumn Field="Part.SerialNumber" Title="Serial Number" Groupable="false" Filterable="true" Sortable="false">
+                        <HeaderTemplate>
+                            <span><i class="fa-solid fa-barcode" style="color: #11515E;"></i> Serial Number</span>
+                        </HeaderTemplate>
+                    </GridColumn>
+                    <GridColumn Field="@(nameof(Entities.Inspection.UpdateDate))" Title="Update Date" Groupable="false" Sortable="true" Filterable="true">
+                        <HeaderTemplate>
+                            <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Update Date</span>
+                        </HeaderTemplate>
+                    </GridColumn>
+                    <GridColumn Field="@(nameof(Entities.Inspection.Status))" Title="Status" Groupable="false" Sortable="true" Filterable="true">
+                        <HeaderTemplate>
+                            <span><i class="fa-duotone fa-wave-pulse" style="color: #11515E;"></i> Status</span>
+                        </HeaderTemplate>
+                        <Template>
+                            @{
+                                var inspection = context as Entities.Inspection;
+                                if (inspection != null && inspection.Pass == true)
+                                {
                                     <lable style="color:green">@inspection.Status</lable>
-                              }
-                              else
-                              {
+                                }
+                                else
+                                {
                                     <lable style="color:red;">@inspection.Status</lable>
-                              }
+                                }
                             }
-                    </Template>
-                </GridColumn>
+                        </Template>
+                    </GridColumn>
 
-                <GridColumn Field="Station.Name" Title="Station" Groupable="false" Filterable="true" Sortable="false">
-                    <HeaderTemplate>
-                        <span><i class="fa-solid fa-arrow-trend-up" style="color: #11515E;"></i> Station</span>
-                    </HeaderTemplate>
-                </GridColumn>
+                    <GridColumn Field="Station.Name" Title="Station" Groupable="false" Filterable="true" Sortable="false">
+                        <HeaderTemplate>
+                            <span><i class="fa-solid fa-arrow-trend-up" style="color: #11515E;"></i> Station</span>
+                        </HeaderTemplate>
+                    </GridColumn>
 
-                 <GridColumn Field="@(nameof(Entities.Inspection.GeneralComments))" Title="Comments" Groupable="false" Sortable="true" Filterable="false">
-                    <HeaderTemplate>
-                        <span><i class="fa-regular fa-comments" style="color: #11515E;"></i>Comments</span>
-                    </HeaderTemplate>
-                </GridColumn>
+                    <GridColumn Field="@(nameof(Entities.Inspection.GeneralComments))" Title="Comments" Groupable="false" Sortable="true" Filterable="false">
+                        <HeaderTemplate>
+                            <span><i class="fa-regular fa-comments" style="color: #11515E;"></i>Comments</span>
+                        </HeaderTemplate>
+                    </GridColumn>
 
-                <GridCommandColumn Width="10%;">
+                    <GridCommandColumn Width="10%;">
                         <GridCommandButton OnClick="@((args)=> findInspectionsDetail(args.Item as Entities.Inspection))"><i class="fa-solid fa-chevron-right" style="color: #69A3AF;"></i></GridCommandButton>
-                </GridCommandColumn>
-            </GridColumns>
-        </TelerikGrid>
+                    </GridCommandColumn>
+                </GridColumns>
+            </TelerikGrid>
         </div>
     </div>
-    </div>
+</div>
 
-    <div class="row">
-        <div class="col-md-12">
-
-        
-
-    <div id="mySidebar" class="sidebar">
-    <div class="form-group row inspection">
-        <div class="col-md-7"> </div>
-        <div class=" col-sm-5 right-scroll-column" style="border-left:unset!important;">
-
-            <div class="row">
-                <div class="col-sm-9 left-input">
-                    <TelerikTextBox id="txtSerialSearch" Class="form-control col-sm-12" @bind-Value="SerialNumber" PlaceHolder="Search for a Serial NUmber"></TelerikTextBox>
-                </div>
-                <div class=" col-sm-3 b-btn">
-                    <TelerikButton id="btnSearch" OnClick="(()=>btnFindOnClick(true))" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
-                </div>
-            </div>
-
-            <div class="row class=">
-                <div class="col-sm-12">
-                    <label class="col-sm-12 col-form-label">Desc :</label>
-                    <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b" @onclick="(() => CloseAddEditInspectionWindow())">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty) <i class="fa-solid fa-circle-xmark" ></i></label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-12">
-                    <label class="col-sm-12 col-form-label">Part Number :</label>
-                    <label id="lblPartNumberValue" class="col-sm-12 col-form-label right-value n-font">@(dataInspectionModel !=null ? dataInspectionModel.PartNumber:string.Empty)</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-12">
-                    <label class="col-sm-12 col-form-label">Serial Number :</label>
-                    <label id="lblSerialNumberValue" class="col-sm-12 col-form-label right-value n-font">@(dataInspectionModel !=null ? dataInspectionModel.SerialNumber:string.Empty)</label>
-                </div>
-
-            </div>
-
-            <div class="row">
-
-                <div class=" col-sm-12 alert-section">
-                    <TelerikGrid Data=@GridAlertDeviationData Sortable="true" Pageable="false">
-                        <GridColumns>
-                            <GridColumn Field=@nameof(AlertDeviationDetailModel.Title) Title="Alerts & Deviations" Filterable="false">
-                                <HeaderTemplate>
-                                    <span><i class="fa-light fa-bell-exclamation" style="color: #11515E;"></i> Alerts & Deviations</span>
-                                </HeaderTemplate>
-                            </GridColumn>
-                            <!----<GridColumn Field=@nameof(AlertDeviationDetailModel.Title) Title="Alerts & Deviations" Filterable="false">
-                            </GridColumn>---->
-                             <GridCommandColumn Width="60px">
-                                <GridCommandButton Icon="eye" OnClick="@((args)=> SelectAlertDeviationRecord(args.Item as AlertDeviationDetailModel))"></GridCommandButton>
-                            </GridCommandColumn>
-                        </GridColumns>
-                        <NoDataTemplate>
-                            <text>No Records Available</text>
-                        </NoDataTemplate>
-                    </TelerikGrid>
-                </div>
-
-            </div>
-
-
-            <div class="row station-section">
-                <label class="col-sm-2 col-form-label">Station</label>
-
-                <div class="col-sm-10">
-                    <TelerikDropDownList Data="@dataStationDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
-                                     @bind-Value="@DdlStationValue" DefaultText="Select Status ">
-                    </TelerikDropDownList>
-                </div>
-
-            </div>
-
-            <div class="row">
-                <label class="col-sm-2 col-form-label">Status</label>
-                <div class="col-sm-10">
-                    <!----<TelerikRadioGroup Data="@dataStatusOptions"
-                    @bind-Value="@RdoStatusValue"
-                    ValueField="@nameof(Models.DropDownBind.DropValue)"
-                    TextField="@nameof(Models.DropDownBind.DropText)">
-                    </TelerikRadioGroup>---->
-                <ul class="switch-btn">
-                        <li class="@AddActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(1))"><i class="fa-regular fa-circle-check"></i> Passed</li>
-                        <li class="failed @AddInActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(0))"><i class="fa-light fa-circle-xmark"></i> Failed</li>
-                    </ul>
-                </div>
-            </div>
-
-            @{
-                if (@RdoStatusValue == 0)
-                {
-                    //<div class="row">
-                    //    <label class="col-sm-2 col-form-label">Primary</label>
-                    //    <div class="col-sm-10">
-                    //        <TelerikDropDownList Data="@dataFailurePrimaryDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
-                    //                     @bind-Value="@DdlFailurePrimaryValue" DefaultText="Select Failure Primary" OnChange="@MyOnChangeHandler">
-                    //        </TelerikDropDownList>
-                    //    </div>
-                    //</div>
-                    //<div class="row">
-                    //    <label class="col-sm-2 col-form-label">Secondary</label>
-                    //    <div class="col-sm-10">
-                    //        <TelerikDropDownList Data="@dataFailureDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
-                    //                     @bind-Value="@DdlFailureValue" DefaultText="Select Failure ">
-                    //        </TelerikDropDownList>
-                    //    </div>
-                    //</div>
+<div class="row">
+    <div class="col-md-12">
+        <div id="mySidebar" class="sidebar">
+            <div class="form-group row inspection">
+                <div class="col-md-7"> </div>
+                <div class=" col-sm-5 right-scroll-column" style="border-left:unset!important;">
 
                     <div class="row">
-                        <label class="col-sm-2 col-form-label">Build Station Failure Code</label>
-                        <div class="col-sm-10">
-                            <TelerikDropDownList Data="@dataBuildStationFailureCodeDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
-                                         @bind-Value="@DdlBuildStationFailureCodeValue" DefaultText="Select Build Station Failure Code">
-                            </TelerikDropDownList>
+                        <div class="col-sm-9 left-input">
+                            <TelerikTextBox id="txtSerialSearch" Class="form-control col-sm-12" @bind-Value="SerialNumber" PlaceHolder="Search for a Serial NUmber"></TelerikTextBox>
                         </div>
-                    </div>
-                    <div class="row">
-                        <label class="col-sm-2 col-form-label">Comment</label>
-                        <div class="col-sm-10">
-                            <TelerikTextBox Class="form-control col-sm-11" @bind-Value="@FailureCommentValue"></TelerikTextBox>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12 add-reason-btn">
-                            <TelerikButton id="btnSearch" ButtonType="@ButtonType.Submit" OnClick="@btnAddOnClick"><i class="fa-light fa-plus"></i> Add Reason</TelerikButton>
+                        <div class=" col-sm-3 b-btn">
+                            <TelerikButton id="btnSearch" OnClick="(()=>btnFindOnClick(true))" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
                         </div>
                     </div>
 
+                    <div class="row class=">
+                        <div class="col-sm-12">
+                            <label class="col-sm-12 col-form-label">Desc :</label>
+                            <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b" @onclick="(() => CloseAddEditInspectionWindow())">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty) <i class="fa-solid fa-circle-xmark" ></i></label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <label class="col-sm-12 col-form-label">Part Number :</label>
+                            <label id="lblPartNumberValue" class="col-sm-12 col-form-label right-value n-font">@(dataInspectionModel !=null ? dataInspectionModel.PartNumber:string.Empty)</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <label class="col-sm-12 col-form-label">Serial Number :</label>
+                            <label id="lblSerialNumberValue" class="col-sm-12 col-form-label right-value n-font">@(dataInspectionModel !=null ? dataInspectionModel.SerialNumber:string.Empty)</label>
+                        </div>
 
-                    <div class="reason-section">
-                        <h3>Reasons</h3>
-                        <TelerikGrid Data="@dataFailureGrid"
-                     Sortable="true"
-                     Resizable="true"
-                     EditMode="Telerik.Blazor.GridEditMode.Inline"
-                     OnDelete=@DeleteHandler>
-                            <GridColumns>
-                                <GridColumn Field="BuildStationFailureCodeName" Title="Build Station Failure Code Name" Groupable="false" />
-                                <GridColumn Field="Comment" Title="Comments" Groupable="false" />
-                                <GridCommandColumn Width="10%">
-                                    <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
-                                </GridCommandColumn>
-                            </GridColumns>
-                        </TelerikGrid>
                     </div>
 
+                    <div class="row">
 
-                }
-            }
-            <div class="row">
-                <label class="col-sm-2 col-form-label">General Comments</label>
+                        <div class=" col-sm-12 alert-section">
+                            <TelerikGrid Data=@GridAlertDeviationData Sortable="true" Pageable="false">
+                                <GridColumns>
+                                    <GridColumn Field=@nameof(AlertDeviationDetailModel.Title) Title="Alerts & Deviations" Filterable="false">
+                                        <HeaderTemplate>
+                                            <span><i class="fa-light fa-bell-exclamation" style="color: #11515E;"></i> Alerts & Deviations</span>
+                                        </HeaderTemplate>
+                                    </GridColumn>
+                                    <!----<GridColumn Field=@nameof(AlertDeviationDetailModel.Title) Title="Alerts & Deviations" Filterable="false">
+                                    </GridColumn>---->
+                                    <GridCommandColumn Width="60px">
+                                        <GridCommandButton Icon="eye" OnClick="@((args)=> SelectAlertDeviationRecord(args.Item as AlertDeviationDetailModel))"></GridCommandButton>
+                                    </GridCommandColumn>
+                                </GridColumns>
+                                <NoDataTemplate>
+                                    <text>No Records Available</text>
+                                </NoDataTemplate>
+                            </TelerikGrid>
+                        </div>
 
-                @{
-                    if (dataInspection == null)
-                        dataInspection = new Models.Inspection();
-                }
-                <div class="col-sm-10 add-reason-btn">
-                    <TelerikTextArea Id="txtGenerelComment" @bind-Value="@dataInspection.GeneralComments">
-                    </TelerikTextArea>
+                    </div>
+
+                    @{
+                        if (@IsWorkOrderInspection)
+                        {
+                            if (OriginalWorkOrderInspection != null)
+                            {
+                                <div class="row">
+                                    <label class="col-sm-2 col-form-label">Status</label>
+                                    <div class="col-sm-10">
+                                        <ul class="switch-btn">
+                                            <li class="@(OriginalWorkOrderInspection.Pass?"active":"")" @onclick="(() => OnDataStatusChangeHandler(true))"><i class="fa-regular fa-circle-check"></i> Passed</li>
+                                            <li class="failed @(OriginalWorkOrderInspection.Pass?"":"active")" @onclick="(() => OnDataStatusChangeHandler(false))"><i class="fa-light fa-circle-xmark"></i> Failed</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                if (!OriginalWorkOrderInspection.Pass)
+                                {
+                                    <div class="row">
+                                        <label class="col-sm-2 col-form-label">Failure Reason</label>
+                                        <div class="col-sm-10">
+                                            <TelerikDropDownList Data="@dataBuildStationFailureCodeDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                                     @bind-Value="@OriginalWorkOrderInspection.InspectionFailed.BuildStationFailureCodeId" DefaultText="Select Failure Reason">
+                                            </TelerikDropDownList>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-sm-2 col-form-label">Comment</label>
+                                        <div class="col-sm-10">
+                                            <TelerikTextBox Class="form-control col-sm-11" @bind-Value="@OriginalWorkOrderInspection.InspectionFailed.Comment"></TelerikTextBox>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div class="row">
+                                    <div class="col-sm-12 save-btn">
+                                        <TelerikButton ButtonType="@ButtonType.Button" Enabled=@(!isSaveInspectionClick) OnClick="@btnSaveInspectionOnClick"><i class="fa-solid fa-floppy-disk"></i> Save</TelerikButton>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="row station-section">
+                                <label class="col-sm-2 col-form-label">Station</label>
+
+                                <div class="col-sm-10">
+                                    <TelerikDropDownList Data="@dataStationDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                                     @bind-Value="@DdlStationValue" DefaultText="Select Status ">
+                                    </TelerikDropDownList>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <label class="col-sm-2 col-form-label">Status</label>
+                                <div class="col-sm-10">
+                                    <ul class="switch-btn">
+                                        <li class="@AddActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(1))"><i class="fa-regular fa-circle-check"></i> Passed</li>
+                                        <li class="failed @AddInActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(0))"><i class="fa-light fa-circle-xmark"></i> Failed</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            if (@RdoStatusValue == 0)
+                            {
+                                <div class="row">
+                                    <label class="col-sm-2 col-form-label">Primary</label>
+                                    <div class="col-sm-10">
+                                        <TelerikDropDownList Data="@dataFailurePrimaryDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                                     @bind-Value="@DdlFailurePrimaryValue" DefaultText="Select Failure Primary" OnChange="@MyOnChangeHandler">
+                                        </TelerikDropDownList>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label class="col-sm-2 col-form-label">Secondary</label>
+                                    <div class="col-sm-10">
+                                        <TelerikDropDownList Data="@dataFailureDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                                     @bind-Value="@DdlFailureValue" DefaultText="Select Failure ">
+                                        </TelerikDropDownList>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label class="col-sm-2 col-form-label">Comment</label>
+                                    <div class="col-sm-10">
+                                        <TelerikTextBox Class="form-control col-sm-11" @bind-Value="@FailureCommentValue"></TelerikTextBox>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12 add-reason-btn">
+                                        <TelerikButton id="btnSearch" ButtonType="@ButtonType.Button" OnClick="@btnAddOnClick"><i class="fa-light fa-plus"></i> Add Reason</TelerikButton>
+                                    </div>
+                                </div>
+                                <div class="reason-section">
+                                    <h3>Reasons</h3>
+                                    <TelerikGrid Data="@dataFailureGrid"
+                                     Sortable="true"
+                                     Resizable="true"
+                                     EditMode="Telerik.Blazor.GridEditMode.Inline"
+                                     OnDelete=@DeleteHandler>
+                                        <GridColumns>
+                                            <GridColumn Field="FailurePrimaryName" Title="Primary" Groupable="false" />
+                                            <GridColumn Field="FailureName" Title="Secondary" Groupable="false" />
+                                            <GridColumn Field="Comment" Title="Comments" Groupable="false" />
+                                            <GridCommandColumn Width="10%">
+                                                <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
+                                            </GridCommandColumn>
+                                        </GridColumns>
+                                    </TelerikGrid>
+                                </div>
+                            }
+
+                            <div class="row">
+                                <label class="col-sm-2 col-form-label">General Comments</label>
+
+                                @{
+                                    if (dataInspection == null)
+                                        dataInspection = new Models.Inspection();
+                                }
+                                <div class="col-sm-10 add-reason-btn">
+                                    <TelerikTextArea Id="txtGenerelComment" @bind-Value="@dataInspection.GeneralComments">
+                                    </TelerikTextArea>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 save-btn">
+                                    <TelerikButton ButtonType="@ButtonType.Button" OnClick="@btnSaveOnClick"><i class="fa-solid fa-floppy-disk"></i> Save</TelerikButton>
+                                </div>
+                            </div>
+                        }
+                    }
                 </div>
+
+
+
             </div>
-
-            <div class="row">
-                <div class="col-sm-12 save-btn">
-                    <TelerikButton ButtonType="@ButtonType.Submit" OnClick="@btnSaveOnClick"><i class="fa-solid fa-floppy-disk"></i> Save</TelerikButton>               
-                </div>
-            </div>
-
-        </div>
-
-
+        </div><!--my sidebar end--->
 
     </div>
-    </div><!--my sidebar end--->
-
-        </div>
-    </div>
+</div>
 
 
 @if(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)
 {
-        <TelerikWindow Visible="@(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)" Modal="true" Width="570px" Draggable="false" Left="1450px">
-            <WindowTitle>
-                @{
-                    
-                    <h5><!---<i aria-hidden="true"></i>--->
+    <TelerikWindow Visible="@(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)" Modal="true" Width="570px" Draggable="false" Left="1450px">
+        <WindowTitle>
+            @{
+
+                <h5><!---<i aria-hidden="true"></i>--->
                     @if(SelectedAlertDeviationRecord.AlertId > 0)
                     {
                         <div class="row p-lr">
-                        <div class="col-md-11">
-                        <text><i class="fa-light fa-bell-exclamation"></i> Alert Detail </text>
-                        </div>
-                        
+                            <div class="col-md-11">
+                                <text><i class="fa-light fa-bell-exclamation"></i> Alert Detail </text>
+                            </div>
 
-                        <div class="col-md-1" @onclick="(()=>ClearAlertDeviationSelection())"><i class="fa-light fa-circle-xmark" ></i></div>
+
+                            <div class="col-md-1" @onclick="(()=>ClearAlertDeviationSelection())"><i class="fa-light fa-circle-xmark" ></i></div>
                         </div>
                     }
                     else if(SelectedAlertDeviationRecord.DeviationId > 0)
                     {
                         <div class="row p-lr">
-                        <div class="col-md-11">
-                        <text><i class="fa-light fa-arrows-turn-to-dots" b-kq6mrvu7il=""></i> Deviation Detail</text>
+                            <div class="col-md-11">
+                                <text><i class="fa-light fa-arrows-turn-to-dots" b-kq6mrvu7il=""></i> Deviation Detail</text>
+                            </div>
+                            <div class="col-md-1" @onclick="(()=>ClearAlertDeviationSelection())"><i class="fa-light fa-circle-xmark"></i></div>
                         </div>
-                         <div class="col-md-1" @onclick="(()=>ClearAlertDeviationSelection())"><i class="fa-light fa-circle-xmark"></i></div>
-                         </div>
                     }
-                    </h5>
-                    
-                }
-            </WindowTitle>
-            <WindowContent>
+                </h5>
+
+            }
+        </WindowTitle>
+        <WindowContent>
             @if (SelectedAlertDeviationRecord.AlertId > 0)
             {
-                 <div class="form-group row popup-frm">
+                <div class="form-group row popup-frm">
                     <label for="Title" class="col-sm-12 col-form-label">Title</label>
                     <label for="Title" class="col-sm-12 col-form-label pop-value-title">@SelectedAlertDeviationRecord.Alert.Title</label>
-                    
-                 </div>
 
-                  <div class="form-group row popup-frm">
+                </div>
+
+                <div class="form-group row popup-frm">
                     <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label">Reason for Manufacturing Deviation</label>
-                    
-                     <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.Alert.ReasonforManufacturingDeviation</label>
-                    
-                 </div>
 
-                 <div class="form-group row popup-frm">
+                    <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.Alert.ReasonforManufacturingDeviation</label>
+
+                </div>
+
+                <div class="form-group row popup-frm">
                     <label for="DateCreated" class="col-sm-12 col-form-label">Date Created</label>
-                    
-                        <label for="DateCreated" class="col-sm-12 col-form-label pop-value">
-                            @if (SelectedAlertDeviationRecord.Alert != null && SelectedAlertDeviationRecord.Alert.DateCreated != null)
-                            {
-                                @SelectedAlertDeviationRecord.Alert.DateCreated.Value.ToString("dd-MM-yyyy")
-                            }
-                     </label>
-                   
-                 </div>
+
+                    <label for="DateCreated" class="col-sm-12 col-form-label pop-value">
+                        @if (SelectedAlertDeviationRecord.Alert != null && SelectedAlertDeviationRecord.Alert.DateCreated != null)
+                        {
+                            @SelectedAlertDeviationRecord.Alert.DateCreated.Value.ToString("dd-MM-yyyy")
+                        }
+                    </label>
+
+                </div>
 
                 <div class="form-group row popup-frm">
                     <label for="ExpirationDate" class="col-sm-12 col-form-label">Expiration Date</label>
-                    
-                        <label for="ExpirationDate" class="col-sm-12 col-form-label pop-value">
-                            @if (SelectedAlertDeviationRecord.Alert != null && SelectedAlertDeviationRecord.Alert.ExpirationDate != null)
-                            {
-                                @SelectedAlertDeviationRecord.Alert.ExpirationDate.Value.ToString("dd-MM-yyyy")
-                            }
-                     </label>
-                    
-                 </div>
 
-                 <div class="form-group row popup-frm">
+                    <label for="ExpirationDate" class="col-sm-12 col-form-label pop-value">
+                        @if (SelectedAlertDeviationRecord.Alert != null && SelectedAlertDeviationRecord.Alert.ExpirationDate != null)
+                        {
+                            @SelectedAlertDeviationRecord.Alert.ExpirationDate.Value.ToString("dd-MM-yyyy")
+                        }
+                    </label>
+
+                </div>
+
+                <div class="form-group row popup-frm">
                     <label for="MasterPartNumber" class="col-sm-12 col-form-label">Master Part Number</label>
                     <div class="col-sm-8">
-                     <label for="MasterPartNumber" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.MasterPartNumber</label>
+                        <label for="MasterPartNumber" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.MasterPartNumber</label>
                     </div>
-                 </div>
+                </div>
 
-                 <div class="form-group row popup-frm">
+                <div class="form-group row popup-frm">
                     <label for="MasterPartDescription" class="col-sm-12 col-form-label">Master Part Description</label>
                     <div class="col-sm-8">
-                     <label for="MasterPartDescription" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.MasterPartDescription</label>
+                        <label for="MasterPartDescription" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.MasterPartDescription</label>
                     </div>
-                 </div>
+                </div>
             }
             else if (SelectedAlertDeviationRecord.DeviationId > 0)
-            { 
+            {
                 <div class="form-group row popup-frm">
                     <label for="Title" class="col-sm-12 col-form-label">Title</label>
-                    
-                     <label for="Title" class="col-sm-12 col-form-label pop-value-title">@SelectedAlertDeviationRecord.Deviation.Title</label>
-                    
-                 </div>
 
-                 <div class="form-group row popup-frm">
+                    <label for="Title" class="col-sm-12 col-form-label pop-value-title">@SelectedAlertDeviationRecord.Deviation.Title</label>
+
+                </div>
+
+                <div class="form-group row popup-frm">
                     <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label">Reason for Manufacturing Deviation</label>
-                   
-                     <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.Deviation.ReasonforManufacturingDeviation</label>
-                    
-                 </div>
 
-                 <div class="form-group row popup-frm">
-                       
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <table class="dev-tab" width="100%">
-                                    <thead>
-                                        <tr>
-                                            <th width="25%">Location</th>
-                                            <th width="15%">SVRART</th>
-                                            <th width="15%">SEVE</th>
-                                            <th width="15%">2</th>
-                                            <th width="15%">WIP</th>
-                                            <th width="15%">3(FGI)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Vendor</td>
-                                            <td>@SelectedAlertDeviationRecord.Deviation.VendorSVPART</td>
-                                            <td>@SelectedAlertDeviationRecord.Deviation.VendorSEVE</td>
-                                            <td>@SelectedAlertDeviationRecord.Deviation.Vendor2</td>
-                                            <td>@SelectedAlertDeviationRecord.Deviation.VendorWIP</td>
-                                            <td>@SelectedAlertDeviationRecord.Deviation.Vendor3FGI</td>
-                                        </tr>
-                                        <tr>
-                                            <td>LSA</td>
-                                            <td>@SelectedAlertDeviationRecord.Deviation.LSASVPART</td>
-                                            <td>@SelectedAlertDeviationRecord.Deviation.LSASEVE</td>
-                                            <td>@SelectedAlertDeviationRecord.Deviation.LSA2</td>
-                                            <td>@SelectedAlertDeviationRecord.Deviation.LSAWIP</td>
-                                            <td>@SelectedAlertDeviationRecord.Deviation.LSAFGI</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <label for="ReasonforManufacturingDeviation" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.Deviation.ReasonforManufacturingDeviation</label>
+
+                </div>
+
+                <div class="form-group row popup-frm">
+
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <table class="dev-tab" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th width="25%">Location</th>
+                                        <th width="15%">SVRART</th>
+                                        <th width="15%">SEVE</th>
+                                        <th width="15%">2</th>
+                                        <th width="15%">WIP</th>
+                                        <th width="15%">3(FGI)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Vendor</td>
+                                        <td>@SelectedAlertDeviationRecord.Deviation.VendorSVPART</td>
+                                        <td>@SelectedAlertDeviationRecord.Deviation.VendorSEVE</td>
+                                        <td>@SelectedAlertDeviationRecord.Deviation.Vendor2</td>
+                                        <td>@SelectedAlertDeviationRecord.Deviation.VendorWIP</td>
+                                        <td>@SelectedAlertDeviationRecord.Deviation.Vendor3FGI</td>
+                                    </tr>
+                                    <tr>
+                                        <td>LSA</td>
+                                        <td>@SelectedAlertDeviationRecord.Deviation.LSASVPART</td>
+                                        <td>@SelectedAlertDeviationRecord.Deviation.LSASEVE</td>
+                                        <td>@SelectedAlertDeviationRecord.Deviation.LSA2</td>
+                                        <td>@SelectedAlertDeviationRecord.Deviation.LSAWIP</td>
+                                        <td>@SelectedAlertDeviationRecord.Deviation.LSAFGI</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                  </div>
+                    </div>
+                </div>
 
                 <div class="form-group row popup-frm">
                     <label for="Title" class="col-sm-12 col-form-label">ECO Required</label>
-                   
-                        <label for="ECORequired" class="col-sm-12 col-form-label pop-value">
-                            @if (SelectedAlertDeviationRecord.Deviation.ECORequired)
-                            {
-                                <text>Yes</text>
-                            }
-                            else
-                            {
-                                 <text>No</text>
-                            }
-                     </label>
-                    
-               </div>
+
+                    <label for="ECORequired" class="col-sm-12 col-form-label pop-value">
+                        @if (SelectedAlertDeviationRecord.Deviation.ECORequired)
+                        {
+                            <text>Yes</text>
+                        }
+                        else
+                        {
+                            <text>No</text>
+                        }
+                    </label>
+
+                </div>
 
                 @if (SelectedAlertDeviationRecord.Deviation.ECORequired)
                 {
                     <div class="form-group row popup-frm">
                         <label for="ECONumber" class="col-sm-12 col-form-label">ECO Number</label>
-                        
-                         <label for="ECONumber" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.Deviation.ECONumber</label>
-                        
+
+                        <label for="ECONumber" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.Deviation.ECONumber</label>
+
                     </div>
                 }
 
-                 <div class="form-group row popup-frm">
+                <div class="form-group row popup-frm">
                     <label for="CommentCorrectiveAction" class="col-sm-12 col-form-label">Comment Corrective Action</label>
-                    
-                     <label for="CommentCorrectiveAction" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.Deviation.CommentCorrectiveAction</label>
-                    
-                 </div>
 
-                 <div class="form-group row popup-frm">
+                    <label for="CommentCorrectiveAction" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.Deviation.CommentCorrectiveAction</label>
+
+                </div>
+
+                <div class="form-group row popup-frm">
                     <label for="DateCreated" class="col-sm-12 col-form-label">Date Created</label>
-                    
-                        <label for="DateCreated" class="col-sm-12 col-form-label pop-value">
-                            @if (SelectedAlertDeviationRecord.Deviation != null && SelectedAlertDeviationRecord.Deviation.DateCreated != null)
-                            {
-                                @SelectedAlertDeviationRecord.Deviation.DateCreated.Value.ToString("dd-MM-yyyy")
-                            }
-                     </label>
-                    
-                 </div>
 
-                 <div class="form-group row popup-frm">
+                    <label for="DateCreated" class="col-sm-12 col-form-label pop-value">
+                        @if (SelectedAlertDeviationRecord.Deviation != null && SelectedAlertDeviationRecord.Deviation.DateCreated != null)
+                        {
+                            @SelectedAlertDeviationRecord.Deviation.DateCreated.Value.ToString("dd-MM-yyyy")
+                        }
+                    </label>
+
+                </div>
+
+                <div class="form-group row popup-frm">
                     <label for="MasterPartNumber" class="col-sm-12 col-form-label">Master Part Number</label>
                     <label for="MasterPartNumber" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.MasterPartNumber</label>
-                    
-                 </div>
 
-                 <div class="form-group row popup-frm">
+                </div>
+
+                <div class="form-group row popup-frm">
                     <label for="MasterPartDescription" class="col-sm-12 col-form-label">Master Part Description</label>
-                   
-                     <label for="MasterPartDescription" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.MasterPartDescription</label>
-                    </div>
-                
+
+                    <label for="MasterPartDescription" class="col-sm-12 col-form-label pop-value">@SelectedAlertDeviationRecord.MasterPartDescription</label>
+                </div>
+
             }
 
             <div class="form-row popup-frm">
@@ -465,16 +486,21 @@
                     <TelerikButton OnClick="(()=>ClearAlertDeviationSelection())">Cancel</TelerikButton>
                 </div>
             </div>
-            </WindowContent>
-        </TelerikWindow>
+        </WindowContent>
+    </TelerikWindow>
 }
 @code {
+    bool IsWorkOrderInspection { get; set; }
+    public Models.Inspection OriginalWorkOrderInspection { get; set; }
+    List<Models.DropDownBind> dataBuildStationFailureCodeDropdown { get; set; }
+    bool isSaveInspectionClick { get; set; }
+
     List<Entities.Inspection> MyData { get; set; }
     List<Models.InspectionFailed> dataFailureGrid { get; set; }
 
-    List<Models.DropDownBind> dataBuildStationFailureCodeDropdown { get; set; }
-    //List<Models.DropDownBind> dataFailurePrimaryDropdown { get; set; }
-    //List<Models.DropDownBind> dataFailureDropdown { get; set; }
+
+    List<Models.DropDownBind> dataFailurePrimaryDropdown { get; set; }
+    List<Models.DropDownBind> dataFailureDropdown { get; set; }
     List<Models.DropDownBind> dataStatusOptions { get; set; }
     List<Models.DropDownBind> dataStationDropdown { get; set; }
     Models.InspectionModel dataInspectionModel { get; set; }
@@ -485,16 +511,62 @@
     public Models.AlertDeviationDetailModel SelectedAlertDeviationRecord { get; set; }
     public bool IsDisplayPopUpWindow { get; set; } = false;
 
-    int DdlBuildStationFailureCodeValue { get; set; }
-    //int DdlFailurePrimaryValue { get; set; }
-    //int DdlFailureValue { get; set; }
+    int DdlFailurePrimaryValue { get; set; }
+    int DdlFailureValue { get; set; }
     int RdoStatusValue { get; set; }
-    int DdlStationValue { get; set; }
+    int? DdlStationValue { get; set; }
     string SerialNumber { get; set; }
     string FailureCommentValue { get; set; }
 
     public string AddActiveCssClass { get; set; } = "active";
     public string AddInActiveCssClass { get; set; }
+
+    public void OnDataStatusChangeHandler(bool value)
+    {
+        OriginalWorkOrderInspection.Pass = value;
+    }
+
+    async Task btnSaveInspectionOnClick()
+    {
+        try
+        {
+            if (isSaveInspectionClick)
+                return;
+
+            isSaveInspectionClick = true;
+
+            if (!OriginalWorkOrderInspection.Pass)
+            {
+                if (!OriginalWorkOrderInspection.InspectionFailed.BuildStationFailureCodeId.HasValue)
+                {
+                    toastService.ShowError("Please Select Failure Reason.", "Error");
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(OriginalWorkOrderInspection.InspectionFailed.Comment))
+                {
+                    toastService.ShowError("Please Enter Comment.", "Error");
+                    return;
+                }
+            }
+
+            var isSuccess = await InspectionService.SaveWorkOrderInspection(OriginalWorkOrderInspection);
+            if (isSuccess)
+            {
+                toastService.ShowSuccess("Inspection Saved Successfully.", "Success");
+                NavigationManager.NavigateTo("Inspection", true);
+            }
+            else
+            {
+                toastService.ShowError("Error while saving inspection.", "Error");
+            }
+        }
+        finally
+        {
+            isSaveInspectionClick = false;
+            StateHasChanged();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -516,15 +588,14 @@
         }
         else
         {
-            GridAlertDeviationData = new List<Models.AlertDeviationDetailModel>();    
+            GridAlertDeviationData = new List<Models.AlertDeviationDetailModel>();
         }
         StateHasChanged();
     }
 
     void GetDropDownData()
     {
-        dataBuildStationFailureCodeDropdown = BuildStationFailureCodeService.DropDownData();
-        //dataFailurePrimaryDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureTypePrimary, null);
+        dataFailurePrimaryDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureTypePrimary, null);
         dataStationDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.Station, null);
 
         dataStatusOptions = new List<Models.DropDownBind>();
@@ -534,11 +605,11 @@
 
     }
 
-    //void MyOnChangeHandler()
-    //{
-    //    dataFailureDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureType, DdlFailurePrimaryValue);
+    void MyOnChangeHandler()
+    {
+        dataFailureDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureType, DdlFailurePrimaryValue);
 
-    //}
+    }
 
     async Task btnAddOnClick()
     {
@@ -547,23 +618,17 @@
             dataFailureGrid = new List<Models.InspectionFailed>();
         }
 
-        if (DdlBuildStationFailureCodeValue <= 0)
+        if (DdlFailurePrimaryValue <= 0)
         {
-            toastService.ShowError("Please Select Build Station Failure Code", "Error");
+            toastService.ShowError("Please Select Failure Primary Type", "Error");
             return;
         }
 
-        //if (DdlFailurePrimaryValue <= 0)
-        //{
-        //    toastService.ShowError("Please Select Failure Primary Type", "Error");
-        //    return;
-        //}
-
-        //if (DdlFailureValue <= 0)
-        //{
-        //    toastService.ShowError("Please Select Failure Type", "Error");
-        //    return;
-        //}
+        if (DdlFailureValue <= 0)
+        {
+            toastService.ShowError("Please Select Failure Type", "Error");
+            return;
+        }
 
         if (string.IsNullOrEmpty(FailureCommentValue))
         {
@@ -572,35 +637,24 @@
         }
         if (dataFailureGrid.Count > 0)
         {
-            //if (dataFailureGrid.Any(p => p.FailureTypeId == DdlFailureValue && p.FailurePrimaryTypeId == DdlFailurePrimaryValue))
-            //{
-            //    toastService.ShowError("Record Already there !", "Error");
-            //    return;
-            //}
-
-            if (dataFailureGrid.Any(p => p.BuildStationFailureCodeId == DdlBuildStationFailureCodeValue))
+            if (dataFailureGrid.Any(p => p.FailureTypeId == DdlFailureValue && p.FailurePrimaryTypeId == DdlFailurePrimaryValue))
             {
                 toastService.ShowError("Record Already there !", "Error");
                 return;
             }
-
         }
         dataFailureGrid.Add(new Models.InspectionFailed
             {
                 Comment = FailureCommentValue,
-                //FailurePrimaryTypeId = DdlFailurePrimaryValue,
-                //FailureTypeId = DdlFailureValue,
-                //FailurePrimaryName = dataFailurePrimaryDropdown.FirstOrDefault(p => p.DropValue == DdlFailurePrimaryValue).DropText,
-                //FailureName = dataFailureDropdown.FirstOrDefault(p => p.DropValue == DdlFailureValue).DropText,
-                BuildStationFailureCodeId = DdlBuildStationFailureCodeValue,
-                BuildStationFailureCodeName = dataBuildStationFailureCodeDropdown.FirstOrDefault(p => p.DropValue == DdlBuildStationFailureCodeValue).DropText,
-
+                FailurePrimaryTypeId = DdlFailurePrimaryValue,
+                FailureTypeId = DdlFailureValue,
+                FailurePrimaryName = dataFailurePrimaryDropdown.FirstOrDefault(p => p.DropValue == DdlFailurePrimaryValue)?.DropText,
+                FailureName = dataFailureDropdown.FirstOrDefault(p => p.DropValue == DdlFailureValue)?.DropText,
             });
         FailureCommentValue = string.Empty;
-        DdlBuildStationFailureCodeValue = 0;
-        //DdlFailurePrimaryValue = 0;
-        //DdlFailureValue = 0;
-        //MyOnChangeHandler();
+        DdlFailurePrimaryValue = 0;
+        DdlFailureValue = 0;
+        MyOnChangeHandler();
         dataFailureGrid = new List<Models.InspectionFailed>(dataFailureGrid);
 
 
@@ -634,7 +688,7 @@
             toastService.ShowError("Please Enter Serial Number", "Error");
             return;
         }
-
+        IsWorkOrderInspection = false;
         dataInspectionModel = await InspectionService.GetDataBySerialNumber(SerialNumber.Trim());
         await GetGridAlertDeviationData();
         if (dataInspectionModel == null)
@@ -644,46 +698,54 @@
         }
         if (dataInspectionModel.Inspection != null)
         {
-            if (isFindButton)
+            if (SelectedDataInspection != null && SelectedDataInspection.WorkOrderId.HasValue && !isFindButton)
             {
-                dataInspection = new Models.Inspection();
+                IsWorkOrderInspection = true;
+                dataBuildStationFailureCodeDropdown = BuildStationFailureCodeService.DropDownDataByPartId(SelectedDataInspection.PartId);
+                OriginalWorkOrderInspection = await InspectionService.GetInspectionByWorkOrderIdAndPartId(SelectedDataInspection.WorkOrderId.Value, SelectedDataInspection.PartId);
             }
             else
             {
-                if(SelectedDataInspection != null && SelectedDataInspection.InspectionId > 0)
-                {
-                    dataInspection = SelectedDataInspection;
-                }
-                else
+                if (isFindButton)
                 {
                     dataInspection = new Models.Inspection();
                 }
-            }
+                else
+                {
+                    if(SelectedDataInspection != null && SelectedDataInspection.InspectionId > 0)
+                    {
+                        dataInspection = SelectedDataInspection;
+                    }
+                    else
+                    {
+                        dataInspection = new Models.Inspection();
+                    }
+                }
 
-            RdoStatusValue = dataInspection.Pass ? 1 : 0;
-            DdlStationValue = dataInspection.StationId;
+                RdoStatusValue = dataInspection.Pass ? 1 : 0;
+                DdlStationValue = dataInspection.StationId;
 
-            if (SelectedDataInspection != null && SelectedDataInspection.InspectionFailedList != null && SelectedDataInspection.InspectionFailedList.Count > 0)
-            {
-                dataFailureGrid = SelectedDataInspection.InspectionFailedList;
-            }
-            else
-            {
-                dataFailureGrid = new List<Models.InspectionFailed>();
-            }
+                if (SelectedDataInspection != null && SelectedDataInspection.InspectionFailedList != null && SelectedDataInspection.InspectionFailedList.Count > 0)
+                {
+                    dataFailureGrid = SelectedDataInspection.InspectionFailedList;
+                }
+                else
+                {
+                    dataFailureGrid = new List<Models.InspectionFailed>();
+                }
 
-            if (RdoStatusValue == 1)
-            {
-                AddActiveCssClass = "active";
-                AddInActiveCssClass = string.Empty;
-            }
-            else if(RdoStatusValue == 0)
-            { 
-                AddActiveCssClass = string.Empty;
-                AddInActiveCssClass = "active";
+                if (RdoStatusValue == 1)
+                {
+                    AddActiveCssClass = "active";
+                    AddInActiveCssClass = string.Empty;
+                }
+                else if(RdoStatusValue == 0)
+                {
+                    AddActiveCssClass = string.Empty;
+                    AddInActiveCssClass = "active";
+                }
             }
         }
-
     }
 
 
@@ -699,7 +761,7 @@
             toastService.ShowError("Please Bind Serial Data", "Error");
             return;
         }
-        if (DdlStationValue <= 0)
+        if (!DdlStationValue.HasValue || DdlStationValue.Value <= 0)
         {
             toastService.ShowError("Please Select Station", "Error");
             return;
@@ -752,7 +814,7 @@
             AddInActiveCssClass = string.Empty;
         }
         else if(value == 0)
-        { 
+        {
             AddActiveCssClass = string.Empty;
             AddInActiveCssClass = "active";
         }

@@ -38,9 +38,22 @@ namespace QBD2.Services
             await _context.SaveChangesAsync();
         }
 
-        public List<Models.DropDownBind> DropDownData()
+        public List<Models.DropDownBind> DropDownData(int? buildStationId)
         {
-            return _context.BuildStationFailureCodes.Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.BuildStationFailureCodeId }).ToList();
+            if (buildStationId.HasValue)
+                return _context.BuildStationFailureCodes.Where(x => x.BuildStationId == buildStationId.Value).OrderBy(x => x.Name).Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.BuildStationFailureCodeId }).ToList();
+            else
+                return _context.BuildStationFailureCodes.OrderBy(x => x.Name).Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.BuildStationFailureCodeId }).ToList();
+
+        }
+
+        public List<Models.DropDownBind> DropDownDataByPartId(int partId)
+        {
+            var part = _context.Parts.FirstOrDefault(x => x.PartId == partId);
+            if (part != null)
+                return DropDownData(part.BuildStationId);
+            else
+                return DropDownData(null);
         }
     }
 }

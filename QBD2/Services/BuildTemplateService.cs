@@ -13,126 +13,70 @@ namespace QBD2.Services
             _context = context;
         }
 
-        public async Task Create(BuildTemplate itemToInsert)
-        {
-            _context.BuildTemplates.Add(itemToInsert);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<List<Models.BuildTemplateModel>> ReadBuildTemplate()
+        public async Task<List<Models.BuildTemplateModel>> Read()
         {
             List<Models.BuildTemplateModel> buildTemplateModelList = new List<Models.BuildTemplateModel>();
             buildTemplateModelList = await (from bt in _context.BuildTemplates
-                                                join mp in _context.MasterParts on bt.MasterPartId equals mp.MasterPartId
-                                                select new Models.BuildTemplateModel
-                                                {
-                                                    BuildTemplateId = bt.BuildTemplateId,
-                                                    Name = bt.Name,
-                                                    MasterPartId = bt.MasterPartId,
-                                                    MasterPart = mp,
-                                                    BuildTemplatePartList = _context.BuildTemplateParts.Include(a => a.BuildStation).Include(b=>b.BuildTemplate).Include(c=>c.MasterPart).Where(x => x.BuildTemplateId == bt.BuildTemplateId).ToList()
-                                                }).ToListAsync();
+                                            join mp in _context.MasterParts on bt.MasterPartId equals mp.MasterPartId
+                                            join b in _context.BuildStations on bt.BuildStationId equals b.BuildStationId
+                                            select new Models.BuildTemplateModel
+                                            {
+                                                BuildTemplateId = bt.BuildTemplateId,
+                                                Name = bt.Name,
+                                                MasterPartId = bt.MasterPartId,
+                                                MasterPart = mp,
+                                                BuildStation = b,
+                                                BuildStationId = bt.BuildStationId,
+                                                BuildTemplatePartList = (from btp in _context.BuildTemplateParts
+                                                                         join mp2 in _context.MasterParts on btp.MasterPartId equals mp2.MasterPartId
+                                                                         join b2 in _context.BuildStations on btp.BuildStationId equals b2.BuildStationId
+                                                                         where btp.BuildTemplateId == bt.BuildTemplateId
+                                                                         select new BuildTemplatePart
+                                                                         {
+                                                                             BuildTemplatePartId = btp.BuildTemplatePartId,
+                                                                             BuildTemplateId = btp.BuildTemplateId,
+                                                                             MasterPartId = btp.MasterPartId,
+                                                                             MasterPart = mp2,
+                                                                             BuildStationId = btp.BuildStationId,
+                                                                             BuildStation = b2,
+                                                                             SerialNumberRequired = btp.SerialNumberRequired,
+                                                                         }).ToList()
+                                            }).ToListAsync();
             return buildTemplateModelList;
         }
 
-        public async Task<List<BuildTemplate>> Read()
-        {
-            return await _context.BuildTemplates.Include(a=>a.MasterPart).ToListAsync();
-        }
-
-        public async Task Update(BuildTemplate itemToUpdate)
-        {
-            if (itemToUpdate.BuildTemplateId > 0 && itemToUpdate.MasterPartId > 0)
-            {
-                var buildTemplate = _context.BuildTemplates.Where(d => d.BuildTemplateId == itemToUpdate.BuildTemplateId).FirstOrDefault();
-                buildTemplate.Name = itemToUpdate.Name;
-                buildTemplate.MasterPartId = itemToUpdate.MasterPartId;
-                _context.Entry(buildTemplate).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        public async Task Delete(BuildTemplate itemToDelete)
-        {
-            var buildTemplate = _context.BuildTemplates.Where(d => d.BuildTemplateId == itemToDelete.BuildTemplateId).FirstOrDefault();
-            _context.BuildTemplates.Remove(buildTemplate);
-            await _context.SaveChangesAsync();
-        }
-
-        public List<Models.DropDownBind> DropDownData()
-        {
-            return _context.BuildTemplates.Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.BuildTemplateId }).ToList();
-        }
-
-        public async Task<Models.ApiResponse> Save(Models.AddEditBuildTemplateModel addEditBuildTemplateModel)
+        public async Task<Models.ApiResponse> Save(Models.AddEditBuildTemplateModel model)
         {
             Models.ApiResponse apiResponse = new Models.ApiResponse();
-
             try
             {
-                var objBuildTemplate = new Entities.BuildTemplate();
-                if (addEditBuildTemplateModel.BuildTemplateId > 0)
+                var buildTemplate = new Entities.BuildTemplate();
+                buildTemplate.Name = model.Name;
+                buildTemplate.MasterPartId = model.MasterPartId;
+                buildTemplate.BuildStationId = model.BuildStationId.Value;
+                _context.BuildTemplates.Add(buildTemplate);
+                await _context.SaveChangesAsync();
+
+                if (model.AddEditBuildTemplatePartModels != null)
                 {
-                    //objBuildTemplatePart = _context.BuildTemplateParts.Where(d => d.BuildTemplateId == addEditBuildTemplatePartModel.BuildTemplateId).FirstOrDefault();
-                    //if (objBuildTemplatePart != null)
-                    //{
-                    //    objBuildTemplatePart.BuildTemplateId = addEditBuildTemplatePartModel.BuildTemplateId.Value;
-                    //    objBuildTemplatePart.MasterPartId = addEditBuildTemplatePartModel.MasterPartId.Value;
-                    //    objBuildTemplatePart.BuildStationId = addEditBuildTemplatePartModel.BuildStationId.Value;
-                    //    objBuildTemplatePart.SerialNumberRequired = addEditBuildTemplatePartModel.SerialNumberRequired;
-                    //    _context.Entry(objBuildTemplatePart).State = EntityState.Modified;
-                    //}
-                }
-                else
-                {
-                    var part = await _context.Parts.Where(x => x.MasterPartId == addEditBuildTemplateModel.MasterPartId.Value && x.ParentPartId == null).FirstOrDefaultAsync();
-                    if (part != null)
+                    foreach (var item in model.AddEditBuildTemplatePartModels)
                     {
-                        var childParts = await _context.Parts.Where(x => x.ParentPartId == part.PartId).ToListAsync();
-                        objBuildTemplate = new Entities.BuildTemplate()
-                        {
-                            Name = addEditBuildTemplateModel.Name,
-                            MasterPartId = part.MasterPartId
-                        };
-
-                        _context.BuildTemplates.Add(objBuildTemplate);
-                        await _context.SaveChangesAsync();
-
-                        if (objBuildTemplate != null && objBuildTemplate.BuildTemplateId > 0)
-                        {
-                            foreach (var item in childParts)
-                            {
-                                var objBuildTemplatePart = new Entities.BuildTemplatePart();
-                                objBuildTemplatePart.BuildTemplateId = objBuildTemplate.BuildTemplateId;
-                                objBuildTemplatePart.MasterPartId = item.MasterPartId;
-                                objBuildTemplatePart.BuildStationId = addEditBuildTemplateModel.BuildStationId.Value;
-                                objBuildTemplatePart.SerialNumberRequired = addEditBuildTemplateModel.SerialNumberRequired;
-
-                                _context.BuildTemplateParts.Add(objBuildTemplatePart);
-                                await _context.SaveChangesAsync();
-                            }
-                        }
-
-                        await _context.SaveChangesAsync();
-
-                        apiResponse.Success = true;
-                        apiResponse.Message = "Record Saved Successfully.";
-                        return apiResponse;
-                    }
-                    else
-                    {
-                        apiResponse.Success = false;
-                        apiResponse.Message = "Parent Part detail not found.";
-                        return apiResponse;
+                        var buildTemplatePart = new Entities.BuildTemplatePart();
+                        buildTemplatePart.BuildTemplateId = buildTemplate.BuildTemplateId;
+                        buildTemplatePart.MasterPartId = item.MasterPartId;
+                        buildTemplatePart.BuildStationId = item.BuildStationId.Value;
+                        buildTemplatePart.SerialNumberRequired = item.SerialNumberRequired;
+                        _context.BuildTemplateParts.Add(buildTemplatePart);
                     }
 
+                    await _context.SaveChangesAsync();
                 }
 
-                apiResponse.Success = false;
-                apiResponse.Message = "Please enter valid data.";
+                apiResponse.Success = true;
+                apiResponse.Message = "Record Saved Successfully.";
                 return apiResponse;
             }
-            catch
+            catch (Exception ex)
             {
                 apiResponse.Success = false;
                 apiResponse.Message = "Record Not Saved ! Something Worng.";

@@ -11,8 +11,8 @@ namespace QBD2.Models
         public int MasterPartId { get; set; }
         public virtual MasterPart MasterPart { get; set; }
 
-        public int BuildTemplatePartId { get; set; }
-        public virtual BuildTemplatePart BuildTemplatePart { get; set; }
+        public int BuildStationId { get; set; }
+        public virtual BuildStation BuildStation { get; set; }
 
         public List<BuildTemplatePart> BuildTemplatePartList { get; set; }
     }

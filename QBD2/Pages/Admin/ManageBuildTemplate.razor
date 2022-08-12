@@ -9,9 +9,7 @@
 @inject IToastService toastService
 @inject BuildStationService BuildStationService
 <style>
-    .k-input, .k-picker {
-        font-size: 20px;
-    }
+   
     .btn-width{
         width:auto !important;
     }
@@ -66,7 +64,7 @@ else
     </div>
     <hr />
     <div class="form-group">
-        <div class="col-sm-7">
+        <div class="col-sm-9">
             <EditForm EditContext="@ECAddEditBuildTemplate">
                 <DataAnnotationsValidator />
                 <div class="row m-tb">
@@ -112,7 +110,7 @@ else
                             <GridCommandButton Command="Add" Icon="add">Add Part</GridCommandButton>
                         </GridToolBar>
                         <GridColumns>
-                            <GridColumn Field="MasterPartNumber" Title="Part Number" Groupable="false" Width="35%">
+                            <GridColumn Field="MasterPartNumber" Title="Part Number" Groupable="false">
                                 <EditorTemplate>
                                     @{
                                         var childPart = context as AddEditBuildTemplatePartModel;
@@ -124,7 +122,7 @@ else
                                 }
                             </EditorTemplate>
                         </GridColumn>
-                        <GridColumn Field="BuildStationName" Title="Build Station" Groupable="false" Width="30%">
+                        <GridColumn Field="BuildStationName" Title="Build Station" Groupable="false">
                             <EditorTemplate>
                                 @{
                                         var childPart = context as AddEditBuildTemplatePartModel;
@@ -134,7 +132,7 @@ else
                                 }
                             </EditorTemplate>
                         </GridColumn>
-                        <GridColumn Field="SerialNumberRequired" Title="Serial Number Required" Groupable="false" Width="17%">
+                        <GridColumn Field="SerialNumberRequired" Title="Serial Number Required" Groupable="false" Width="180px">
                             <Template>
                                 @{
                                         var childPart = context as AddEditBuildTemplatePartModel;
@@ -151,7 +149,7 @@ else
                                 }
                             </EditorTemplate>
                         </GridColumn>
-                        <GridCommandColumn Width="18%">
+                        <GridCommandColumn Width="200px">
                             <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
                             <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
                             <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>

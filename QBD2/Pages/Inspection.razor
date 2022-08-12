@@ -147,8 +147,8 @@
                             if (OriginalWorkOrderInspection != null)
                             {
                                 <div class="row">
-                                    <label class="col-sm-2 col-form-label">Status</label>
-                                    <div class="col-sm-10">
+                                    <label class="col-sm-3 col-form-label">Status</label>
+                                    <div class="col-sm-9">
                                         <ul class="switch-btn">
                                             <li class="@(OriginalWorkOrderInspection.Pass?"active":"")" @onclick="(() => OnDataStatusChangeHandler(true))"><i class="fa-regular fa-circle-check"></i> Passed</li>
                                             <li class="failed @(OriginalWorkOrderInspection.Pass?"":"active")" @onclick="(() => OnDataStatusChangeHandler(false))"><i class="fa-light fa-circle-xmark"></i> Failed</li>
@@ -159,17 +159,17 @@
                                 if (!OriginalWorkOrderInspection.Pass)
                                 {
                                     <div class="row">
-                                        <label class="col-sm-2 col-form-label">Failure Reason</label>
-                                        <div class="col-sm-10">
+                                        <label class="col-sm-3 col-form-label">Failure Reason</label>
+                                        <div class="col-sm-9">
                                             <TelerikDropDownList Data="@dataBuildStationFailureCodeDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
                                                      @bind-Value="@OriginalWorkOrderInspection.InspectionFailed.BuildStationFailureCodeId" DefaultText="Select Failure Reason">
                                             </TelerikDropDownList>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <label class="col-sm-2 col-form-label">Comment</label>
-                                        <div class="col-sm-10">
-                                            <TelerikTextBox Class="form-control col-sm-11" @bind-Value="@OriginalWorkOrderInspection.InspectionFailed.Comment"></TelerikTextBox>
+                                        <label class="col-sm-3 col-form-label">Comment</label>
+                                        <div class="col-sm-9">
+                                            <TelerikTextArea @bind-Value="@OriginalWorkOrderInspection.InspectionFailed.Comment"></TelerikTextArea>
                                         </div>
                                     </div>
                                 }
@@ -225,7 +225,7 @@
                                 <div class="row">
                                     <label class="col-sm-2 col-form-label">Comment</label>
                                     <div class="col-sm-10">
-                                        <TelerikTextBox Class="form-control col-sm-11" @bind-Value="@FailureCommentValue"></TelerikTextBox>
+                                        <TelerikTextArea Class="form-control col-sm-11" @bind-Value="@FailureCommentValue"></TelerikTextArea>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -259,7 +259,7 @@
                                     if (dataInspection == null)
                                         dataInspection = new Models.Inspection();
                                 }
-                                <div class="col-sm-10 add-reason-btn">
+                                <div class="col-sm-10">
                                     <TelerikTextArea Id="txtGenerelComment" @bind-Value="@dataInspection.GeneralComments">
                                     </TelerikTextArea>
                                 </div>

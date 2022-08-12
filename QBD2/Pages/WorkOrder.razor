@@ -23,7 +23,7 @@
         position: inherit;
     }
     .k-centered {
-        transform: translate(5%, -300%);
+        transform: translate(5%, -200%);
         width: 320px;
     }
     .k-window-titlebar.k-dialog-titlebar.k-header {
@@ -283,10 +283,10 @@
     <div class="alert-edit-page">
         <EditForm EditContext="@ECAddEditWorkOrder">
             <DataAnnotationsValidator />
-            <div class="form-group row m-tb">
-                <label for="BuildTemplateMasterPartName" class="col-sm-1 col-form-label">Build Template: </label>
-                <div class="col-md-4 bg-w">
-                    <label style="padding-top:10px;">@OriginalRecord.BuildTemplateMasterPartName</label>
+            <div class="form-group row">
+                <label for="BuildTemplateMasterPartName" class="col-sm-2 col-form-label">Build Template: </label>
+                <div class="col-md-4">
+                    <label class="col-form-label">@OriginalRecord.BuildTemplateMasterPartName</label>
                 </div>
 
                 <label for="WorkOrderTypeId" class="col-md-2 col-form-label">Type </label>
@@ -297,10 +297,10 @@
                 </div>
             </div>
 
-            <div class="form-group row m-tb">
-                <label for="Quantity" class="col-sm-1 col-form-label">Quantity: </label>
-                <div class="col-md-4 bg-w">
-                    <label style="padding-top:10px;">@AddEditWorkOrderModel.Quantity</label>
+            <div class="form-group row">
+                <label for="Quantity" class="col-sm-2 col-form-label">Quantity: </label>
+                <div class="col-md-4">
+                    <label class="col-form-label">@AddEditWorkOrderModel.Quantity</label>
                 </div>
 
                 <label for="WorkOrderStatusId" class="col-md-2 col-form-label">Status </label>
@@ -311,10 +311,8 @@
                 </div>
             </div>
 
-            <div class="form-group row m-tb">
-                <label for="empty" class="col-sm-1 col-form-label">&nbsp;</label>
-                <div class="col-md-4 bg-w">
-                    <label style="padding-top:10px;background:unset!important;">&nbsp;</label>
+            <div class="form-group row">
+                <div class="col-md-6">
                 </div>
 
                 <label for="WorkOrderPriorityID" class="col-md-2 col-form-label">Priority </label>
@@ -436,23 +434,23 @@
                 {
                     <EditForm EditContext="@ECEditPart">
                         <DataAnnotationsValidator />
-                        <div class="form-group row m-tb">
-                            <label for="PartNumber" class="col-sm-2 col-form-label">Part Number: </label>
-                            <div class="col-md-8 bg-w">
-                                <label style="padding-top:10px;">@EditPartModel.PartNumber</label>
+                        <div class="form-group row">
+                            <label for="PartNumber" class="col-sm-4 col-form-label">Part Number:</label>
+                            <div class="col-md-8">
+                                <label class="col-form-label">@EditPartModel.PartNumber</label>
                             </div>
                         </div>
 
-                        <div class="form-group row m-tb">
-                            <label for="BuildStations" class="col-sm-2 col-form-label">Build Station: </label>
-                            <div class="col-md-8 bg-w">
-                                <label style="padding-top:10px;">@EditPartModel.BuildStations</label>
+                        <div class="form-group row">
+                            <label for="BuildStations" class="col-sm-4 col-form-label">Build Station:</label>
+                            <div class="col-md-8">
+                                <label class="col-form-label">@EditPartModel.BuildStations</label>
                             </div>
                         </div>
 
-                        <div class="form-group row m-tb">
-                            <label for="SerialNumber" class="col-sm-2 col-form-label">Serial Number: </label>
-                            <div class="col-md-8 bg-w">
+                        <div class="form-group row">
+                            <label for="SerialNumber" class="col-sm-4 col-form-label">Serial Number: </label>
+                            <div class="col-md-8">
                                 <InputText type="text" class="form-control" @bind-Value="@EditPartModel.SerialNumber" @onblur="@EditSerialNumberOnBlur" />
                             </div>
                         </div>
@@ -460,9 +458,9 @@
 
                     if (OriginalWorkOrderInspection != null)
                     {
-                        <div class="form-group row m-tb">
-                            <label for="PartNumber" class="col-sm-2 col-form-label">Status:</label>
-                            <div class="col-md-8 bg-w">
+                        <div class="form-group row" style="margin-top:10px">
+                            <label for="PartNumber" class="col-sm-4 col-form-label">Status:</label>
+                            <div class="col-md-8">
                                 <ul class="switch-btn">
                                     <li class="@(OriginalWorkOrderInspection.Pass?"active":"")" @onclick="(() => OnDataStatusChangeHandler(true))"><i class="fa-regular fa-circle-check"></i> Passed</li>
                                     <li class="failed @(OriginalWorkOrderInspection.Pass?"":"active")" @onclick="(() => OnDataStatusChangeHandler(false))"><i class="fa-light fa-circle-xmark"></i> Failed</li>
@@ -472,24 +470,24 @@
 
                         if (!OriginalWorkOrderInspection.Pass)
                         {
-                            <div class="form-group row m-tb">
-                                <label class="col-sm-2 col-form-label">Failure Reason</label>
-                                <div class="col-md-8 bg-w">
+                            <div class="form-group row" style="margin-top:10px">
+                                <label class="col-sm-4 col-form-label">Failure Reason:</label>
+                                <div class="col-md-8">
                                     <TelerikDropDownList Data="@dataBuildStationFailureCodeDropdown" class="form-control" TextField="DropText" ValueField="DropValue"
                                          @bind-Value="@OriginalWorkOrderInspection.InspectionFailed.BuildStationFailureCodeId" DefaultText="Select Failure Reason">
                                     </TelerikDropDownList>
                                 </div>
                             </div>
-                            <div class="form-group row m-tb">
-                                <label class="col-sm-2 col-form-label">Comment</label>
-                                <div class="col-md-8 bg-w">
-                                    <TelerikTextBox Class="form-control" @bind-Value="@OriginalWorkOrderInspection.InspectionFailed.Comment"></TelerikTextBox>
+                            <div class="form-group row" style="margin-top:10px">
+                                <label class="col-sm-4 col-form-label">Comment:</label>
+                                <div class="col-md-8">
+                                    <TelerikTextArea @bind-Value="@OriginalWorkOrderInspection.InspectionFailed.Comment"></TelerikTextArea>
                                 </div>
                             </div>
                         }
 
                         <div class="form-group row m-tb" style="padding-bottom: 20px;">
-                            <label class="col-sm-2 col-form-label"></label>
+                            <label class="col-sm-4 col-form-label"></label>
                             <div class="col-md-8 bg-w save-btn">
                                 <TelerikButton ButtonType="@ButtonType.Button" Enabled=@(!isSaveInspectionClick) OnClick="@btnSaveInspectionOnClick"><i class="fa-solid fa-floppy-disk"></i> Save Inspection</TelerikButton>
                             </div>

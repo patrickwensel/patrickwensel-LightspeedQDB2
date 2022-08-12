@@ -1,7 +1,237 @@
 ﻿@page "/mrb"
+@using QBD2.Models
+@using QBD2.Services
+@using QBD2.Entities
+@inject MRBService MRBService
+@inject IToastService toastService
+<style>
+    .SaveButton {
+        float: right;
+        width: 100px;
+    }
 
-<h3>MRB</h3>
+    .k-dialog-wrapper {
+        position: inherit;
+    }
 
+    .k-centered {
+        transform: translate(5%, -250%);
+        width: 320px;
+    }
+
+    .k-window-titlebar.k-dialog-titlebar.k-header {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        padding: 10px 10px 20px 10px;
+    }
+
+    .k-window-content.k-dialog-content {
+        border-radius: 0;
+    }
+
+    label.k-form-label {
+        margin-right: 15px;
+    }
+
+    .k-form .k-form-field, .k-form .k-form-field-wrap {
+        display: inline-flex;
+        width: 100%;
+    }
+
+    .k-actions-start {
+        float: right;
+    }
+
+    .k-window-actions span {
+        color: #fff;
+    }
+
+    label.col-form-label {
+        text-align: right;
+        font-weight: bold;
+    }
+
+    .no-headers-grid .k-grid-header {
+        display: none;
+    }
+</style>
+<div class="row alerts-row">
+    <div class="col-md-7">
+        <h3 class="alert-title"><i class="fa-light fa-tower-control" aria-hidden="true"></i>&nbsp;&nbsp;MRB</h3>
+    </div>
+    <div class="col-md-5">
+        <div style="float:right;">
+            <span style="float:left;margin:10px;">Show Completed Items:</span>
+            <ul class="switch-btn">
+                <li class="@(IsShowCompletedItems?"active":"")" @onclick="(() => OnShowCompletedItemsChange(true))"><i class="fa-regular fa-circle-check"></i> Yes</li>
+                <li class="failed @(IsShowCompletedItems?"":"active")" @onclick="(() => OnShowCompletedItemsChange(false))"><i class="fa-light fa-circle-xmark"></i> No</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<hr />
+<TelerikGrid Data="@MRBGridData"
+             Pageable="true" Sortable="true" FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
+             Resizable="true"
+             EditMode="Telerik.Blazor.GridEditMode.None">
+    <GridToolBar>
+        <GridCommandButton Command="AddMRB" OnClick="@OnAddMRB" Icon="add">Add New</GridCommandButton>
+    </GridToolBar>
+    <GridColumns>
+        <GridColumn Field="Description" Title="Description" />
+        <GridColumn Field="MRBDisposition.Name" Title="Disposition" Width="200px" />
+        <GridColumn Field="BarCode" Title="Barcode" Width="300px" />
+        <GridColumn Field="IsComplete" Title="Completed" Width="180px">
+            <Template Context="context">
+                @{
+                    var mrb = context as QBD2.Entities.MRB;
+                    <lable style="color:@(mrb.IsComplete?"green":"red")">@(mrb.IsComplete?"Yes":"No")</lable>
+                }
+            </Template>
+        </GridColumn>
+        <GridCommandColumn Width="90px">
+            <GridCommandButton Command="OnEditMRB" OnClick="@OnEditMRB" Icon="edit">Edit</GridCommandButton>
+        </GridCommandColumn>
+    </GridColumns>
+</TelerikGrid>
+
+<TelerikWindow Visible="@(AddMRBModel != null)" Modal="true" Width="600px" Draggable="false">
+    <WindowTitle>
+        <strong>Add New MRB</strong>
+    </WindowTitle>
+    <WindowActions>
+        <WindowAction Name="Close" OnClick="@OnAddMRBCancel"></WindowAction>
+    </WindowActions>
+    <WindowContent>
+        <EditForm Model="@AddMRBModel" OnValidSubmit="@OnAddMRBSave">
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label>Description</label>
+                <TelerikTextArea @bind-Value="@AddMRBModel.Description" />
+            </div>
+            <div class="form-group m-tb">
+                <label>Barcode</label>
+                <TelerikTextBox @bind-Value="@AddMRBModel.BarCode" />
+            </div>
+            <hr />
+            <div class="form-row" style="float:right;">
+                <TelerikButton Icon="save" ButtonType="@ButtonType.Submit">Save</TelerikButton>
+                &nbsp;
+                <TelerikButton Icon="cancel" OnClick="@OnAddMRBCancel" ButtonType="@ButtonType.Button">Cancel</TelerikButton>
+            </div>
+        </EditForm>
+    </WindowContent>
+</TelerikWindow>
+
+<TelerikWindow Visible="@(EditMRBStatusModel != null)" Modal="true" Width="600px" Draggable="false">
+    <WindowTitle>
+        <strong>Edit MRB</strong>
+    </WindowTitle>
+    <WindowActions>
+        <WindowAction Name="Close" OnClick="@OnEditMRBCancel"></WindowAction>
+    </WindowActions>
+    <WindowContent>
+        <EditForm Model="@EditMRBStatusModel" OnValidSubmit="@OnEditMRBSave">
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label>Status</label>
+                <TelerikDropDownList @bind-Value="@EditMRBStatusModel.MRBDispositionId" DefaultText="Select Status"
+                                     Data="@MRBDispositionDropdownData" TextField="DropText" ValueField="DropValue">
+                </TelerikDropDownList>
+            </div>
+            <hr />
+            <div class="form-row" style="float:right;">
+                <TelerikButton Icon="save" ButtonType="@ButtonType.Submit">Save</TelerikButton>
+                &nbsp;
+                <TelerikButton Icon="cancel" OnClick="@OnEditMRBCancel" ButtonType="@ButtonType.Button">Cancel</TelerikButton>
+            </div>
+        </EditForm>
+    </WindowContent>
+</TelerikWindow>
 @code {
+    List<QBD2.Entities.MRB> MRBGridData { get; set; }
+    bool IsShowCompletedItems { get; set; } = false;
+    AddMRBModel AddMRBModel { get; set; }
+    EditMRBStatusModel EditMRBStatusModel { get; set; }
+    List<Models.DropDownBind> MRBDispositionDropdownData { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        await GetGridData(IsShowCompletedItems);
+        MRBDispositionDropdownData = await MRBService.MRBDispositionDropDownData();
+    }
+
+    protected async Task GetGridData(bool isShowCompletedItems)
+    {
+        MRBGridData = await MRBService.Read(isShowCompletedItems);
+    }
+
+    protected async Task OnShowCompletedItemsChange(bool isShowCompletedItems)
+    {
+        if (IsShowCompletedItems != isShowCompletedItems)
+        {
+            IsShowCompletedItems = isShowCompletedItems;
+            await GetGridData(IsShowCompletedItems);
+        }
+    }
+
+    protected void OnAddMRB(GridCommandEventArgs args)
+    {
+        AddMRBModel = new AddMRBModel();
+    }
+
+    protected void OnEditMRB(GridCommandEventArgs args)
+    {
+        QBD2.Entities.MRB item = (QBD2.Entities.MRB)args.Item;
+        EditMRBStatusModel editMRBStatusModel = new EditMRBStatusModel();
+        editMRBStatusModel.MRBId = item.MRBId;
+        editMRBStatusModel.MRBDispositionId = item.MRBDispositionId;
+        EditMRBStatusModel = editMRBStatusModel;
+    }
+
+    protected void OnAddMRBCancel()
+    {
+        AddMRBModel = null;
+    }
+
+    protected async Task OnAddMRBSave()
+    {
+        var result = await MRBService.Create(AddMRBModel);
+        if (result != null)
+        {
+            if (result.Success)
+            {
+                toastService.ShowSuccess(result.Message, "Success");
+                AddMRBModel = null;
+                await GetGridData(IsShowCompletedItems);
+            }
+            else
+            {
+                toastService.ShowError(result.Message, "Error");
+            }
+        }
+    }
+
+    protected void OnEditMRBCancel()
+    {
+        EditMRBStatusModel = null;
+    }
+
+    protected async Task OnEditMRBSave()
+    {
+        var result = await MRBService.EditStatus(EditMRBStatusModel);
+        if (result != null)
+        {
+            if (result.Success)
+            {
+                toastService.ShowSuccess(result.Message, "Success");
+                EditMRBStatusModel = null;
+                await GetGridData(IsShowCompletedItems);
+            }
+            else
+            {
+                toastService.ShowError(result.Message, "Error");
+            }
+        }
+    }
 }

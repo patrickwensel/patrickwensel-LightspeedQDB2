@@ -14,5 +14,15 @@
             Local,
             Azure,
         }
+
+        public enum EnumMRBDispositions
+        {
+            Review = 1,
+            Rework = 2,
+            SendToVendor = 3,
+            Scrap = 4,
+            EngEval = 5,
+            UseAsIs = 6
+        }
     }
 }

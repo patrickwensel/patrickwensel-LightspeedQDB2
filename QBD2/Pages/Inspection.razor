@@ -27,8 +27,7 @@
                          Pageable="true"
                          Sortable="true"
                          Resizable="true"
-                         FilterMode="@GridFilterMode.FilterRow"
-            >
+                         FilterMode="@GridFilterMode.FilterRow">
 
                 <GridColumns>
                     <GridColumn Field="Part.SerialNumber" Title="Serial Number" Groupable="false" Filterable="true" Sortable="false">
@@ -100,7 +99,7 @@
                     <div class="row class=">
                         <div class="col-sm-12">
                             <label class="col-sm-12 col-form-label">Desc :</label>
-                            <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b" @onclick="(() => CloseAddEditInspectionWindow())">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty) <i class="fa-solid fa-circle-xmark" ></i></label>
+                            <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b" @onclick="(() => CloseAddEditInspectionWindow())">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty) <i class="fa-solid fa-circle-xmark"></i></label>
                         </div>
                     </div>
                     <div class="row">
@@ -283,14 +282,15 @@
 </div>
 
 
-@if(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)
+@if (SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)
 {
     <TelerikWindow Visible="@(SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)" Modal="true" Width="570px" Draggable="false" Left="1450px">
         <WindowTitle>
             @{
 
-                <h5><!---<i aria-hidden="true"></i>--->
-                    @if(SelectedAlertDeviationRecord.AlertId > 0)
+                <h5>
+                    <!---<i aria-hidden="true"></i>--->
+                    @if (SelectedAlertDeviationRecord.AlertId > 0)
                     {
                         <div class="row p-lr">
                             <div class="col-md-11">
@@ -298,10 +298,10 @@
                             </div>
 
 
-                            <div class="col-md-1" @onclick="(()=>ClearAlertDeviationSelection())"><i class="fa-light fa-circle-xmark" ></i></div>
+                            <div class="col-md-1" @onclick="(()=>ClearAlertDeviationSelection())"><i class="fa-light fa-circle-xmark"></i></div>
                         </div>
                     }
-                    else if(SelectedAlertDeviationRecord.DeviationId > 0)
+                    else if (SelectedAlertDeviationRecord.DeviationId > 0)
                     {
                         <div class="row p-lr">
                             <div class="col-md-11">
@@ -501,7 +501,6 @@
 
     List<Models.DropDownBind> dataFailurePrimaryDropdown { get; set; }
     List<Models.DropDownBind> dataFailureDropdown { get; set; }
-    List<Models.DropDownBind> dataStatusOptions { get; set; }
     List<Models.DropDownBind> dataStationDropdown { get; set; }
     Models.InspectionModel dataInspectionModel { get; set; }
     Models.Inspection dataInspection { get; set; }
@@ -597,12 +596,6 @@
     {
         dataFailurePrimaryDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureTypePrimary, null);
         dataStationDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.Station, null);
-
-        dataStatusOptions = new List<Models.DropDownBind>();
-        dataStatusOptions.Add(new Models.DropDownBind { DropText = "Pass", DropValue = 1 });
-        dataStatusOptions.Add(new Models.DropDownBind { DropText = "Fail", DropValue = 0 });
-
-
     }
 
     void MyOnChangeHandler()
@@ -683,12 +676,15 @@
 
     async Task btnFindOnClick(bool isFindButton)
     {
-        if (string.IsNullOrEmpty(SerialNumber))
+         IsWorkOrderInspection = false;
+        if (string.IsNullOrEmpty(SerialNumber) )
         {
-            toastService.ShowError("Please Enter Serial Number", "Error");
+            if (isFindButton)
+            {
+                toastService.ShowError("Please Enter Serial Number", "Error");
+            }
             return;
         }
-        IsWorkOrderInspection = false;
         dataInspectionModel = await InspectionService.GetDataBySerialNumber(SerialNumber.Trim());
         await GetGridAlertDeviationData();
         if (dataInspectionModel == null)
@@ -712,7 +708,7 @@
                 }
                 else
                 {
-                    if(SelectedDataInspection != null && SelectedDataInspection.InspectionId > 0)
+                    if (SelectedDataInspection != null && SelectedDataInspection.InspectionId > 0)
                     {
                         dataInspection = SelectedDataInspection;
                     }
@@ -739,7 +735,7 @@
                     AddActiveCssClass = "active";
                     AddInActiveCssClass = string.Empty;
                 }
-                else if(RdoStatusValue == 0)
+                else if (RdoStatusValue == 0)
                 {
                     AddActiveCssClass = string.Empty;
                     AddInActiveCssClass = "active";
@@ -754,6 +750,11 @@
         if (string.IsNullOrEmpty(SerialNumber))
         {
             toastService.ShowError("Please Enter Serial Number", "Error");
+            return;
+        }
+        if (dataInspectionModel==null)
+        {
+            toastService.ShowError("Please Enter Valid Serial Number and Find", "Error");
             return;
         }
         if (dataInspectionModel.PartId <= 0)
@@ -791,7 +792,7 @@
     {
         if (item != null)
         {
-            SelectedAlertDeviationRecord = new  Models.AlertDeviationDetailModel();
+            SelectedAlertDeviationRecord = new Models.AlertDeviationDetailModel();
             SelectedAlertDeviationRecord = item;
             IsDisplayPopUpWindow = true;
         }
@@ -801,7 +802,7 @@
     public async Task ClearAlertDeviationSelection()
     {
         IsDisplayPopUpWindow = false;
-        SelectedAlertDeviationRecord  = new  Models.AlertDeviationDetailModel();
+        SelectedAlertDeviationRecord = new Models.AlertDeviationDetailModel();
         StateHasChanged();
     }
 
@@ -813,7 +814,7 @@
             AddActiveCssClass = "active";
             AddInActiveCssClass = string.Empty;
         }
-        else if(value == 0)
+        else if (value == 0)
         {
             AddActiveCssClass = string.Empty;
             AddInActiveCssClass = "active";

@@ -56,8 +56,11 @@ namespace QBD2.Services
                     foreach (var role in roles.ToList())
                     {
                         var userRole = _context.Roles.Where(x => x.Id == role.RoleId).FirstOrDefault();
-                        var claim = new Claim("Role", userRole.Name);
+                        var claim = new Claim(newIdentity.RoleClaimType, userRole.Name);
                         newIdentity.AddClaim(claim);
+
+                        var claim2 = new Claim("Role", userRole.Name);
+                        newIdentity.AddClaim(claim2);
                     }
                 }
             }
@@ -94,8 +97,11 @@ namespace QBD2.Services
                         _context.SaveChanges();
                     }
 
-                    var claim = new Claim("Role", role.Name);
+                    var claim = new Claim(newIdentity.RoleClaimType, role.Name);
                     newIdentity.AddClaim(claim);
+
+                    var claim2 = new Claim("Role", role.Name);
+                    newIdentity.AddClaim(claim2);
                 }
             }
 

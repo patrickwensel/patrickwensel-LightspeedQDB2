@@ -4,6 +4,38 @@
 @using QBD2.Entities
 @inject FailureCodeService FailureCodeService
 
+<style>
+    .k-dialog-wrapper {
+    position: inherit;   
+}
+.k-centered {
+    transform: translate(5%, -300%);
+    width: 320px;
+}
+.k-window-titlebar.k-dialog-titlebar.k-header {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding: 10px 10px 20px 10px;
+}
+.k-window-content.k-dialog-content {
+    border-radius: 0;
+}
+label.k-form-label {
+    margin-right: 15px;
+}
+.k-form .k-form-field, .k-form .k-form-field-wrap {
+    display: inline-flex;
+    width: 100%;
+}
+.k-actions-start {
+    float: right;
+}
+.k-window-actions span {
+    color: #fff;
+}
+</style>
+
+
 <h3>Failure Code</h3>
 
 <TelerikGrid Data="@MyData" 

@@ -9,7 +9,7 @@
 @inject ExcelUploadService ExcelUploadService
 @inject ApplicationSettings ApplicationSettings
 
-<h3>Upload CSV File</h3>
+<h3>Upload Excel File</h3>
 @*<InputFile OnChange="@LoadFiles" multiple />*@
 <form @onsubmit="OnSubmit">
     @if (AddPartsToExcelUploadError != null && AddPartsToExcelUploadError.Count() > 0)
@@ -24,5 +24,5 @@
      }
     <InputFile OnChange="OnInputFileChange" />
     <br /><br />
-    <button type="submit">Upload Selected File(s)</button>
+    <button type="submit" disabled="@IsUploading">Upload Selected File(s)</button>
 </form>

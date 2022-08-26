@@ -1,97 +1,70 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using QBD2.Data;
 using QBD2.Entities;
 using QBD2.Models;
+using static QBD2.Models.Enum;
 
 namespace QBD2.Services
 {
     public class UserService
     {
         private readonly ApplicationDbContext _context;
-        //private readonly SignInManager<ApplicationUser> _signInManager;
-        //private readonly UserManager<ApplicationUser> _userManager;
-        //private readonly RoleManager<ApplicationRole> _roleManager;
 
-        public UserService( ApplicationDbContext context)
+        public UserService(ApplicationDbContext context)
         {
-            //_signInManager = signInManager;
-            //_userManager = usrMgr;
             _context = context;
-            //_roleManager = roleMgr;
-        }
-        public async Task Create(ApplicationUser itemToInsert)
-        {
-            _context.Users.Add(itemToInsert);
-            await _context.SaveChangesAsync();
-            }
-
-        public async Task<List<ApplicationUser>> Read()
-        {
-            var userRoles = await _context.UserRoles.ToListAsync();
-            var roles = await _context.Roles.ToListAsync();
-            var users = await _context.Users.Select(s => new ApplicationUser
-            {
-                AccessFailedCount = s.AccessFailedCount,
-            SecurityStamp = s.SecurityStamp,
-            ConcurrencyStamp = s.ConcurrencyStamp,
-            Email = s.Email,
-            EmailConfirmed = s.EmailConfirmed,
-             Id = s.Id,
-             LockoutEnabled = s.LockoutEnabled,
-             LockoutEnd = s.LockoutEnd,
-             NormalizedEmail = s.NormalizedEmail,
-             NormalizedUserName = s.NormalizedUserName,
-             PasswordHash = s.PasswordHash,
-             PhoneNumber = s.PhoneNumber,
-             PhoneNumberConfirmed = s.PhoneNumberConfirmed,
-             TwoFactorEnabled = s.TwoFactorEnabled,
-             UserName = s.UserName,
-             ADLogin = s.UserName,
-            })?.ToListAsync();
-
-            foreach (var item in users)
-            {
-                item.UserRoles = userRoles.Where(x => x.UserId == x.UserId)
-             .Select(t => new ApplicationUserRole
-             {
-                 RoleId = t.RoleId,
-                 UserId = t.UserId,
-                 Role = roles.Where(r => r.Id == t.RoleId).Select(g => new ApplicationRole
-                 {
-                     Id = g.Id,
-                     ConcurrencyStamp = g.ConcurrencyStamp,
-                     Name = g.Name,
-                     NormalizedName = g.NormalizedName,
-                 }).FirstOrDefault()
-             })?.ToList();
-            }
-
-            return users;
         }
 
-        public async Task Update(ApplicationUser itemToUpdate)
+        public async Task<List<ApplicationUserModel>> Read()
         {
-            var user = await _context.Users.FirstOrDefaultAsync(s => s.Id == itemToUpdate.Id);
-            if (user != null)
-            {
-                user.UserName = itemToUpdate.UserName;
-                user.Email = itemToUpdate.Email;
-                _context.Users.Update(user);
-            }
-            await _context.SaveChangesAsync();
+            List<ApplicationUserModel> applicationUserModels = await (from u in _context.Users
+                                                                      join ur in _context.UserRoles on u.Id equals ur.UserId into ur_join
+                                                                      from ur in ur_join.DefaultIfEmpty()
+                                                                      join r in _context.Roles on ur.RoleId equals r.Id into r_join
+                                                                      from r in r_join.DefaultIfEmpty()
+                                                                      select new ApplicationUserModel
+                                                                      {
+                                                                          UserId = u.Id,
+                                                                          Email = u.Email,
+                                                                          UserName = u.UserName,
+                                                                          RoleId = ur.RoleId,
+                                                                          RoleName = r.Name
+                                                                      }).ToListAsync();
+
+            return applicationUserModels;
         }
 
-        public async Task Delete(ApplicationUser itemToDelete)
+        public async Task<Models.ApiResponse> EditRole(EditApplicationUserRoleModel model)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(s => s.Id == itemToDelete.Id);
-            if (user != null)
+            Models.ApiResponse apiResponse = new Models.ApiResponse();
+            try
             {
-                _context.Users.Remove(user);
+                var userRoles = await _context.UserRoles.Where(x => x.UserId == model.UserId).ToListAsync();
+                if (userRoles != null && userRoles.Any())
+                {
+                    _context.UserRoles.RemoveRange(userRoles);
+                    await _context.SaveChangesAsync();
+                }
+
+                ApplicationUserRole applicationUserRole = new ApplicationUserRole();
+                applicationUserRole.UserId = model.UserId;
+                applicationUserRole.RoleId = model.RoleId;
+                _context.UserRoles.Add(applicationUserRole);
+                await _context.SaveChangesAsync();
+
+                apiResponse.Success = true;
+                apiResponse.Message = "Record Saved Successfully.";
+                return apiResponse;
+            }
+            catch
+            {
+                apiResponse.Success = false;
+                apiResponse.Message = "Record Not Saved ! Something Worng.";
+                return apiResponse;
             }
         }
 
-        public async Task<IEnumerable<DropDownBindString>> GetRoleSelectList()
+        public async Task<List<DropDownBindString>> GetRoleDropdown()
         {
             return await _context.Roles
              .Select(c => new DropDownBindString

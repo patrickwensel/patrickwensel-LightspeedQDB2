@@ -23,7 +23,7 @@ namespace QBD2.Pages.Admin
         private IToastService ToastService { get; set; }
 
         public List<AddPartsToExcelUploadError> AddPartsToExcelUploadError { get; set; }
-
+        public bool IsUploading { get; set; }
         string Message = "No file(s) selected";
         IReadOnlyList<IBrowserFile> selectedFiles;
 
@@ -36,44 +36,61 @@ namespace QBD2.Pages.Admin
 
         public async void OnSubmit()
         {
-            string? path = null;
-            if (selectedFiles != null)
+            IsUploading = true;
+            try
             {
-                foreach (var file in selectedFiles)
+                AddPartsToExcelUploadError = null;
+                string? path = null;
+                if (selectedFiles != null)
                 {
-                    if (this._appSettings.Value.FileUploadType.ToLower() == FileUploadType.Local.ToString().ToLower())
+                    foreach (var file in selectedFiles)
                     {
-                        Stream stream = file.OpenReadStream();
-                        path = _appSettings.Value.LocalFileUploadPath + file.Name;
-                        FileStream fs = File.Create(path);
-                        await stream.CopyToAsync(fs);
-                        stream.Close();
-                        fs.Close();
-
-                        var errors = await _excelUploadService.ProcessExcelFile(path);
-                        if (errors != null && errors.AddPartsToExcelUploadError != null && errors.AddPartsToExcelUploadError.Count() > 0)
+                        if (file.Name.EndsWith(".xls") || file.Name.EndsWith(".xlsx"))
                         {
-                            AddPartsToExcelUploadError = errors.AddPartsToExcelUploadError;
-                        }
-                        else
-                        {
-                            AddPartsToExcelUploadError = null;
-                        }
-                        StateHasChanged();
-                    }
-                    else
-                    {
+                            if (this._appSettings.Value.FileUploadType.ToLower() == FileUploadType.Local.ToString().ToLower())
+                            {
+                                Stream stream = file.OpenReadStream(100000000);//100MB
+                                path = _appSettings.Value.LocalFileUploadPath + file.Name;
+                                FileStream fs = File.Create(path);
+                                await stream.CopyToAsync(fs);
+                                stream.Close();
+                                fs.Close();
 
+                                var errors = await _excelUploadService.ProcessExcelFile(path);
+                                if (errors != null && errors.AddPartsToExcelUploadError != null && errors.AddPartsToExcelUploadError.Count() > 0)
+                                {
+                                    AddPartsToExcelUploadError = errors.AddPartsToExcelUploadError;
+                                }
+                                else
+                                {
+                                    AddPartsToExcelUploadError = null;
+                                    ToastService.ShowSuccess("File Uploaded Successfully", "Success");
+                                }
+                            }
+                            else
+                            {
+
+                            }
+                        }
                     }
+
+                    Message = $"{selectedFiles.Count} file(s) uploaded on server";
                 }
-
-                Message = $"{selectedFiles.Count} file(s) uploaded on server";
-                this.StateHasChanged();
+                else
+                {
+                    ToastService.ShowError("Please Select file", "Error");
+                    return;
+                }
             }
-            else
+            catch
             {
-                ToastService.ShowError("Please Select file", "Error");
+                ToastService.ShowError("Error while uploading excel.", "Error");
                 return;
+            }
+            finally
+            {
+                IsUploading=false;
+                this.StateHasChanged();
             }
         }
     }

@@ -5,129 +5,135 @@
 @using Telerik.Blazor.Components
 @using QBD2.Entities
 @inject UserService UserService
+@inject IToastService toastService
 
 <style>
     .k-dialog-wrapper {
-    position: inherit;   
-}
-.k-centered {
-    transform: translate(5%, -300%);
-    width: 320px;
-}
-.k-window-titlebar.k-dialog-titlebar.k-header {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    padding: 10px 10px 20px 10px;
-}
-.k-window-content.k-dialog-content {
-    border-radius: 0;
-}
-label.k-form-label {
-    margin-right: 15px;
-}
-.k-form .k-form-field, .k-form .k-form-field-wrap {
-    display: inline-flex;
-    width: 100%;
-}
-.k-actions-start {
-    float: right;
-}
-.k-window-actions span {
-    color: #fff;
-}
+        position: inherit;
+    }
+    .k-centered {
+        transform: translate(5%, -300%);
+        width: 320px;
+    }
+    .k-window-titlebar.k-dialog-titlebar.k-header {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        padding: 10px 10px 20px 10px;
+    }
+    .k-window-content.k-dialog-content {
+        border-radius: 0;
+    }
+    label.k-form-label {
+        margin-right: 15px;
+    }
+    .k-form .k-form-field, .k-form .k-form-field-wrap {
+        display: inline-flex;
+        width: 100%;
+    }
+    .k-actions-start {
+        float: right;
+    }
+    .k-window-actions span {
+        color: #fff;
+    }
 </style>
-
 
 <PageTitle>Users</PageTitle>
 <h3>Users</h3>
-    <TelerikGrid Data=@MyData
-                 Sortable="true"
-                 Pageable="true"
-                 FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
-                 EditMode="Telerik.Blazor.GridEditMode.Popup"
-             OnUpdate=@UpdateHandler
-             OnDelete=@DeleteHandler
-             OnCreate=@CreateHandler>
-        <GridToolBar>
-            <GridCommandButton Command="Add" Icon="add">Add</GridCommandButton>
-        </GridToolBar>
-        <GridColumns>
-            <GridColumn Field=@nameof(ApplicationUser.Email) Title="Email" Width="230px" />
-            <GridColumn Field=@nameof(ApplicationUser.UserName) Title="UserName" Width="230px" />
-            @*<GridColumn Field=@nameof(ApplicationUser.ADLogin) Title="ADLogin" Width="230px" />*@
-            @*<GridColumn Field=@nameof(ApplicationUser.UserRoles.FirstOrDefault().Role.Name) Title="Role" Width="100px">
-                <EditorTemplate>
-                    @{
-                        var CurrentlyEditedUser = context as ApplicationUser;
-                        <TelerikDropDownList @bind-Value="CurrentlyEditedUser.UserRoles?.FirstOrDefault()?.RoleId"
-                                             DefaultText="Choose a role"
-                                             Data="@roles"
-                                             ValueField="Value"
-                                             TextField="Text" Class="form-control">
-                        </TelerikDropDownList>
-                    }
-                </EditorTemplate>
-            </GridColumn>*@
-            <GridCommandColumn Width="120px">
-                <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
-            </GridCommandColumn>
-        </GridColumns>
-        <NoDataTemplate>
-            <text>No Records Available</text>
-        </NoDataTemplate>
-    </TelerikGrid>
+<TelerikGrid Data=@UserGridData
+             Sortable="true"
+             Pageable="true"
+             FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
+             EditMode="Telerik.Blazor.GridEditMode.None">
+    <GridColumns>
+        <GridColumn Field="Email" Title="Email" />
+        <GridColumn Field="UserName" Title="User Name" />
+        <GridColumn Field="RoleName" Title="Role" />
+        <GridCommandColumn Width="120px">
+            <GridCommandButton Command="OnEditRole" OnClick="@OnEditRole" Icon="edit">Edit</GridCommandButton>
+        </GridCommandColumn>
+    </GridColumns>
+    <NoDataTemplate>
+        <text>No Records Available</text>
+    </NoDataTemplate>
+</TelerikGrid>
 
+<TelerikWindow Visible="@(EditApplicationUserRoleModel != null)" Modal="true" Width="600px" Draggable="false">
+    <WindowTitle>
+        <strong>Edit User Role</strong>
+    </WindowTitle>
+    <WindowActions>
+        <WindowAction Name="Close" OnClick="@OnEditRoleCancel"></WindowAction>
+    </WindowActions>
+    <WindowContent>
+        <EditForm Model="@EditApplicationUserRoleModel" OnValidSubmit="@OnEditRoleSave">
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label>Role</label>
+                <TelerikDropDownList @bind-Value="@EditApplicationUserRoleModel.RoleId" DefaultText="Select Role"
+                                     Data="@RoleDropDownData" TextField="DropText" ValueField="DropValue">
+                </TelerikDropDownList>
+            </div>
+            <hr />
+            <div class="form-row" style="float:right;">
+                <TelerikButton Icon="save" ButtonType="@ButtonType.Submit">Save</TelerikButton>
+                &nbsp;
+                <TelerikButton Icon="cancel" OnClick="@OnEditRoleCancel" ButtonType="@ButtonType.Button">Cancel</TelerikButton>
+            </div>
+        </EditForm>
+    </WindowContent>
+</TelerikWindow>
 @code {
 
-    List<ApplicationUser> MyData { get; set; }
-    List<DropDownBindString> roles {get; set; }
+    List<ApplicationUserModel> UserGridData { get; set; }
+    List<DropDownBindString> RoleDropDownData { get; set; }
+    EditApplicationUserRoleModel EditApplicationUserRoleModel { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await GetGridData();
+        await GetUserGridData();
+        await GetRoles();
     }
 
-    async Task GetGridData()
+    protected async Task GetUserGridData()
     {
-        MyData = await UserService.Read();
+        UserGridData = await UserService.Read();
     }
 
-    async Task GetRoles()
+    protected void OnEditRole(GridCommandEventArgs args)
     {
-        roles = (await UserService.GetRoleSelectList())?.ToList();
+        ApplicationUserModel item = (ApplicationUserModel)args.Item;
+        EditApplicationUserRoleModel editApplicationUserRoleModel = new EditApplicationUserRoleModel();
+        editApplicationUserRoleModel.UserId = item.UserId;
+        editApplicationUserRoleModel.RoleId = item.RoleId;
+        EditApplicationUserRoleModel = editApplicationUserRoleModel;
     }
 
-    async Task UpdateHandler(GridCommandEventArgs args)
+    protected void OnEditRoleCancel()
     {
-        ApplicationUser item = (ApplicationUser)args.Item;
-
-        await UserService.Update(item);
-
-        await GetGridData();
+        EditApplicationUserRoleModel = null;
     }
 
-    async Task DeleteHandler(GridCommandEventArgs args)
+    protected async Task OnEditRoleSave()
     {
-        ApplicationUser item = (ApplicationUser)args.Item;
-
-        await UserService.Delete(item);
-
-        await GetGridData();
+        var result = await UserService.EditRole(EditApplicationUserRoleModel);
+        if (result != null)
+        {
+            if (result.Success)
+            {
+                toastService.ShowSuccess(result.Message, "Success");
+                EditApplicationUserRoleModel = null;
+                await GetUserGridData();
+            }
+            else
+            {
+                toastService.ShowError(result.Message, "Error");
+            }
+        }
     }
 
-    async Task CreateHandler(GridCommandEventArgs args)
+    protected async Task GetRoles()
     {
-        ApplicationUser item = (ApplicationUser)args.Item;
-
-        await UserService.Create(item);
-
-        await GetGridData();
+        RoleDropDownData = await UserService.GetRoleDropdown();
     }
-
-    async Task CancelHandler(GridCommandEventArgs args)
-    {
-        Station item = (Station)args.Item;
-    }
-
-
 }

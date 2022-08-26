@@ -171,7 +171,7 @@ namespace QBD2.Services
                 addPartsToExcelUploadModel.AddPartsToExcelUploadError = new List<AddPartsToExcelUploadError>();
                 addPartsToExcelUploadModel.Parts = new List<Part>();
                 List<ExcelRow> excelRows = new List<ExcelRow>();
-                if (fileName.EndsWith(".xls"))
+                if (fileName.EndsWith(".xls") || fileName.EndsWith(".xlsx"))
                 {
                     using (FileStream FileStream = File.OpenRead(fileName))
                     {
@@ -179,7 +179,7 @@ namespace QBD2.Services
                         DataSet dsexcelRecords = new DataSet();
                         IExcelDataReader reader = null;
                         //if (fileName.EndsWith(".xls"))
-                        reader = ExcelReaderFactory.CreateBinaryReader(FileStream);
+                        reader = ExcelReaderFactory.CreateReader(FileStream);
                         //else if (fileName.EndsWith(".xlsx"))
                         //    reader = ExcelReaderFactory.CreateOpenXmlReader(FileStream);
 
@@ -384,17 +384,17 @@ namespace QBD2.Services
 
 
 
-                                                //If they are not in the Parts table, add them
-                                                var childPart = new Entities.Part
-                                                {
-                                                    SerialNumber = childItem.SerialNumber,
-                                                    MasterPartId = masterPartIdToUse,
-                                                    PartStatusId = 1,
-                                                    ParentPartId = partFromQDB.PartId,
-                                                    UpdateDate = DateTime.Now
-                                                };
+                                                    //If they are not in the Parts table, add them
+                                                    var childPart = new Entities.Part
+                                                    {
+                                                        SerialNumber = childItem.SerialNumber,
+                                                        MasterPartId = masterPartIdToUse,
+                                                        PartStatusId = 1,
+                                                        ParentPartId = partFromQDB.PartId,
+                                                        UpdateDate = DateTime.Now
+                                                    };
 
-                                                partsList.Add(childPart);
+                                                    partsList.Add(childPart);
 
                                             }
                                         }
@@ -433,7 +433,7 @@ namespace QBD2.Services
             }
             catch (Exception ex)
             {
-                return null;
+                throw;
             }
         }
 

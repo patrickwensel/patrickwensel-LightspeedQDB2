@@ -7,54 +7,77 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject BuildStationFailureCodeService BuildStationFailureCodeService
+@inject PartService PartService
+
+<style>
+.autocompletehright40
+{
+   height: 40px !important;
+}
+</style>
 
 <div class="row alerts-row">
     <div class="col-md-9">
-        <h3 class="alert-title"><i class="fa fa-search"></i> Inspection</h3>
+           @if (IsDisplayAddEditInspection == true && IsAddInspection == true)
+           {
+               <h3 class="alert-title"><label @onclick="(()=> CloseAddEditInspectionWindow())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add new Inspection</h3>
+           }
+           else if(IsDisplayAddEditInspection == true && IsAddInspection == false)
+           {
+               <h3 class="alert-title"><label @onclick="(()=> CloseAddEditInspectionWindow())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Edit Inspection</h3>
+           }
+           else
+           {
+                <h3 class="alert-title"><i class="fa fa-search" aria-hidden="true"></i>&nbsp;&nbsp;Inspection</h3>
+           }
     </div>
-
     <div class="col-md-3 add-alrert-btn">
-        <TelerikButton Icon="add" OnClick="@(()=> findInspectionsDetail(null))">Add New Inspection</TelerikButton>
+         @if (IsDisplayAddEditInspection == false && IsAddInspection == true)
+         {
+             <TelerikButton Icon="add" OnClick="@(()=> findInspectionsDetail(null))">Add New Inspection</TelerikButton>
+         }
     </div>
 </div>
 <hr />
 
-<div class="row">
-    <div class="current-inspection">
-        <h3 class="alert-table-title">Current Inspections</h3>
-        <div class="al-table">
-            <TelerikGrid Data="@MyData"
+@if (!IsDisplayAddEditInspection)
+{
+    <div class="row">
+        <div class="current-inspection">
+            <h3 class="alert-table-title">Current Inspections</h3>
+            <div class="al-table">
+                <TelerikGrid Data="@MyData"
                          Pageable="true"
                          Sortable="true"
                          Resizable="true"
                          FilterMode="@GridFilterMode.FilterRow">
 
-                <GridColumns>
-                    <GridColumn Field="Part.SerialNumber" Title="Serial Number" Groupable="false" Filterable="true" Sortable="false">
-                        <HeaderTemplate>
-                            <span><i class="fa-solid fa-barcode" style="color: #11515E;"></i> Serial Number</span>
-                        </HeaderTemplate>
-                    </GridColumn>
-                    <GridColumn Field="@(nameof(Entities.Inspection.UpdateDate))" Title="Update Date" Groupable="false" Sortable="true" Filterable="true">
-                        <HeaderTemplate>
-                            <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Update Date</span>
-                        </HeaderTemplate>
-                    </GridColumn>
-                    <GridColumn Field="@(nameof(Entities.Inspection.Status))" Title="Status" Groupable="false" Sortable="true" Filterable="true">
-                        <HeaderTemplate>
-                            <span><i class="fa-duotone fa-wave-pulse" style="color: #11515E;"></i> Status</span>
-                        </HeaderTemplate>
-                        <Template>
-                            @{
-                                var inspection = context as Entities.Inspection;
-                                if (inspection != null && inspection.Pass == true)
-                                {
-                                    <lable style="color:green">@inspection.Status</lable>
-                                }
-                                else
-                                {
-                                    <lable style="color:red;">@inspection.Status</lable>
-                                }
+                    <GridColumns>
+                        <GridColumn Field="Part.SerialNumber" Title="Serial Number" Groupable="false" Filterable="true" Sortable="false">
+                            <HeaderTemplate>
+                                <span><i class="fa-solid fa-barcode" style="color: #11515E;"></i> Serial Number</span>
+                            </HeaderTemplate>
+                        </GridColumn>
+                        <GridColumn Field="@(nameof(Entities.Inspection.UpdateDate))" Title="Update Date" Groupable="false" Sortable="true" Filterable="true">
+                            <HeaderTemplate>
+                                <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Update Date</span>
+                            </HeaderTemplate>
+                        </GridColumn>
+                        <GridColumn Field="@(nameof(Entities.Inspection.Status))" Title="Status" Groupable="false" Sortable="true" Filterable="true">
+                            <HeaderTemplate>
+                                <span><i class="fa-duotone fa-wave-pulse" style="color: #11515E;"></i> Status</span>
+                            </HeaderTemplate>
+                            <Template>
+                                @{
+                                    var inspection = context as Entities.Inspection;
+                                    if (inspection != null && inspection.Pass == true)
+                                    {
+                                        <lable style="color:green">@inspection.Status</lable>
+                                    }
+                                    else
+                                    {
+                                        <lable style="color:red;">@inspection.Status</lable>
+                                    }
                             }
                         </Template>
                     </GridColumn>
@@ -79,17 +102,21 @@
         </div>
     </div>
 </div>
+}
 
+@if(IsDisplayAddEditInspection)
+{
 <div class="row">
     <div class="col-md-12">
-        <div id="mySidebar" class="sidebar">
             <div class="form-group row inspection">
-                <div class="col-md-7"> </div>
-                <div class=" col-sm-5 right-scroll-column" style="border-left:unset!important;">
+                <div class=" col-sm-12 right-scroll-column" style="border-left:unset!important;">
 
                     <div class="row">
                         <div class="col-sm-9 left-input">
-                            <TelerikTextBox id="txtSerialSearch" Class="form-control col-sm-12" @bind-Value="SerialNumber" PlaceHolder="Search for a Serial NUmber"></TelerikTextBox>
+                        <TelerikAutoComplete Data="@Parts" @bind-Value="@SerialNumber" Class="form-control col-sm-12 autocompletehright40"
+                        ValueField="@(nameof(Part.SerialNumber))" ItemHeight="35" ScrollMode="@DropDownScrollMode.Virtual"
+                        PageSize="10" Filterable="true" MinLength="3" ClearButton="true"
+                        Placeholder="Search for a Serial Number" />
                         </div>
                         <div class=" col-sm-3 b-btn">
                             <TelerikButton id="btnSearch" OnClick="(()=>btnFindOnClick(true))" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
@@ -99,7 +126,7 @@
                     <div class="row class=">
                         <div class="col-sm-12">
                             <label class="col-sm-12 col-form-label">Desc :</label>
-                            <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b" @onclick="(() => CloseAddEditInspectionWindow())">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty) <i class="fa-solid fa-circle-xmark"></i></label>
+                            <label id="lblDescValue" class="col-sm-12 col-form-label right-value font-b">@(dataInspectionModel !=null ? dataInspectionModel.Description:string.Empty)</label>
                         </div>
                     </div>
                     <div class="row">
@@ -145,130 +172,132 @@
                         {
                             if (OriginalWorkOrderInspection != null)
                             {
-                                <div class="row">
-                                    <label class="col-sm-3 col-form-label">Status</label>
-                                    <div class="col-sm-9">
-                                        <ul class="switch-btn">
-                                            <li class="@(OriginalWorkOrderInspection.Pass?"active":"")" @onclick="(() => OnDataStatusChangeHandler(true))"><i class="fa-regular fa-circle-check"></i> Passed</li>
-                                            <li class="failed @(OriginalWorkOrderInspection.Pass?"":"active")" @onclick="(() => OnDataStatusChangeHandler(false))"><i class="fa-light fa-circle-xmark"></i> Failed</li>
-                                        </ul>
+                                    <div class="row">
+                                        <label class="col-sm-3 col-form-label">Status</label>
+                                        <div class="col-sm-9">
+                                            <ul class="switch-btn">
+                                                <li class="@(OriginalWorkOrderInspection.Pass?"active":"")" @onclick="(() => OnDataStatusChangeHandler(true))"><i class="fa-regular fa-circle-check"></i> Passed</li>
+                                                <li class="failed @(OriginalWorkOrderInspection.Pass?"":"active")" @onclick="(() => OnDataStatusChangeHandler(false))"><i class="fa-light fa-circle-xmark"></i> Failed</li>
+                                            </ul>
+                                        </div>
                                     </div>
-                                </div>
 
                                 if (!OriginalWorkOrderInspection.Pass)
                                 {
-                                    <div class="row">
-                                        <label class="col-sm-3 col-form-label">Failure Reason</label>
-                                        <div class="col-sm-9">
-                                            <TelerikDropDownList Data="@dataBuildStationFailureCodeDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
-                                                     @bind-Value="@OriginalWorkOrderInspection.InspectionFailed.BuildStationFailureCodeId" DefaultText="Select Failure Reason">
-                                            </TelerikDropDownList>
+                                        <div class="row">
+                                            <label class="col-sm-3 col-form-label">Failure Reason</label>
+                                            <div class="col-sm-9">
+                                                <TelerikDropDownList Data="@dataBuildStationFailureCodeDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                                         @bind-Value="@OriginalWorkOrderInspection.InspectionFailed.BuildStationFailureCodeId" DefaultText="Select Failure Reason">
+                                                </TelerikDropDownList>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <label class="col-sm-3 col-form-label">Comment</label>
-                                        <div class="col-sm-9">
-                                            <TelerikTextArea @bind-Value="@OriginalWorkOrderInspection.InspectionFailed.Comment"></TelerikTextArea>
+                                        <div class="row">
+                                            <label class="col-sm-3 col-form-label">Comment</label>
+                                            <div class="col-sm-9">
+                                                <TelerikTextArea @bind-Value="@OriginalWorkOrderInspection.InspectionFailed.Comment"></TelerikTextArea>
+                                            </div>
                                         </div>
-                                    </div>
                                 }
 
-                                <div class="row">
-                                    <div class="col-sm-12 save-btn">
-                                        <TelerikButton ButtonType="@ButtonType.Button" Enabled=@(!isSaveInspectionClick) OnClick="@btnSaveInspectionOnClick"><i class="fa-solid fa-floppy-disk"></i> Save</TelerikButton>
+                                    <div class="row">
+                                        <div class="col-sm-12 save-btn">
+                                            <TelerikButton ButtonType="@ButtonType.Button" Enabled=@(!isSaveInspectionClick) OnClick="@btnSaveInspectionOnClick"><i class="fa-solid fa-floppy-disk"></i> Save</TelerikButton>
+                                        </div>
                                     </div>
-                                </div>
                             }
                         }
                         else
                         {
-                            <div class="row station-section">
-                                <label class="col-sm-2 col-form-label">Station</label>
+                                <div class="row station-section">
+                                    <label class="col-sm-2 col-form-label">Station</label>
 
-                                <div class="col-sm-10">
-                                    <TelerikDropDownList Data="@dataStationDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
-                                                     @bind-Value="@DdlStationValue" DefaultText="Select Status ">
-                                    </TelerikDropDownList>
+                                    <div class="col-sm-10">
+                                        <TelerikDropDownList Data="@dataStationDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                                         @bind-Value="@DdlStationValue" DefaultText="Select Status ">
+                                        </TelerikDropDownList>
+                                    </div>
+
                                 </div>
 
-                            </div>
-
-                            <div class="row">
-                                <label class="col-sm-2 col-form-label">Status</label>
-                                <div class="col-sm-10">
-                                    <ul class="switch-btn">
-                                        <li class="@AddActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(1))"><i class="fa-regular fa-circle-check"></i> Passed</li>
-                                        <li class="failed @AddInActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(0))"><i class="fa-light fa-circle-xmark"></i> Failed</li>
-                                    </ul>
+                                <div class="row">
+                                    <label class="col-sm-2 col-form-label">Status</label>
+                                    <div class="col-sm-10">
+                                        <ul class="switch-btn">
+                                            <li class="@AddActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(1))"><i class="fa-regular fa-circle-check"></i> Passed</li>
+                                            <li class="failed @AddInActiveCssClass" @onclick="(() => OnDataStatusChangeHandler(0))"><i class="fa-light fa-circle-xmark"></i> Failed</li>
+                                        </ul>
+                                    </div>
                                 </div>
-                            </div>
 
                             if (@RdoStatusValue == 0)
                             {
-                                <div class="row">
-                                    <label class="col-sm-2 col-form-label">Primary</label>
-                                    <div class="col-sm-10">
-                                        <TelerikDropDownList Data="@dataFailurePrimaryDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
-                                                     @bind-Value="@DdlFailurePrimaryValue" DefaultText="Select Failure Primary" OnChange="@MyOnChangeHandler">
-                                        </TelerikDropDownList>
+                                    <div class="row">
+                                        <label class="col-sm-2 col-form-label">Primary</label>
+                                        <div class="col-sm-10">
+                                            <TelerikDropDownList Data="@dataFailurePrimaryDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                                         @bind-Value="@DdlFailurePrimaryValue" DefaultText="Select Failure Primary" OnChange="@MyOnChangeHandler">
+                                            </TelerikDropDownList>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <label class="col-sm-2 col-form-label">Secondary</label>
-                                    <div class="col-sm-10">
-                                        <TelerikDropDownList Data="@dataFailureDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
-                                                     @bind-Value="@DdlFailureValue" DefaultText="Select Failure ">
-                                        </TelerikDropDownList>
+                                    <div class="row">
+                                        <label class="col-sm-2 col-form-label">Secondary</label>
+                                        <div class="col-sm-10">
+                                            <TelerikDropDownList Data="@dataFailureDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                                         @bind-Value="@DdlFailureValue" DefaultText="Select Failure ">
+                                            </TelerikDropDownList>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <label class="col-sm-2 col-form-label">Comment</label>
-                                    <div class="col-sm-10">
-                                        <TelerikTextArea Class="form-control col-sm-11" @bind-Value="@FailureCommentValue"></TelerikTextArea>
+                                    <div class="row">
+                                        <label class="col-sm-2 col-form-label">Comment</label>
+                                        <div class="col-sm-10">
+                                            <TelerikTextArea Class="form-control col-sm-11" @bind-Value="@FailureCommentValue"></TelerikTextArea>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12 add-reason-btn">
-                                        <TelerikButton id="btnSearch" ButtonType="@ButtonType.Button" OnClick="@btnAddOnClick"><i class="fa-light fa-plus"></i> Add Reason</TelerikButton>
+                                    <div class="row">
+                                        <div class="col-sm-12 add-reason-btn">
+                                            <TelerikButton id="btnSearch" ButtonType="@ButtonType.Button" OnClick="@btnAddOnClick"><i class="fa-light fa-plus"></i> Add Reason</TelerikButton>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="reason-section">
-                                    <h3>Reasons</h3>
-                                    <TelerikGrid Data="@dataFailureGrid"
+                                    <div class="reason-section">
+                                        <h3>Reasons</h3>
+                                        <TelerikGrid Data="@dataFailureGrid"
                                      Sortable="true"
                                      Resizable="true"
                                      EditMode="Telerik.Blazor.GridEditMode.Inline"
                                      OnDelete=@DeleteHandler>
-                                        <GridColumns>
-                                            <GridColumn Field="FailurePrimaryName" Title="Primary" Groupable="false" />
-                                            <GridColumn Field="FailureName" Title="Secondary" Groupable="false" />
-                                            <GridColumn Field="Comment" Title="Comments" Groupable="false" />
-                                            <GridCommandColumn Width="10%">
-                                                <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
-                                            </GridCommandColumn>
-                                        </GridColumns>
-                                    </TelerikGrid>
-                                </div>
+                                            <GridColumns>
+                                                <GridColumn Field="FailurePrimaryName" Title="Primary" Groupable="false" />
+                                                <GridColumn Field="FailureName" Title="Secondary" Groupable="false" />
+                                                <GridColumn Field="Comment" Title="Comments" Groupable="false" />
+                                                <GridCommandColumn Width="10%">
+                                                    <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
+                                                </GridCommandColumn>
+                                            </GridColumns>
+                                        </TelerikGrid>
+                                    </div>
                             }
 
-                            <div class="row">
-                                <label class="col-sm-2 col-form-label">General Comments</label>
+                                <div class="row">
+                                    <label class="col-sm-2 col-form-label">General Comments</label>
 
-                                @{
+                                    @{
                                     if (dataInspection == null)
                                         dataInspection = new Models.Inspection();
-                                }
-                                <div class="col-sm-10">
-                                    <TelerikTextArea Id="txtGenerelComment" @bind-Value="@dataInspection.GeneralComments">
-                                    </TelerikTextArea>
+                                    }
+                                    <div class="col-sm-10">
+                                        <TelerikTextArea Id="txtGenerelComment" @bind-Value="@dataInspection.GeneralComments">
+                                        </TelerikTextArea>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="row">
-                                <div class="col-sm-12 save-btn">
-                                    <TelerikButton ButtonType="@ButtonType.Button" OnClick="@btnSaveOnClick"><i class="fa-solid fa-floppy-disk"></i> Save</TelerikButton>
+                                <div class="row">
+                                    <div class="col-sm-12 save-btn">
+                                        <TelerikButton Icon="cancel" ButtonType="ButtonType.Button" @onclick="(()=> CloseAddEditInspectionWindow())" >Cancel</TelerikButton>
+                                        &nbsp;
+                                        <TelerikButton ButtonType="@ButtonType.Button" OnClick="@btnSaveOnClick"><i class="fa-solid fa-floppy-disk"></i> Save</TelerikButton>
+                                    </div>
                                 </div>
-                            </div>
                         }
                     }
                 </div>
@@ -276,11 +305,10 @@
 
 
             </div>
-        </div><!--my sidebar end--->
-
     </div>
 </div>
 
+}
 
 @if (SelectedAlertDeviationRecord != null && IsDisplayPopUpWindow == true)
 {
@@ -288,29 +316,29 @@
         <WindowTitle>
             @{
 
-                <h5>
-                    <!---<i aria-hidden="true"></i>--->
-                    @if (SelectedAlertDeviationRecord.AlertId > 0)
+                    <h5>
+                        <!---<i aria-hidden="true"></i>--->
+                        @if (SelectedAlertDeviationRecord.AlertId > 0)
                     {
-                        <div class="row p-lr">
-                            <div class="col-md-11">
-                                <text><i class="fa-light fa-bell-exclamation"></i> Alert Detail </text>
+                            <div class="row p-lr">
+                                <div class="col-md-11">
+                                    <text><i class="fa-light fa-bell-exclamation"></i> Alert Detail </text>
+                                </div>
+
+
+                                <div class="col-md-1" @onclick="(()=>ClearAlertDeviationSelection())"><i class="fa-light fa-circle-xmark"></i></div>
                             </div>
-
-
-                            <div class="col-md-1" @onclick="(()=>ClearAlertDeviationSelection())"><i class="fa-light fa-circle-xmark"></i></div>
-                        </div>
                     }
                     else if (SelectedAlertDeviationRecord.DeviationId > 0)
                     {
-                        <div class="row p-lr">
-                            <div class="col-md-11">
-                                <text><i class="fa-light fa-arrows-turn-to-dots" b-kq6mrvu7il=""></i> Deviation Detail</text>
+                            <div class="row p-lr">
+                                <div class="col-md-11">
+                                    <text><i class="fa-light fa-arrows-turn-to-dots" b-kq6mrvu7il=""></i> Deviation Detail</text>
+                                </div>
+                                <div class="col-md-1" @onclick="(()=>ClearAlertDeviationSelection())"><i class="fa-light fa-circle-xmark"></i></div>
                             </div>
-                            <div class="col-md-1" @onclick="(()=>ClearAlertDeviationSelection())"><i class="fa-light fa-circle-xmark"></i></div>
-                        </div>
                     }
-                </h5>
+                    </h5>
 
             }
         </WindowTitle>
@@ -520,6 +548,12 @@
     public string AddActiveCssClass { get; set; } = "active";
     public string AddInActiveCssClass { get; set; }
 
+    public bool IsDisplayAddEditInspection { get; set; }
+
+    public bool IsAddInspection { get; set; } = true;
+
+    public IEnumerable<Part> Parts { get; set; }
+
     public void OnDataStatusChangeHandler(bool value)
     {
         OriginalWorkOrderInspection.Pass = value;
@@ -553,7 +587,8 @@
             if (isSuccess)
             {
                 toastService.ShowSuccess("Inspection Saved Successfully.", "Success");
-                NavigationManager.NavigateTo("Inspection", true);
+                await CloseAddEditInspectionWindow();
+                await this.OnInitializedAsync();
             }
             else
             {
@@ -594,6 +629,7 @@
 
     void GetDropDownData()
     {
+        Parts = PartService.GetAllParts();
         dataFailurePrimaryDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureTypePrimary, null);
         dataStationDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.Station, null);
     }
@@ -662,22 +698,24 @@
 
     async Task findInspectionsDetail(Entities.Inspection inspection)
     {
-        await JSRuntime.InvokeVoidAsync("openNav");
+        IsDisplayAddEditInspection = true;
         if (inspection != null && inspection.Part != null)
         {
+            IsAddInspection = false;
             SerialNumber = inspection.Part.SerialNumber;
             SelectedDataInspection = await InspectionService.GetInspectionsById(inspection.InspectionId);
             await btnFindOnClick(false);
         }
         else
         {
+            IsAddInspection = true;
             await btnFindOnClick(false);
         }
     }
 
     async Task btnFindOnClick(bool isFindButton)
     {
-         IsWorkOrderInspection = false;
+        IsWorkOrderInspection = false;
         if (string.IsNullOrEmpty(SerialNumber) )
         {
             if (isFindButton)
@@ -783,7 +821,8 @@
         if (await InspectionService.Save(dataInspectionModel))
         {
             toastService.ShowInfo("Record Saved Successfully", "Info");
-            NavigationManager.NavigateTo("Inspection", true);
+            await CloseAddEditInspectionWindow();
+            await this.OnInitializedAsync();
         }
         else
         {
@@ -833,7 +872,21 @@
         RdoStatusValue = 1;
         DdlStationValue = dataInspection.StationId;
         OnDataStatusChangeHandler(RdoStatusValue);
-        await JSRuntime.InvokeVoidAsync("closeNav");
+        IsDisplayAddEditInspection = false;
+        IsAddInspection = true;
         StateHasChanged();
     }
+
+
+    private async Task MyOnChangeHandler(object theUserChoice)
+    {
+        if(theUserChoice != null)
+        {
+            Part selectedMasterPart = Parts.Where(x => x.SerialNumber == (string)theUserChoice).FirstOrDefault();
+            if (selectedMasterPart != null)
+            {
+            }
+        }
+    }
+
  }

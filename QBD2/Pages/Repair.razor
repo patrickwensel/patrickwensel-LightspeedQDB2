@@ -76,7 +76,7 @@
                <TelerikAutoComplete Data="@Parts" @bind-Value="@SerialNumber" Class="form-control col-sm-12 autocompletehright40"
                 ValueField="@(nameof(Part.SerialNumber))" ItemHeight="35" ScrollMode="@DropDownScrollMode.Virtual"
                 PageSize="10" Filterable="true" MinLength="3" ClearButton="true"
-                Placeholder="Type Serial Number And Select Part" OnChange="@MyOnChangeHandler"/>
+                Placeholder="Search for a Serial Number" OnChange="@MyOnChangeHandler"/>
             </div>
             <div class=" col-sm-3 b-btn">
                 <TelerikButton id="btnSearch" OnClick="@btnFindOnClick" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
@@ -243,6 +243,7 @@
         </GridColumns>
       </TelerikGrid>
     </div>
+    <br/> <br/>
 }
 @code {
 
@@ -441,7 +442,6 @@
     {
         if(theUserChoice != null)
         {
-            var result = string.Format("The user confirmed: {0}", (string)theUserChoice);
             Part selectedMasterPart = Parts.Where(x => x.SerialNumber == (string)theUserChoice).FirstOrDefault();
             if (selectedMasterPart != null)
             {

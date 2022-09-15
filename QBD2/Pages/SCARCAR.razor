@@ -48,6 +48,11 @@ label.k-form-label {
 .k-window-actions span {
     color: #fff;
 }
+
+.marg-left-10
+{
+    margin-left: 10px
+}
 </style>
 
 <div class="row alerts-row">
@@ -216,7 +221,7 @@ label.k-form-label {
                          <Template Context="scarCarNoteItem">
                                @{
                                    var scarCarNote = scarCarNoteItem as Models.ScarCarNote;
-                                       <TelerikButton Icon="delete" OnClick="((args) => DeleteHandler(scarCarNote))" ButtonType="ButtonType.Button"></TelerikButton>
+                                           <TelerikButton Icon="delete" OnClick="((args) => DeleteHandler(scarCarNote))" ButtonType="ButtonType.Button"></TelerikButton>
                                  }
                          </Template>
                      </GridColumn>
@@ -225,9 +230,9 @@ label.k-form-label {
          </div>
         <br />
         <div style="text-align:right!important">
-            <TelerikButton ButtonType="ButtonType.Button" @onclick="(()=> btnCancelScarCarOnClick())" >Cancel</TelerikButton>
-            &nbsp;
-            <TelerikButton Class="SaveButton" ButtonType="ButtonType.Submit" Icon="save">Save</TelerikButton>
+            <TelerikButton Class="SaveButton marg-left-10" ButtonType="ButtonType.Submit" Icon="save">Save</TelerikButton>
+            &nbsp;&nbsp;
+            <TelerikButton Class="SaveButton marg-left-10" ButtonType="ButtonType.Button" Icon="cancel" @onclick="(()=> btnCancelScarCarOnClick())">Cancel</TelerikButton>
         </div>
         <br />
     </EditForm>

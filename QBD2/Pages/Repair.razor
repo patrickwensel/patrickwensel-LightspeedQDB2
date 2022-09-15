@@ -9,16 +9,35 @@
 @inject GLCodeService GLCodeService
 @inject PartStatusService PartStatusService
 @inject FailureCodeService FailureCodeService
-
+@inject IJSRuntime JSRuntime
+@inject MasterPartService MasterPartService
+<style>
+.autocompletehright40
+{
+   height: 40px !important;
+}
+</style>
 
 <div class="row alerts-row">
     <div class="col-md-9">
-<h3 class="alert-title"><i class="fa-solid fa-hammer"></i> Repair</h3>
-</div>
- <div class="col-md-3 add-alrert-btn">
-        <GridToolBar>
+           @if (AddParts != null && IsAddRecord == true)
+           {
+               <h3 class="alert-title"><label @onclick="(()=> btnCancelRepairOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add new Repair</h3>
+           }
+           else if(AddParts != null && IsAddRecord == false)
+           {
+               <h3 class="alert-title"><label @onclick="(()=> btnCancelRepairOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Edit Repair</h3>
+           }
+           else
+           {
+                <h3 class="alert-title"><i class="fa-solid fa-hammer" aria-hidden="true"></i>&nbsp;&nbsp;Repair</h3>
+           }
+    </div>
+    <div class="col-md-3 add-alrert-btn">
+        @if (AddParts == null)
+        {
             <TelerikButton Icon="add" OnClick="(() => SelectRecord(null))">Add new Repair</TelerikButton>
-        </GridToolBar>
+        }
    </div>
 </div>
 
@@ -50,56 +69,14 @@
 {
     
 <div class="form-group row inspection">
-    <div class="col-sm-4 left-serial">
-
-        <div class="current-inspection">
-        <h3>History</h3>
-       <TelerikGrid Data="@MyData"
-        Pageable="true" Sortable="true"
-        Resizable="true">
-        <GridColumns>
-              <!---<GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false"/>---->
-                <GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false">
-                <HeaderTemplate>
-                <span><i class="fa-solid fa-barcode" style="color: #11515E;"></i> Serial Number</span>
-                </HeaderTemplate>
-                </GridColumn>
-
-                <GridColumn Field="@(nameof(Models.Parts.UpdateDate))" Title="Update Date" Groupable="false">
-                <HeaderTemplate>
-                <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Update Date</span>
-                </HeaderTemplate>
-                </GridColumn>
-
-              <!----<GridColumn Field="@(nameof(Models.Parts.UpdateDate))" Title="Date Updated" Groupable="false">
-                    <Template>
-                          @{
-                              var parts = context as Models.Parts;
-                              if (parts != null && !parts.UpdateDate.Equals(DateTime.MinValue))
-                              {
-                                  @parts.UpdateDate.ToString("dd/MM/yyyy @ h:mm")
-                              }
-                          }
-                    </Template>
-              </GridColumn>---->
-              <GridCommandColumn Width="10%">
-              <GridCommandButton Icon="" OnClick="@((args)=> btnHistoryGridEyeOnClick(args.Item as Models.Parts))"><i class="fa-solid fa-chevron-right" style="color: #69A3AF;"></i></GridCommandButton>
-              </GridCommandColumn>
-        </GridColumns>
-      </TelerikGrid>
-    </div>
-        
-
-        
-    </div><!----left column end---->
       
-    
-     <div class=" col-sm-8 right-scroll-column">
-
+    <div class=" col-sm-12">
           <div class="row">
-
             <div class="col-sm-9 left-input">
-                <TelerikTextBox id="txtSerialSearch" Class="form-control col-sm-12" @bind-Value="SerialNumber"></TelerikTextBox>
+               <TelerikAutoComplete Data="@Parts" @bind-Value="@SerialNumber" Class="form-control col-sm-12 autocompletehright40"
+                ValueField="@(nameof(Part.SerialNumber))" ItemHeight="35" ScrollMode="@DropDownScrollMode.Virtual"
+                PageSize="10" Filterable="true" MinLength="3" ClearButton="true"
+                Placeholder="Type Serial Number And Select Part" OnChange="@MyOnChangeHandler"/>
             </div>
             <div class=" col-sm-3 b-btn">
                 <TelerikButton id="btnSearch" OnClick="@btnFindOnClick" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
@@ -215,13 +192,13 @@
                         @{
                             var partStatus = context as Models.Parts;
                             var oldPartStatusId = partStatus.PartStatusId;
-                            <TelerikDropDownList @bind-Value="@partStatus.PartStatusId" Width="100%"
+                                <TelerikDropDownList @bind-Value="@partStatus.PartStatusId" Width="100%"
                                                  Data="@dataPartStatusDropdown"
                                                  ValueField="DropValue"
                                                  TextField="DropText"
                                                  Class="form-control"
                                                  OnChange="@(() => OnPartStatusesChangeHandler(partStatus,oldPartStatusId))">
-                            </TelerikDropDownList>
+                                </TelerikDropDownList>
                         }
                     </Template>
               </GridColumn>
@@ -229,6 +206,43 @@
         </TelerikGrid>
     </div>
 </div>
+
+<div class="current-inspection">
+        <h3>History</h3>
+       <TelerikGrid Data="@MyData"
+        Pageable="true" Sortable="true"
+        Resizable="true">
+        <GridColumns>
+              <!---<GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false"/>---->
+                <GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false">
+                <HeaderTemplate>
+                <span><i class="fa-solid fa-barcode" style="color: #11515E;"></i> Serial Number</span>
+                </HeaderTemplate>
+                </GridColumn>
+
+                <GridColumn Field="@(nameof(Models.Parts.UpdateDate))" Title="Update Date" Groupable="false">
+                <HeaderTemplate>
+                <span><i class="fa-solid fa-arrows-rotate" style="color: #11515E;"></i> Update Date</span>
+                </HeaderTemplate>
+                </GridColumn>
+
+              <!----<GridColumn Field="@(nameof(Models.Parts.UpdateDate))" Title="Date Updated" Groupable="false">
+                    <Template>
+                          @{
+                              var parts = context as Models.Parts;
+                              if (parts != null && !parts.UpdateDate.Equals(DateTime.MinValue))
+                              {
+                                      @parts.UpdateDate.ToString("dd/MM/yyyy @ h:mm")
+                              }
+                          }
+                    </Template>
+              </GridColumn>---->
+              <GridCommandColumn Width="10%">
+              <GridCommandButton Icon="" OnClick="@((args)=> btnHistoryGridEyeOnClick(args.Item as Models.Parts))"><i class="fa-solid fa-chevron-right" style="color: #69A3AF;"></i></GridCommandButton>
+              </GridCommandColumn>
+        </GridColumns>
+      </TelerikGrid>
+    </div>
 }
 @code {
 
@@ -250,6 +264,10 @@
 
     string SerialNumber { get; set; }
 
+    public bool IsAddRecord { get; set; } = true;
+
+    public IEnumerable<Part> Parts { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await GetRepairGridData();
@@ -260,11 +278,13 @@
     {
         if (repair != null)
         {
-             SerialNumber = repair.PartSerialNumber;
-             await btnFindOnClick();
+            IsAddRecord = false;
+            SerialNumber = repair.PartSerialNumber;
+            await btnFindOnClick();
         }
         else
         {
+            IsAddRecord = true;
             AddParts = new AddPartModel();
         }
 
@@ -324,6 +344,7 @@
 
     async Task GetDropDownData()
     {
+        Parts = PartService.GetAllParts();
         dataGLCodeDropdown =  GLCodeService.DropDownData();
         dataPartStatusDropdown = PartStatusService.DropDownData();
         dataFailureCodesDropdown = FailureCodeService.DropDownData();
@@ -399,8 +420,61 @@
     {
         if (item != null)
         {
-            await RepairService.Delete(item);
-            await GetRepairGridData();
+            var istrue = await JSRuntime.InvokeAsync<bool>("confirmMessage", new[] { "Are you sure you want to delete this record?" });
+            if(istrue)
+            {
+                await RepairService.Delete(item);
+                await GetRepairGridData();
+            }
         }
-     }
+    }
+
+    public async Task btnCancelRepairOnClick()
+    {
+        IsAddRecord = true;
+        AddParts = null;
+        await this.OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    private async Task MyOnChangeHandler(object theUserChoice)
+    {
+        if(theUserChoice != null)
+        {
+            var result = string.Format("The user confirmed: {0}", (string)theUserChoice);
+            Part selectedMasterPart = Parts.Where(x => x.SerialNumber == (string)theUserChoice).FirstOrDefault();
+            if (selectedMasterPart != null)
+            {
+                if (string.IsNullOrEmpty(selectedMasterPart.SerialNumber))
+                {
+                    toastService.ShowError("Please Enter Serial Number", "Error");
+                    return;
+                }
+
+                dataRepairModel = await RepairService.GetDataBySerialNumber(selectedMasterPart.SerialNumber.Trim());
+
+                if (dataRepairModel == null)
+                {
+                    toastService.ShowError("No Record Found ! Please Enter Valid Serial Number", "Error");
+                    AddParts.SelectedPartId = 0;
+                }
+
+                if (dataRepairModel != null)
+                {
+                    AddParts = new AddPartModel();
+                    ECAddPart = new EditContext(AddParts);
+                    AddParts.SelectedPartId = dataRepairModel.PartId;
+                    StateHasChanged();
+                }
+                await GetGridData();
+            }
+        }
+        else
+        {
+            dataRepairModel = null;
+            AddParts.SelectedPartId = 0;
+            await GetGridData();
+            StateHasChanged();
+        }
+    }
 }

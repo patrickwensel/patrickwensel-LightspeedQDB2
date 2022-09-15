@@ -201,8 +201,11 @@ namespace QBD2.Data
             modelBuilder.Entity<WorkOrder>().HasMany(x => x.WorkOrderParts).WithOne(x => x.WorkOrder).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<Inspection>().Property(m => m.StationId).IsRequired(false);
             modelBuilder.Entity<Inspection>().Property(m => m.WorkOrderId).IsRequired(false);
+            modelBuilder.Entity<Inspection>().Property(m => m.GeneralComments).IsRequired(false);
+            modelBuilder.Entity<Repair>().Property(m => m.Description).IsRequired(false);
             modelBuilder.Entity<InspectionFailure>().Property(m => m.FailureTypeId).IsRequired(false);
             modelBuilder.Entity<InspectionFailure>().Property(m => m.BuildStationFailureCodeId).IsRequired(false);
+            modelBuilder.Entity<InspectionFailure>().Property(m => m.Comment).IsRequired(false);
             modelBuilder.Entity<BuildStation>().HasMany(s => s.BuildTemplates).WithOne(c => c.BuildStation).OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);

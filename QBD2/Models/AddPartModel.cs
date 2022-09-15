@@ -18,7 +18,7 @@ namespace QBD2.Models
         [Required(ErrorMessage = "The Failure Code field is required.")]
         public int? FailureCodeId { get; set; }
 
-        [Required(ErrorMessage = "The Repair Description field is required.")]
+        //[Required(ErrorMessage = "The Repair Description field is required.")]
         public string? RepairDescription { get; set; }
     }
 }

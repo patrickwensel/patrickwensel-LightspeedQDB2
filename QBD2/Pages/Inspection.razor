@@ -542,11 +542,11 @@
                     return;
                 }
 
-                if (string.IsNullOrWhiteSpace(OriginalWorkOrderInspection.InspectionFailed.Comment))
-                {
-                    toastService.ShowError("Please Enter Comment.", "Error");
-                    return;
-                }
+                //if (string.IsNullOrWhiteSpace(OriginalWorkOrderInspection.InspectionFailed.Comment))
+                //{
+                //    toastService.ShowError("Please Enter Comment.", "Error");
+                //    return;
+                //}
             }
 
             var isSuccess = await InspectionService.SaveWorkOrderInspection(OriginalWorkOrderInspection);
@@ -623,11 +623,12 @@
             return;
         }
 
-        if (string.IsNullOrEmpty(FailureCommentValue))
-        {
-            toastService.ShowError("Please Enter Comment", "Error");
-            return;
-        }
+        //if (string.IsNullOrEmpty(FailureCommentValue))
+        //{
+        //    toastService.ShowError("Please Enter Comment", "Error");
+        //    return;
+        //}
+
         if (dataFailureGrid.Count > 0)
         {
             if (dataFailureGrid.Any(p => p.FailureTypeId == DdlFailureValue && p.FailurePrimaryTypeId == DdlFailurePrimaryValue))
@@ -767,11 +768,13 @@
             toastService.ShowError("Please Select Station", "Error");
             return;
         }
-        if (string.IsNullOrEmpty(dataInspection.GeneralComments))
-        {
-            toastService.ShowError("Please Enter General Comments", "Error");
-            return;
-        }
+
+        //if (string.IsNullOrEmpty(dataInspection.GeneralComments))
+        //{
+        //    toastService.ShowError("Please Enter General Comments", "Error");
+        //    return;
+        //}
+
         dataInspection.Pass = (RdoStatusValue == 1 ? true : false);
         dataInspection.StationId = DdlStationValue;
         dataInspection.PartId = dataInspectionModel.PartId;

@@ -16,6 +16,12 @@ namespace QBD2.Services
             _serialNumberService = serialNumberService;
         }
 
+        public List<Part> GetAllParts()
+        {
+            var x = _context.Parts.ToList();
+            return x;
+        }
+
         public async Task<List<Parts>> Read()
         {
             var x = await (from p in _context.Parts
@@ -175,7 +181,8 @@ namespace QBD2.Services
                 {
                     AddPartsToAlertError addPartsToAlertError = new AddPartsToAlertError
                     {
-                        Error = "Serial Number: " + serialNumberSearchResult.SerialNumber + " was not listed in Stage"
+                        Error = "Serial Number: " + serialNumberSearchResult.SerialNumber + " was not listed in Stage",
+                        SerialNumber = serialNumberSearchResult.SerialNumber
                     };
                     addPartsToAlertModel.AddPartsToAlertError.Add(addPartsToAlertError);
                 }
@@ -426,6 +433,7 @@ namespace QBD2.Services
     public class AddPartsToAlertError
     {
         public string Error { get; set; }
+        public string SerialNumber { get; set; }
     }
 
     public class AddPartsToAlertModel

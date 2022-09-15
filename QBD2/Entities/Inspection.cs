@@ -10,7 +10,7 @@ namespace QBD2.Entities
         public int InspectionId { get; set; }
         
         public bool Pass { get; set; }
-        public string GeneralComments { get; set; }
+        public string? GeneralComments { get; set; }
 
         public virtual List<InspectionFailure> InspectionFailures { get; set; }
 

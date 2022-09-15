@@ -9,7 +9,7 @@ namespace QBD2.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int RepairId { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [ForeignKey("GLCode")]
         public int GLCodeId { get; set; }

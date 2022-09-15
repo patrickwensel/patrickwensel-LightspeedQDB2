@@ -54,11 +54,11 @@ label.k-form-label {
     <div class="col-md-9">
            @if (AddEditScarCarModel != null && AddEditScarCarModel.ScarCarId == 0)
            {
-               <h3 class="alert-title"><label @onclick="(()=> btnCancelScarCarOnClick())"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add new Scar/Car</h3>
+               <h3 class="alert-title"><label @onclick="(()=> btnCancelScarCarOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add new Scar/Car</h3>
            }
            else if(AddEditScarCarModel != null && AddEditScarCarModel.ScarCarId > 0)
            {
-               <h3 class="alert-title"><label @onclick="(()=> btnCancelScarCarOnClick())"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Edit Scar/Car</h3>
+               <h3 class="alert-title"><label @onclick="(()=> btnCancelScarCarOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Edit Scar/Car</h3>
            }
            else
            {
@@ -216,7 +216,7 @@ label.k-form-label {
                          <Template Context="scarCarNoteItem">
                                @{
                                    var scarCarNote = scarCarNoteItem as Models.ScarCarNote;
-                                   <TelerikButton Icon="delete" OnClick="((args) => DeleteHandler(scarCarNote))" ButtonType="ButtonType.Button"></TelerikButton>
+                                       <TelerikButton Icon="delete" OnClick="((args) => DeleteHandler(scarCarNote))" ButtonType="ButtonType.Button"></TelerikButton>
                                  }
                          </Template>
                      </GridColumn>

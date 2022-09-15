@@ -1,4 +1,17 @@
-﻿function onlyAllowNumbers() {
+﻿window.AlertMessage = function (message) {
+    alert(message);
+}
+window.confirmMessage = function (message) {
+    var answer = confirm(message);
+    if (answer) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+function onlyAllowNumbers() {
     setTimeout(() =>
     {
         $('.numeric').on('keypress', function (ev) {

@@ -35,12 +35,24 @@
 
 <div class="row alerts-row">
     <div class="col-md-9">
-<h3 class="alert-title"><i class="fa-solid fa-arrows-turn-to-dots"></i> Deviations</h3>
-</div>
- <div class="col-md-3 add-alrert-btn">
-     <GridToolBar>
-            <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Deviation</TelerikButton>
-        </GridToolBar>
+           @if (AddEditDeviation != null && AddEditDeviation.DeviationId == 0)
+           {
+               <h3 class="alert-title"><label @onclick="(()=> btnCancelDeviationOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add new Deviation</h3>
+           }
+           else if(AddEditDeviation != null && AddEditDeviation.DeviationId > 0)
+           {
+               <h3 class="alert-title"><label @onclick="(()=> btnCancelDeviationOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Edit Deviation</h3>
+           }
+           else
+           {
+                <h3 class="alert-title"><i class="fa fa-car" aria-hidden="true"></i>&nbsp;&nbsp;Deviations</h3>
+           }
+    </div>
+    <div class="col-md-3 add-alrert-btn">
+    @if (AddEditDeviation == null)
+    {
+        <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Deviation</TelerikButton>
+    }
  </div>
 </div>
 
@@ -71,18 +83,24 @@
 
 @if (AddEditDeviation != null)
 {
-    <br />
     @* <div class="row">
         <div class="col-md-12">
         <h5><i class="fa-regular fa-plus"></i> Manage Deviation</h5><br />
         </div>
         </div>*@
     <div class="alert-edit-page">
-    <TelerikAutoComplete Data="@MasterParts" @bind-Value="@selectedMasterPart"
+        <div class="form-group row m-tb">
+            <label for="PartNumber" class="col-sm-2 col-form-label">Part Number</label>
+            <div class="col-md-10 bg-w">
+                <TelerikAutoComplete Data="@MasterParts" @bind-Value="@selectedMasterPart"
                      ValueField="@( nameof(MasterPart.PartNumber) )"
                      Filterable="true" MinLength="3"
                      OnChange="@MyOnChangeHandler"
-                     ClearButton="true" />
+                     ClearButton="true" 
+                     Placeholder="Type Part Number And Select Part"
+                     />
+            </div>
+        </div>
 
     <EditForm EditContext="@ECAddEditDeviation">
         <DataAnnotationsValidator />
@@ -638,5 +656,12 @@
             AddActiveCssClass = string.Empty;
             AddInActiveCssClass = "active";
         }
+    }
+
+    public async Task btnCancelDeviationOnClick()
+    {
+         AddEditDeviation = null;
+         await this.OnInitializedAsync();
+         StateHasChanged();
     }
 }

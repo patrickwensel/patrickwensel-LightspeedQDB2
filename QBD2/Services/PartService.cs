@@ -109,7 +109,8 @@ namespace QBD2.Services
                 {
                     AddPartsToDeviationError addPartsToDeviationError = new AddPartsToDeviationError
                     {
-                        Error = "Serial Number: " + serialNumberSearchResult.SerialNumber + " was not listed in Stage"
+                        Error = "Serial Number: " + serialNumberSearchResult.SerialNumber + " was not listed in Stage",
+                        SerialNumber = serialNumberSearchResult.SerialNumber
                     };
                     addPartsToDeviationModel.AddPartsToDeviationError.Add(addPartsToDeviationError);
                 }
@@ -422,6 +423,8 @@ namespace QBD2.Services
     public class AddPartsToDeviationError
     {
         public string Error { get; set; }
+        public string SerialNumber { get; set; }
+
     }
 
     public class AddPartsToDeviationModel

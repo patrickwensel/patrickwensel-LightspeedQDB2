@@ -150,9 +150,11 @@
                         @if (RangeAddPartsToAlertError != null && RangeAddPartsToAlertError.Count() > 0)
                         {
                             <div class="row">
-                                @foreach(var item in RangeAddPartsToAlertError)
+                                <label class="text-danger">Total&nbsp;@RangeAddPartsToAlertError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br/><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
+                                @if (IsDisplayRangeTextArea)
                                 {
-                                    <label class="text-danger">@item.Error</label><br />
+                                    string errorSerialNumber = string.Join(", ", RangeAddPartsToAlertError.Select(x=>x.SerialNumber));
+                                    <textarea @bind-value="errorSerialNumber" class="form-control" rows="4" @bind-value:event="oninput" style="width: 56%;margin-left: 12px;margin-bottom: 20px;"></textarea>
                                 }
                             </div>
                         }
@@ -216,9 +218,11 @@
                         @if (ExcelAddPartsToAlertError != null && ExcelAddPartsToAlertError.Count() > 0)
                         {
                             <div class="row">
-                                @foreach(var item in ExcelAddPartsToAlertError)
+                                <label class="text-danger">Total&nbsp;@ExcelAddPartsToAlertError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br/><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
+                                @if (IsDisplayRangeTextArea)
                                 {
-                                    <label class="text-danger">@item.Error</label><br />
+                                    string errorSerialNumber = string.Join(", ", ExcelAddPartsToAlertError.Select(x=>x.SerialNumber));
+                                    <textarea @bind-value="errorSerialNumber" class="form-control" rows="4" @bind-value:event="oninput" style="width: 56%;margin-left: 12px;"></textarea>
                                 }
                             </div>
                         }

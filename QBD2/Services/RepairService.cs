@@ -1,16 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.EntityFrameworkCore;
 using QBD2.Data;
 using QBD2.Entities;
+using static QBD2.Models.Enum;
 
 namespace QBD2.Services
 {
     public class RepairService
     {
         private readonly ApplicationDbContext _context;
+        public AuthenticationStateProvider AuthState;
 
-        public RepairService(ApplicationDbContext context)
+        public RepairService(ApplicationDbContext context, AuthenticationStateProvider authState)
         {
             _context = context;
+            AuthState = authState;
         }
 
         public async Task<List<Repair>> ReadRepairs()
@@ -51,12 +55,34 @@ namespace QBD2.Services
 
         public async Task Delete(Entities.Repair itemToDelete)
         {
-             var repairs = _context.Repairs.Where(d => d.RepairId == itemToDelete.RepairId).FirstOrDefault();
-             if (repairs != null)
-             {
-                 _context.Repairs.Remove(repairs);
-                 await _context.SaveChangesAsync();
-             }
+            var state = await AuthState.GetAuthenticationStateAsync();
+            if (state != null)
+            {
+                var UserId = state.User.Claims
+                             .Where(c => c.Type.Contains("UserId"))
+                             .Select(c => c.Value)
+                             .FirstOrDefault() ?? string.Empty;
+
+                if(!string.IsNullOrWhiteSpace(UserId))
+                {
+                    var user = await _context.Users.Where(x => x.Id == UserId).FirstOrDefaultAsync();
+                    if (user != null)
+                    {
+                        var userRoleIds = _context.UserRoles.Where(x => x.UserId == user.Id).Select(x => x.RoleId).ToList();
+                        var userRole = await _context.Roles.Where(x => userRoleIds.Contains(x.Id)).OrderBy(a => a.Name).Select(b => b.Name).ToListAsync();
+                        if(userRole != null && userRole.Any(x=>x.ToLower()== RoleType.CanDeleteRepair.ToString().ToLower()))
+                        {
+                            var repairs = _context.Repairs.Where(d => d.RepairId == itemToDelete.RepairId).FirstOrDefault();
+                            if (repairs != null)
+                            {
+                                _context.Repairs.Remove(repairs);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+                    }
+                }
+
+            }
         }
     }
 }

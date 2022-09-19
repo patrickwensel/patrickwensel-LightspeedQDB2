@@ -70,9 +70,13 @@
             <DataAnnotationsValidator />
             <div class="form-group">
                 <label>Role</label>
-                <TelerikDropDownList @bind-Value="@EditApplicationUserRoleModel.RoleId" DefaultText="Select Role"
-                                     Data="@RoleDropDownData" TextField="DropText" ValueField="DropValue">
-                </TelerikDropDownList>
+                 <TelerikMultiSelect Data="@RoleDropDownData"
+                                @bind-Value="@EditApplicationUserRoleModel.SelectedRoleIds"
+                                ValueField="DropValue"
+                                TextField="DropText"
+                                Placeholder="Select Roles"
+                                Id="roles-multiselect" Width="100%">
+                    </TelerikMultiSelect>
             </div>
             <hr />
             <div class="form-row" style="float:right;">
@@ -105,7 +109,7 @@
         ApplicationUserModel item = (ApplicationUserModel)args.Item;
         EditApplicationUserRoleModel editApplicationUserRoleModel = new EditApplicationUserRoleModel();
         editApplicationUserRoleModel.UserId = item.UserId;
-        editApplicationUserRoleModel.RoleId = item.RoleId;
+        editApplicationUserRoleModel.SelectedRoleIds = item.SelectedRoleIds;
         EditApplicationUserRoleModel = editApplicationUserRoleModel;
     }
 
@@ -116,6 +120,12 @@
 
     protected async Task OnEditRoleSave()
     {
+        if (EditApplicationUserRoleModel != null && EditApplicationUserRoleModel.SelectedRoleIds == null || EditApplicationUserRoleModel.SelectedRoleIds.Count() == 0)
+        { 
+            toastService.ShowError("Please select user roles.", "Error");
+            return;
+        }
+
         var result = await UserService.EditRole(EditApplicationUserRoleModel);
         if (result != null)
         {

@@ -2,12 +2,15 @@
 @using QBD2.Models
 @using QBD2.Services
 @using QBD2.Entities
+@using static QBD2.Models.Enum
 @inject InspectionService InspectionService
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject BuildStationFailureCodeService BuildStationFailureCodeService
 @inject PartService PartService
+@inject AuthenticationStateProvider AuthState
+@inject UserService UserService
 
 <style>
 .autocompletehright40
@@ -270,9 +273,12 @@
                                                 <GridColumn Field="FailurePrimaryName" Title="Primary" Groupable="false" />
                                                 <GridColumn Field="FailureName" Title="Secondary" Groupable="false" />
                                                 <GridColumn Field="Comment" Title="Comments" Groupable="false" />
-                                                <GridCommandColumn Width="10%">
-                                                    <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
-                                                </GridCommandColumn>
+                                                @if(IsUserCanDeleteFailureCodeRights)
+                                                {
+                                                    <GridCommandColumn Width="10%">
+                                                        <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
+                                                    </GridCommandColumn>
+                                                }
                                             </GridColumns>
                                         </TelerikGrid>
                                     </div>
@@ -554,6 +560,10 @@
 
     public IEnumerable<Part> Parts { get; set; }
 
+    public bool IsUserCanDeleteFailureCodeRights { get; set; } = false;
+
+    public string UserId { get; set; }
+
     public void OnDataStatusChangeHandler(bool value)
     {
         OriginalWorkOrderInspection.Pass = value;
@@ -604,9 +614,34 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var state = await AuthState.GetAuthenticationStateAsync();
+        if(state != null)
+        {
+            UserId = state.User.Claims
+                    .Where(c => c.Type.Contains("UserId"))
+                    .Select(c => c.Value)
+                    .FirstOrDefault() ?? string.Empty;
+        }
+        await CheckLoginUserHasDeleteRepairRights();
         await GetGridData();
         GetDropDownData();
         RdoStatusValue = 1;
+    }
+
+    public async Task CheckLoginUserHasDeleteRepairRights()
+    { 
+        if(!string.IsNullOrWhiteSpace(UserId))
+        {
+            var resultRoles = await UserService.GetUserRolesById(UserId);
+            if (resultRoles != null && resultRoles.Count() > 0 && resultRoles.Any(x => x.ToLower() == RoleType.CanDeleteFailureCodes.ToString().ToLower()))
+            {
+                IsUserCanDeleteFailureCodeRights = true;
+            }
+            else
+            {
+                IsUserCanDeleteFailureCodeRights = false;
+            }
+        }
     }
 
     async Task GetGridData()

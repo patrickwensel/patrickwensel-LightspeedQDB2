@@ -7,14 +7,15 @@ namespace QBD2.Models
         public string UserId { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
-        public string RoleId { get; set; }
+        public List<string>? SelectedRoleIds { get; set; }
         public string RoleName { get; set; }
     }
 
     public class EditApplicationUserRoleModel
     {
         public string UserId { get; set; }
+
         [Required(ErrorMessage = "The Role field is required.")]
-        public string RoleId { get; set; }
+        public List<string>? SelectedRoleIds { get; set; }
     }
 }

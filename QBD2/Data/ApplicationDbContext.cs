@@ -165,7 +165,8 @@ namespace QBD2.Data
             #region Role
             modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = "22b3bff1-cfd2-4075-a90f-827380656873", Name = "User", NormalizedName = "USER".ToUpper() });
             modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = "e4e7188b-6ecb-4278-aeee-17271f20d7ce", Name = "Admin", NormalizedName = "ADMIN".ToUpper() });
-
+            modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = "aec800c6-ea7e-4420-a583-91a23787a3af", Name = "CanDeleteFailureCodes", NormalizedName = "CANDELETEFAILURECODES".ToUpper() });
+            modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = "e77174e9-e942-4fc1-bdb5-20a5f318d2ed", Name = "CanDeleteRepair", NormalizedName = "CANDELETEREPAIR".ToUpper() });
             #endregion
 
             ApplicationUser ohiduserApplicationUser = new()

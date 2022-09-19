@@ -2,6 +2,7 @@
 @using QBD2.Models
 @using QBD2.Services
 @using QBD2.Entities
+@using static QBD2.Models.Enum
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
 @inject RepairService RepairService
@@ -11,6 +12,9 @@
 @inject FailureCodeService FailureCodeService
 @inject IJSRuntime JSRuntime
 @inject MasterPartService MasterPartService
+@inject AuthenticationStateProvider AuthState
+@inject UserService UserService
+
 <style>
 .autocompletehright40
 {
@@ -58,8 +62,11 @@
             <GridColumn Field="@(nameof(Entities.Repair.PartSerialNumber))" Title="Serial Number" Filterable="false"/>
             <GridCommandColumn Width="100px">
                  <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Entities.Repair))"><i class="fal fa-edit"></i></GridCommandButton>
-                 <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Entities.Repair))"></GridCommandButton>
-            </GridCommandColumn>
+                @if(IsUserHasCanDeleteRepairRights)
+                {
+                    <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Entities.Repair))"></GridCommandButton>
+                }
+             </GridCommandColumn>
         </GridColumns>
     </TelerikGrid>
     </div>
@@ -192,13 +199,13 @@
                         @{
                             var partStatus = context as Models.Parts;
                             var oldPartStatusId = partStatus.PartStatusId;
-                                <TelerikDropDownList @bind-Value="@partStatus.PartStatusId" Width="100%"
+                                    <TelerikDropDownList @bind-Value="@partStatus.PartStatusId" Width="100%"
                                                  Data="@dataPartStatusDropdown"
                                                  ValueField="DropValue"
                                                  TextField="DropText"
                                                  Class="form-control"
                                                  OnChange="@(() => OnPartStatusesChangeHandler(partStatus,oldPartStatusId))">
-                                </TelerikDropDownList>
+                                    </TelerikDropDownList>
                         }
                     </Template>
               </GridColumn>
@@ -232,7 +239,7 @@
                               var parts = context as Models.Parts;
                               if (parts != null && !parts.UpdateDate.Equals(DateTime.MinValue))
                               {
-                                      @parts.UpdateDate.ToString("dd/MM/yyyy @ h:mm")
+                                          @parts.UpdateDate.ToString("dd/MM/yyyy @ h:mm")
                               }
                           }
                     </Template>
@@ -269,10 +276,39 @@
 
     public IEnumerable<Part> Parts { get; set; }
 
+    public bool IsUserHasCanDeleteRepairRights { get; set; } = false;
+
+    public string UserId { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
+        var state = await AuthState.GetAuthenticationStateAsync();
+        if(state != null)
+        {
+            UserId = state.User.Claims
+                    .Where(c => c.Type.Contains("UserId"))
+                    .Select(c => c.Value)
+                    .FirstOrDefault() ?? string.Empty;
+        }
+        await CheckLoginUserHasDeleteRepairRights();
         await GetRepairGridData();
         base.OnInitialized();
+    }
+
+    public async Task CheckLoginUserHasDeleteRepairRights()
+    { 
+        if(!string.IsNullOrWhiteSpace(UserId))
+        {
+            var resultRoles = await UserService.GetUserRolesById(UserId);
+            if (resultRoles != null && resultRoles.Count() > 0 && resultRoles.Any(x => x.ToLower() == RoleType.CanDeleteRepair.ToString().ToLower()))
+            {
+                IsUserHasCanDeleteRepairRights = true;
+            }
+            else
+            {
+                IsUserHasCanDeleteRepairRights = false;
+            }
+        }
     }
 
     public async Task SelectRecord(Entities.Repair repair)

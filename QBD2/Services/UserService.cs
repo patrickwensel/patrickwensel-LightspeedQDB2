@@ -18,18 +18,25 @@ namespace QBD2.Services
         public async Task<List<ApplicationUserModel>> Read()
         {
             List<ApplicationUserModel> applicationUserModels = await (from u in _context.Users
-                                                                      join ur in _context.UserRoles on u.Id equals ur.UserId into ur_join
-                                                                      from ur in ur_join.DefaultIfEmpty()
-                                                                      join r in _context.Roles on ur.RoleId equals r.Id into r_join
-                                                                      from r in r_join.DefaultIfEmpty()
                                                                       select new ApplicationUserModel
                                                                       {
                                                                           UserId = u.Id,
                                                                           Email = u.Email,
                                                                           UserName = u.UserName,
-                                                                          RoleId = ur.RoleId,
-                                                                          RoleName = r.Name
+                                                                          SelectedRoleIds = _context.UserRoles.Where(x=>x.UserId == u.Id).Select(x=>x.RoleId).ToList()
                                                                       }).ToListAsync();
+
+            foreach (var userItem in applicationUserModels)
+            {
+                if (userItem != null && userItem.SelectedRoleIds != null)
+                {
+                    var selectedRoles = await _context.Roles.Where(x => userItem.SelectedRoleIds.Contains(x.Id)).OrderBy(a=>a.Name).Select(b => b.Name).ToListAsync();
+                    if (selectedRoles != null)
+                    {
+                        userItem.RoleName = String.Join(", ", selectedRoles);
+                    }
+                }
+            }
 
             return applicationUserModels;
         }
@@ -39,21 +46,35 @@ namespace QBD2.Services
             Models.ApiResponse apiResponse = new Models.ApiResponse();
             try
             {
-                var userRoles = await _context.UserRoles.Where(x => x.UserId == model.UserId).ToListAsync();
-                if (userRoles != null && userRoles.Any())
+
+                if (model != null && model.SelectedRoleIds != null && model.SelectedRoleIds.Any())
                 {
-                    _context.UserRoles.RemoveRange(userRoles);
-                    await _context.SaveChangesAsync();
+                    var userRoles = await _context.UserRoles.Where(x => x.UserId == model.UserId).ToListAsync();
+                    if (userRoles != null && userRoles.Any())
+                    {
+                        _context.UserRoles.RemoveRange(userRoles);
+                        await _context.SaveChangesAsync();
+                    }
+
+                    foreach (var roleId in model.SelectedRoleIds)
+                    {
+                        ApplicationUserRole applicationUserRole = new ApplicationUserRole();
+                        applicationUserRole.UserId = model.UserId;
+                        applicationUserRole.RoleId = roleId;
+                        _context.UserRoles.Add(applicationUserRole);
+                        await _context.SaveChangesAsync();
+                    }
+
+                    apiResponse.Success = true;
+                    apiResponse.Message = "Record Saved Successfully.";
+                }
+                else
+                {
+                    apiResponse.Success = false;
+                    apiResponse.Message = "Please select user roles.";
+                   
                 }
 
-                ApplicationUserRole applicationUserRole = new ApplicationUserRole();
-                applicationUserRole.UserId = model.UserId;
-                applicationUserRole.RoleId = model.RoleId;
-                _context.UserRoles.Add(applicationUserRole);
-                await _context.SaveChangesAsync();
-
-                apiResponse.Success = true;
-                apiResponse.Message = "Record Saved Successfully.";
                 return apiResponse;
             }
             catch
@@ -71,7 +92,23 @@ namespace QBD2.Services
              {
                  DropValue = c.Id,
                  DropText = c.Name
-             }).ToListAsync();
+             }).OrderBy(a=>a.DropText).ToListAsync();
+        }
+
+        public async Task<List<string>> GetUserRolesById(string userId)
+        {
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                List<string> userRole = new List<string>();
+                var user = await _context.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
+                if (user != null)
+                {
+                    var userRoleIds = _context.UserRoles.Where(x => x.UserId == user.Id).Select(x => x.RoleId).ToList();
+                    userRole = await _context.Roles.Where(x => userRoleIds.Contains(x.Id)).OrderBy(a => a.Name).Select(b => b.Name).ToListAsync();
+                    return userRole;
+                }
+            }
+            return null;
         }
     }
 }

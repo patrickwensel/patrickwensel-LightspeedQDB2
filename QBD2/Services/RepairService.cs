@@ -19,7 +19,7 @@ namespace QBD2.Services
 
         public async Task<List<Repair>> ReadRepairs()
         {
-            var x = _context.Repairs.Include(a => a.Part).Include(x => x.GLCode).Include(z => z.FailureCode).ToList();
+            var x = _context.Repairs.Include(a => a.Part).Include(x => x.GLCode).Include(z => z.FailureType).ToList();
             return x;
         }
 

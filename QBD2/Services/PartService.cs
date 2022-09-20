@@ -342,7 +342,7 @@ namespace QBD2.Services
                     Repair repair = new Repair();
                     repair.Description = itemToInsert.RepairDescription;
                     repair.GLCodeId = itemToInsert.GLCodeId.Value;
-                    repair.FailureCodeId = itemToInsert.FailureCodeId.Value;
+                    repair.FailureTypeId = itemToInsert.FailureTypeId.Value;
                     repair.PartId = part.PartId;
                     repair.UpdateDate = DateTime.Now;
                     _context.Repairs.Add(repair);

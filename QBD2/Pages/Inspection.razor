@@ -239,7 +239,7 @@
                                         <label class="col-sm-2 col-form-label">Primary</label>
                                         <div class="col-sm-10">
                                             <TelerikDropDownList Data="@dataFailurePrimaryDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
-                                                         @bind-Value="@DdlFailurePrimaryValue" DefaultText="Select Failure Primary" OnChange="@MyOnChangeHandler">
+                                                         @bind-Value="@DdlFailurePrimaryValue" DefaultText="Select Failure Primary" OnChange="@PrimaryDDOnChangeHandler">
                                             </TelerikDropDownList>
                                         </div>
                                     </div>
@@ -669,7 +669,7 @@
         dataStationDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.Station, null);
     }
 
-    void MyOnChangeHandler()
+    void PrimaryDDOnChangeHandler()
     {
         dataFailureDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureType, DdlFailurePrimaryValue);
 
@@ -719,7 +719,7 @@
         FailureCommentValue = string.Empty;
         DdlFailurePrimaryValue = 0;
         DdlFailureValue = 0;
-        MyOnChangeHandler();
+        PrimaryDDOnChangeHandler();
         dataFailureGrid = new List<Models.InspectionFailed>(dataFailureGrid);
 
 

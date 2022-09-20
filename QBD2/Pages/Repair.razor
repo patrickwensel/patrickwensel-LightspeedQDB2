@@ -14,6 +14,7 @@
 @inject MasterPartService MasterPartService
 @inject AuthenticationStateProvider AuthState
 @inject UserService UserService
+@inject InspectionService InspectionService
 
 <style>
 .autocompletehright40
@@ -157,19 +158,25 @@
                       <ValidationMessage For="@(() => AddParts.RepairDescription)"></ValidationMessage>
                       </div>
               </div>
-              
-
-           
-             <div class="row">
-                  <label for="FailureCodeId" class="col-sm-2 col-form-label">Failure Code</label>
-                  <div class="col-md-10">
-                  <TelerikDropDownList Data="@dataFailureCodesDropdown"  TextField="DropText" ValueField="DropValue"
-                             @bind-Value="@AddParts.FailureCodeId" DefaultText="Failure Code">
-                            </TelerikDropDownList>
-                            <ValidationMessage For="@(() => AddParts.FailureCodeId)"></ValidationMessage>
-                  </div>
-             </div>
                
+             <div class="row">
+                 <label class="col-sm-2 col-form-label">Primary</label>
+                 <div class="col-md-10">
+                     <TelerikDropDownList Data="@dataFailurePrimaryDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                  @bind-Value="@AddParts.FailureTypePrimaryId" DefaultText="Select Failure Primary" OnChange="@PrimaryDDOnChangeHandler">
+                     </TelerikDropDownList>
+                     <ValidationMessage For="@(() => AddParts.FailureTypePrimaryId)"></ValidationMessage>
+                 </div>
+             </div>
+             <div class="row">
+                 <label class="col-sm-2 col-form-label">Secondary</label>
+                 <div class="col-md-10">
+                     <TelerikDropDownList Data="@dataFailureDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                  @bind-Value="@AddParts.FailureTypeId" DefaultText="Select Failure ">
+                     </TelerikDropDownList>
+                     <ValidationMessage For="@(() => AddParts.FailureTypeId)"></ValidationMessage>
+                 </div>
+             </div>
 
              <div class="row">
                     <div class="col-md-12 add-reason-btn">
@@ -260,7 +267,9 @@
 
     List<Models.DropDownBind> dataPartStatusDropdown { get; set; }
 
-    List<Models.DropDownBind> dataFailureCodesDropdown { get; set; }
+    List<Models.DropDownBind> dataFailurePrimaryDropdown { get; set; }
+
+    List<Models.DropDownBind> dataFailureDropdown { get; set; }
 
     AddPartModel AddParts { get; set; }
 
@@ -354,6 +363,7 @@
             AddParts = new AddPartModel();
             ECAddPart = new EditContext(AddParts);
             AddParts.SelectedPartId = dataRepairModel.PartId;
+            PrimaryDDOnChangeHandler();
             StateHasChanged();
         }
 
@@ -384,7 +394,7 @@
         Parts = PartService.GetAllParts();
         dataGLCodeDropdown =  GLCodeService.DropDownData();
         dataPartStatusDropdown = PartStatusService.DropDownData();
-        dataFailureCodesDropdown = FailureCodeService.DropDownData();
+        dataFailurePrimaryDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureTypePrimary, null);
     }
 
     async Task btnHistoryGridEyeOnClick(Models.Parts parts)
@@ -422,6 +432,18 @@
             if(string.IsNullOrWhiteSpace(AddParts.PartNumber))
             {
                 toastService.ShowError("Please Enter Part Number", "Error");
+                return;
+            }
+
+            if (AddParts.FailureTypePrimaryId <= 0)
+            {
+                toastService.ShowError("Please Select Failure Primary Type", "Error");
+                return;
+            }
+
+            if (AddParts.FailureTypeId <= 0)
+            {
+                toastService.ShowError("Please Select Failure Type", "Error");
                 return;
             }
 
@@ -511,6 +533,15 @@
             AddParts.SelectedPartId = 0;
             await GetGridData();
             StateHasChanged();
+        }
+    }
+
+    void PrimaryDDOnChangeHandler()
+    {
+        if (AddParts != null)
+        {
+            dataFailureDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureType, AddParts.FailureTypePrimaryId);
+            //StateHasChanged();
         }
     }
 }

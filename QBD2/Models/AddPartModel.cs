@@ -15,8 +15,11 @@ namespace QBD2.Models
         [Required(ErrorMessage = "The GL Code field is required.")]
         public int? GLCodeId { get; set; }
 
-        [Required(ErrorMessage = "The Failure Code field is required.")]
-        public int? FailureCodeId { get; set; }
+        [Required(ErrorMessage = "The Failure Type Primary field is required.")]
+        public int? FailureTypePrimaryId { get; set; }
+
+        [Required(ErrorMessage = "The Failure Type field is required.")]
+        public int? FailureTypeId { get; set; }
 
         //[Required(ErrorMessage = "The Repair Description field is required.")]
         public string? RepairDescription { get; set; }

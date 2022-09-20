@@ -15,9 +15,9 @@ namespace QBD2.Entities
         public int GLCodeId { get; set; }
         public virtual GLCode GLCode { get; set; }
 
-        [ForeignKey("FailureCode")]
-        public int FailureCodeId { get; set; }
-        public virtual FailureCode FailureCode { get; set; }
+        [ForeignKey("FailureType")]
+        public int FailureTypeId { get; set; }
+        public virtual FailureType FailureType { get; set; }
 
         [ForeignKey("Part")]
         public int PartId { get; set; }

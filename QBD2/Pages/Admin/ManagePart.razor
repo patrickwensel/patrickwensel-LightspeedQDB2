@@ -4,6 +4,44 @@
 @using QBD2.Entities
 @using QBD2.Models
 @inject PartService PartService
+@inject MasterPartService MasterPartService
+@inject IToastService toastService
+
+<style>
+    .k-dialog-wrapper {
+        position: inherit;
+    }
+    .k-centered {
+        transform: translate(5%, -300%);
+        width: 320px;
+    }
+    .k-window-titlebar.k-dialog-titlebar.k-header {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        padding: 10px 10px 20px 10px;
+    }
+    .k-window-content.k-dialog-content {
+        border-radius: 0;
+    }
+    label.k-form-label {
+        margin-right: 15px;
+    }
+    .k-form .k-form-field, .k-form .k-form-field-wrap {
+        display: inline-flex;
+        width: 100%;
+    }
+    .k-actions-start {
+        float: right;
+    }
+    .k-window-actions span {
+        color: #fff;
+    }
+
+    label.col-form-label {
+        text-align: right;
+        font-weight: bold;
+    }
+</style>
 
 <h3>Part</h3>
 
@@ -13,7 +51,7 @@
              FilterMode="Telerik.Blazor.GridFilterMode.FilterRow"
              EditMode="Telerik.Blazor.GridEditMode.Inline">
     <GridToolBar>
-        <GridCommandButton Command="Add" Icon="add">Add a Part</GridCommandButton>
+        <GridCommandButton Icon="add" OnClick="(()=>SelectRecord(null))">Add a Part</GridCommandButton>
     </GridToolBar>
     <DetailTemplate>
         @{
@@ -36,9 +74,61 @@
     </GridColumns>
 </TelerikGrid>
 
+<TelerikWindow Visible="@(AddEditPartModel != null)" Modal="true"  Width="600px" Draggable="false">
+    <WindowTitle>
+        <strong>Add new Part</strong>
+    </WindowTitle>
+    <WindowActions>
+        <WindowAction Name="Close" OnClick="@OnAddPartCancel"></WindowAction>
+    </WindowActions>
+    <WindowContent>
+        <EditForm Model="@AddEditPartModel" OnValidSubmit="@OnAddPartSave">
+            <DataAnnotationsValidator />
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="PartNumber" class="col-sm-3 col-form-label">Part Number </label>
+                        <div class="col-sm-9">
+                             <TelerikAutoComplete Data="@MasterPartDropdownData" @bind-Value="@AddEditPartModel.MasterPartNumber"
+                                         ValueField="@(nameof(MasterPart.PartNumber))" ItemHeight="35" ScrollMode="@DropDownScrollMode.Virtual"
+                                         PageSize="10" Filterable="true" MinLength="3" ClearButton="true"
+                                         Placeholder="Type Part Number And Select Part" />
+                            <ValidationMessage For="@(() => AddEditPartModel.MasterPartNumber)" style="width:unset!important;"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="SerialNumber" class="col-sm-3 col-form-label">Serial Number </label>
+                        <div class="col-sm-9">
+                            <TelerikTextBox @bind-Value="@AddEditPartModel.SerialNumber" Class="form-control" PlaceHolder="Serial Number"></TelerikTextBox>
+                            <ValidationMessage For="@(() => AddEditPartModel.SerialNumber)" style="width:unset!important;"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br/>
+            <div class="form-row">
+                <TelerikButton Icon="save" ButtonType="@ButtonType.Submit">Save</TelerikButton>
+                &nbsp;
+                <TelerikButton Icon="cancel" ButtonType="@ButtonType.Button" OnClick="@(()=>OnAddPartCancel())">Cancel</TelerikButton>
+            </div>
+        </EditForm>
+    </WindowContent>
+</TelerikWindow>
+
+
 @code {
 
-    List<Parts> MyData { get; set; }
+    public AddEditPartModel AddEditPartModel { get; set; }
+
+    public IEnumerable<MasterPart> MasterPartDropdownData { get; set; }
+
+    public List<Parts> MyData { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -50,4 +140,67 @@
         MyData = await PartService.Read();
     }
 
+    public async Task SelectRecord(AddEditPartModel addEditPartModel)
+    {
+        MasterPartDropdownData = MasterPartService.GetAllMasterParts();
+        AddEditPartModel = new AddEditPartModel();
+        StateHasChanged();
+    }
+
+    protected async Task OnAddPartSave()
+    {
+        if (AddEditPartModel != null)
+        {
+            MasterPart selectedMasterPart = MasterPartDropdownData.FirstOrDefault(x => x.PartNumber == AddEditPartModel.MasterPartNumber);
+            if (selectedMasterPart == null)
+            {
+                toastService.ShowError("Please Select Valid Part Number.", "Error");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(AddEditPartModel.SerialNumber))
+            {
+                toastService.ShowError("Please Enter Serial Number", "Error");
+                return;
+            }
+
+            var partExists = await PartService.GetPartBySerialNumberAndMasterPart(AddEditPartModel.SerialNumber,selectedMasterPart.MasterPartId);
+            if (partExists != null)
+            {
+                 toastService.ShowError("Record Already there !", "Error");
+                 return;
+            }
+
+            AddEditPartModel.MasterPartId = selectedMasterPart.MasterPartId;
+            AddPartsToAlertModel errors = null;
+            try
+            {
+                errors = await PartService.AddPartsToAlertByStartEnd(selectedMasterPart, long.Parse(AddEditPartModel.SerialNumber), long.Parse(AddEditPartModel.SerialNumber));
+            }
+            catch(Exception ex)
+            {
+                toastService.ShowError("Please enter valid serial number.", "Error");
+                return;
+            }
+
+            if (errors != null && errors.AddPartsToAlertError != null && errors.AddPartsToAlertError.Count() > 0)
+            {
+                string errorSerialNumber = "Serial Number was not listed in Stage : " + string.Join(", ", errors.AddPartsToAlertError.Select(x=>x.SerialNumber));
+                toastService.ShowError(errorSerialNumber, "Error");
+            }
+
+            if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && errors.Parts.Any(x=>x.SerialNumber.ToLower() ==AddEditPartModel.SerialNumber.ToLower()))
+            {
+                await GetGridData();
+                toastService.ShowInfo("Record Saved Successfully", "Info");
+                OnAddPartCancel();
+            }
+            StateHasChanged();
+        }
+    }
+
+    protected void OnAddPartCancel()
+    {
+        AddEditPartModel = null;
+    }
 }

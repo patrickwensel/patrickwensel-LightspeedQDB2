@@ -14,6 +14,8 @@ namespace QBD2.Models
         public int BuildStationId { get; set; }
         public virtual BuildStation BuildStation { get; set; }
 
+        public List<BuildTemplateStation> BuildTemplateStationList { get; set; }
+
         public List<BuildTemplatePart> BuildTemplatePartList { get; set; }
     }
 }

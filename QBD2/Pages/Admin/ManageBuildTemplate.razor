@@ -9,9 +9,9 @@
 @inject IToastService toastService
 @inject BuildStationService BuildStationService
 <style>
-   
-    .btn-width{
-        width:auto !important;
+
+    .btn-width {
+        width: auto !important;
     }
 </style>
 @if (AddEditBuildTemplateModel == null)
@@ -31,29 +31,36 @@
             <DetailTemplate Context="context">
                 @{
                     var buildTemplateModel = context as Models.BuildTemplateModel;
-                <TelerikGrid Data="buildTemplateModel.BuildTemplatePartList" Pageable="true" PageSize="5">
-                    <GridColumns>
-                        <GridColumn Field="MasterPart.PartNumber" Title="Number" />
-                        <GridColumn Field="BuildStation.Name" Title="Build Station" />
-                        <GridColumn Field="SerialNumberRequired" Title="Serial Number Required" TextAlign="ColumnTextAlign.Left">
-                            <Template Context="childContext">
-                                @{
+                     <TelerikGrid Data="buildTemplateModel.BuildTemplateStationList" Pageable="true" PageSize="5">
+                        <GridColumns>
+                            <GridColumn Field="BuildStation.Name" Title="Build Station" />
+                            <GridColumn Field="OrderNumber" Title="Order/Sequence" />
+                        </GridColumns>
+                    </TelerikGrid>
+
+                    <TelerikGrid Data="buildTemplateModel.BuildTemplatePartList" Pageable="true" PageSize="5">
+                        <GridColumns>
+                            <GridColumn Field="MasterPart.PartNumber" Title="Number" />
+                            <GridColumn Field="BuildStation.Name" Title="Build Station" />
+                            <GridColumn Field="SerialNumberRequired" Title="Serial Number Required" TextAlign="ColumnTextAlign.Left">
+                                <Template Context="childContext">
+                                    @{
                                         var buildTemplatePart = childContext as BuildTemplatePart;
-                                    <lable style="color:@(buildTemplatePart.SerialNumberRequired?"green":"red")">@(buildTemplatePart.SerialNumberRequired?"Yes":"No")</lable>
-                                }
-                            </Template>
-                        </GridColumn>
-                    </GridColumns>
-                </TelerikGrid>
-            }
-        </DetailTemplate>
-        <GridColumns>
-            <GridColumn Field="Name" Title="Name" Groupable="false" />
-            <GridColumn Field="MasterPart.PartNumber" Title="Number" Groupable="false" />
-            <GridColumn Field="BuildStation.Name" Title="Build Station" Groupable="false" TextAlign="ColumnTextAlign.Left" />
-        </GridColumns>
-    </TelerikGrid>
-</div>
+                                        <lable style="color:@(buildTemplatePart.SerialNumberRequired?"green":"red")">@(buildTemplatePart.SerialNumberRequired ? "Yes" : "No")</lable>
+                                    }
+                                </Template>
+                            </GridColumn>
+                        </GridColumns>
+                    </TelerikGrid>
+                }
+            </DetailTemplate>
+            <GridColumns>
+                <GridColumn Field="Name" Title="Name" Groupable="false" />
+                <GridColumn Field="MasterPart.PartNumber" Title="Number" Groupable="false" />
+                <GridColumn Field="BuildStation.Name" Title="Build Station" Groupable="false" TextAlign="ColumnTextAlign.Left" />
+            </GridColumns>
+        </TelerikGrid>
+    </div>
 }
 else
 {
@@ -97,6 +104,55 @@ else
 
             <div class="row m-tb">
                 <div class="col-sm-12">
+                    <TelerikGrid Data="@AddEditBuildTemplateModel.AddEditBuildTemplateStationModels"
+                             Sortable="true"
+                             Pageable="true"
+                             EditMode="Telerik.Blazor.GridEditMode.Inline"
+                             OnDelete=@OnDeleteStation
+                             OnUpdate="@OnUpdateStation"
+                             OnEdit="@OnEditStation"
+                             OnCreate="@OnCreateStation"
+                             OnAdd="@OnAddStation">
+                        <GridToolBar>
+                            <GridCommandButton Command="Add" Icon="add">Add Build Station</GridCommandButton>
+                        </GridToolBar>
+                        <GridColumns>
+                            <GridColumn Field="BuildStationName" Title="Build Station" Groupable="false">
+                                <EditorTemplate>
+                                    @{
+                                        var station = context as AddEditBuildTemplateStationModel;
+                                        <TelerikDropDownList @bind-Value="@station.BuildStationId" DefaultText="Select Build Station"
+                                                     Data="@BuildStationDropdownData" TextField="DropText" ValueField="DropValue">
+                                        </TelerikDropDownList>
+                                    }
+                                </EditorTemplate>
+                            </GridColumn>
+                            <GridColumn Field="OrderNumber" Title="Order/Sequence" Groupable="false" Width="200px">
+                                <Template>
+                                    @{
+                                        var station = context as AddEditBuildTemplateStationModel;
+                                        <lable>@station.OrderNumber</lable>
+                                    }
+                                </Template>
+                                <EditorTemplate>
+                                    @{
+                                        var station = context as AddEditBuildTemplateStationModel;
+                                        <TelerikNumericTextBox @bind-Value="@station.OrderNumber" Placeholder="Enter order number" Decimals="0" Min="0"></TelerikNumericTextBox>
+                                    }
+                                </EditorTemplate>
+                            </GridColumn>
+                            <GridCommandColumn Width="200px">
+                                <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
+                                <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
+                                <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
+                                <GridCommandButton Command="Cancel" Icon="cancel" ShowInEdit="true">Cancel</GridCommandButton>
+                            </GridCommandColumn>
+                        </GridColumns>
+                    </TelerikGrid>
+                </div>
+            </div>
+            <div class="row m-tb">
+                <div class="col-sm-12">
                     <TelerikGrid Data="@AddEditBuildTemplateModel.AddEditBuildTemplatePartModels"
                              Sortable="true"
                              Pageable="true"
@@ -114,69 +170,70 @@ else
                                 <EditorTemplate>
                                     @{
                                         var childPart = context as AddEditBuildTemplatePartModel;
-                                    <TelerikAutoComplete Data="@MasterPartDropdownData" @bind-Value="@childPart.MasterPartNumber"
+                                        <TelerikAutoComplete Data="@MasterPartDropdownData" @bind-Value="@childPart.MasterPartNumber"
                                                      ValueField="@(nameof(MasterPart.PartNumber))" ItemHeight="35"
                                                      ScrollMode="@DropDownScrollMode.Virtual" PageSize="10" Filterable="true"
                                                      MinLength="3" ClearButton="true" Placeholder="Type Part Number And Select Part">
-                                    </TelerikAutoComplete>
-                                }
-                            </EditorTemplate>
-                        </GridColumn>
-                        <GridColumn Field="BuildStationName" Title="Build Station" Groupable="false">
-                            <EditorTemplate>
-                                @{
+                                        </TelerikAutoComplete>
+                                    }
+                                </EditorTemplate>
+                            </GridColumn>
+                            <GridColumn Field="BuildStationName" Title="Build Station" Groupable="false">
+                                <EditorTemplate>
+                                    @{
                                         var childPart = context as AddEditBuildTemplatePartModel;
-                                    <TelerikDropDownList @bind-Value="@childPart.BuildStationId" DefaultText="Select Build Station"
+                                        <TelerikDropDownList @bind-Value="@childPart.BuildStationId" DefaultText="Select Build Station"
                                                      Data="@BuildStationDropdownData" TextField="DropText" ValueField="DropValue">
-                                    </TelerikDropDownList>
-                                }
-                            </EditorTemplate>
-                        </GridColumn>
-                        <GridColumn Field="SerialNumberRequired" Title="Serial Number Required" Groupable="false" Width="180px">
-                            <Template>
-                                @{
+                                        </TelerikDropDownList>
+                                    }
+                                </EditorTemplate>
+                            </GridColumn>
+                            <GridColumn Field="SerialNumberRequired" Title="Serial Number Required" Groupable="false" Width="180px">
+                                <Template>
+                                    @{
                                         var childPart = context as AddEditBuildTemplatePartModel;
-                                    <lable style="color:@(childPart.SerialNumberRequired?"green":"red")">@(childPart.SerialNumberRequired?"Yes":"No")</lable>
-                                }
-                            </Template>
-                            <EditorTemplate>
-                                @{
+                                        <lable style="color:@(childPart.SerialNumberRequired?"green":"red")">@(childPart.SerialNumberRequired ? "Yes" : "No")</lable>
+                                    }
+                                </Template>
+                                <EditorTemplate>
+                                    @{
                                         var childPart = context as AddEditBuildTemplatePartModel;
-                                    <ul class="switch-btn">
-                                        <li class="@(childPart.SerialNumberRequired?"active":"")" @onclick="(() => {childPart.SerialNumberRequired=true;})"><i class="fa-regular fa-circle-check"></i> Yes</li>
-                                        <li class="failed @(childPart.SerialNumberRequired?"":"active")" @onclick="(() => {childPart.SerialNumberRequired=false;})"><i class="fa-light fa-circle-xmark"></i> No</li>
-                                    </ul>
-                                }
-                            </EditorTemplate>
-                        </GridColumn>
-                        <GridCommandColumn Width="200px">
-                            <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
-                            <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
-                            <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
-                            <GridCommandButton Command="Cancel" Icon="cancel" ShowInEdit="true">Cancel</GridCommandButton>
-                        </GridCommandColumn>
-                    </GridColumns>
-                </TelerikGrid>
+                                        <ul class="switch-btn">
+                                            <li class="@(childPart.SerialNumberRequired?"active":"")" @onclick="(() => {childPart.SerialNumberRequired=true;})"><i class="fa-regular fa-circle-check"></i> Yes</li>
+                                            <li class="failed @(childPart.SerialNumberRequired?"":"active")" @onclick="(() => {childPart.SerialNumberRequired=false;})"><i class="fa-light fa-circle-xmark"></i> No</li>
+                                        </ul>
+                                    }
+                                </EditorTemplate>
+                            </GridColumn>
+                            <GridCommandColumn Width="200px">
+                                <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Update</GridCommandButton>
+                                <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
+                                <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
+                                <GridCommandButton Command="Cancel" Icon="cancel" ShowInEdit="true">Cancel</GridCommandButton>
+                            </GridCommandColumn>
+                        </GridColumns>
+                    </TelerikGrid>
+                </div>
             </div>
-        </div>
-        <hr style="margin-top: 60px;" />
-        <div class="row m-tb">
-            <div class="col-sm-12 add-alrert-btn">
-                <TelerikButton Icon="save" Class="btn-width" Enabled=@(!isSaveClick) OnClick="(() => OnSaveBuldTemplate())">Save</TelerikButton>
-                <TelerikButton Icon="cancel" Class="btn-width" OnClick="(() => OnCancelAddEditBuildTemplate(false))">Cancel</TelerikButton>
+            <hr style="margin-top: 60px;" />
+            <div class="row m-tb">
+                <div class="col-sm-12 add-alrert-btn">
+                    <TelerikButton Icon="save" Class="btn-width" Enabled=@(!isSaveClick) OnClick="(() => OnSaveBuldTemplate())">Save</TelerikButton>
+                    <TelerikButton Icon="cancel" Class="btn-width" OnClick="(() => OnCancelAddEditBuildTemplate(false))">Cancel</TelerikButton>
+                </div>
             </div>
         </div>
     </div>
-</div>
 }
 
-@code 
+@code
 {
     List<Models.BuildTemplateModel> BuildTemplatesGridData { get; set; }
     AddEditBuildTemplateModel AddEditBuildTemplateModel { get; set; }
     IEnumerable<MasterPart> MasterPartDropdownData { get; set; }
     List<Models.DropDownBind> BuildStationDropdownData { get; set; }
     AddEditBuildTemplatePartModel SelectedChildPart { get; set; }
+    AddEditBuildTemplateStationModel SelectedStation { get; set; }
     EditContext ECAddEditBuildTemplate { get; set; }
     bool isSaveClick { get; set; }
 
@@ -275,6 +332,61 @@ else
         AddEditBuildTemplateModel.AddEditBuildTemplatePartModels.Add(item);
     }
 
+    protected void OnAddStation(GridCommandEventArgs args)
+    {
+
+    }
+
+    protected void OnDeleteStation(GridCommandEventArgs args)
+    {
+        Models.AddEditBuildTemplateStationModel item = (Models.AddEditBuildTemplateStationModel)args.Item;
+        AddEditBuildTemplateModel.AddEditBuildTemplateStationModels.Remove(item);
+    }
+
+    protected void OnUpdateStation(GridCommandEventArgs args)
+    {
+        Models.AddEditBuildTemplateStationModel item = (Models.AddEditBuildTemplateStationModel)args.Item;
+        if (AddEditBuildTemplateModel.AddEditBuildTemplateStationModels.Any(x => x.BuildStationId == item.BuildStationId && x.BuildStationId != SelectedStation.BuildStationId))
+        {
+            toastService.ShowError("Build station already exists.", "Error");
+            args.IsCancelled = true;
+            return;
+        }
+
+        item.BuildStationName = BuildStationDropdownData.FirstOrDefault(x => x.DropValue == item.BuildStationId.Value)?.DropText;
+
+        int index = AddEditBuildTemplateModel.AddEditBuildTemplateStationModels.IndexOf(SelectedStation);
+        if (index == -1)
+        {
+            toastService.ShowError("Record Not Found.", "Error");
+            args.IsCancelled = true;
+            return;
+        }
+
+        AddEditBuildTemplateModel.AddEditBuildTemplateStationModels[index] = item;
+    }
+
+    protected void OnEditStation(GridCommandEventArgs args)
+    {
+        SelectedStation = (Models.AddEditBuildTemplateStationModel)args.Item;
+    }
+
+    protected void OnCreateStation(GridCommandEventArgs args)
+    {
+        Models.AddEditBuildTemplateStationModel item = (Models.AddEditBuildTemplateStationModel)args.Item;
+
+        if (AddEditBuildTemplateModel.AddEditBuildTemplateStationModels.Any(x => x.BuildStationId == item.BuildStationId))
+        {
+            toastService.ShowError("Build station already exists.", "Error");
+            args.IsCancelled = true;
+            return;
+        }
+
+        item.BuildStationName = BuildStationDropdownData.FirstOrDefault(x => x.DropValue == item.BuildStationId.Value)?.DropText;
+
+        AddEditBuildTemplateModel.AddEditBuildTemplateStationModels.Add(item);
+    }
+
     protected async Task OnSaveBuldTemplate()
     {
         if (!string.IsNullOrWhiteSpace(AddEditBuildTemplateModel.MasterPartNumber))
@@ -294,9 +406,9 @@ else
             try
             {
                 if (isSaveClick)
-                return;
+                    return;
 
-                isSaveClick=true;
+                isSaveClick = true;
                 var result = await BuildTemplateService.Save(AddEditBuildTemplateModel);
                 if (result != null)
                 {
@@ -317,7 +429,7 @@ else
             }
             finally
             {
-                isSaveClick=false;
+                isSaveClick = false;
                 StateHasChanged();
             }
         }

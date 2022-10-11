@@ -27,6 +27,17 @@ namespace QBD2.Services
                                                 MasterPart = mp,
                                                 BuildStation = b,
                                                 BuildStationId = bt.BuildStationId,
+                                                BuildTemplateStationList = (from bts in _context.BuildTemplateStations
+                                                                            join b3 in _context.BuildStations on bts.BuildStationId equals b3.BuildStationId
+                                                                            where bts.BuildTemplateId == bt.BuildTemplateId
+                                                                            select new BuildTemplateStation
+                                                                            {
+                                                                                BuildTemplateStationId = bts.BuildTemplateStationId,
+                                                                                BuildTemplateId = bts.BuildTemplateId,
+                                                                                BuildStationId = bts.BuildStationId,
+                                                                                OrderNumber = bts.OrderNumber,
+                                                                                BuildStation = b3,
+                                                                            }).ToList(),
                                                 BuildTemplatePartList = (from btp in _context.BuildTemplateParts
                                                                          join mp2 in _context.MasterParts on btp.MasterPartId equals mp2.MasterPartId
                                                                          join b2 in _context.BuildStations on btp.BuildStationId equals b2.BuildStationId
@@ -56,6 +67,20 @@ namespace QBD2.Services
                 buildTemplate.BuildStationId = model.BuildStationId.Value;
                 _context.BuildTemplates.Add(buildTemplate);
                 await _context.SaveChangesAsync();
+
+                if (model.AddEditBuildTemplateStationModels != null)
+                {
+                    foreach (var item in model.AddEditBuildTemplateStationModels)
+                    {
+                        var buildTemplateStation = new Entities.BuildTemplateStation();
+                        buildTemplateStation.BuildTemplateId = buildTemplate.BuildTemplateId;
+                        buildTemplateStation.BuildStationId = item.BuildStationId.Value;
+                        buildTemplateStation.OrderNumber = item.OrderNumber.Value;
+                        _context.BuildTemplateStations.Add(buildTemplateStation);
+                    }
+
+                    await _context.SaveChangesAsync();
+                }
 
                 if (model.AddEditBuildTemplatePartModels != null)
                 {

@@ -301,6 +301,165 @@ namespace QBD2.Services
             return x;
         }
 
+        public async Task<List<Parts>> GetActiveParentPartByPart(int partId)
+        {
+            var p1 = await _context.Parts.FindAsync(partId);
+            if (p1 != null && p1.ParentPartId == null)
+            {
+                partId = p1.PartId;
+            }
+            else if (p1 != null && p1.ParentPartId > 0)
+            {
+                partId = p1.ParentPartId.Value;
+            }
+
+            var x = await (from p in _context.Parts
+                           join mp in _context.MasterParts
+                           on p.MasterPartId equals mp.MasterPartId
+
+                           join ps in _context.PartStatuses
+                           on p.PartStatusId equals ps.PartStatusId
+
+                           where p.ParentPartId == partId && p.PartStatusId == 1
+
+                           select new Models.Parts
+                           {
+                               PartId = p.PartId,
+                               SerialNumber = p.SerialNumber,
+                               Description = mp.Description,
+                               MasterPartId = mp.MasterPartId,
+                               ParentPartId = p.ParentPartId,
+                               PartNumber = mp.PartNumber,
+                               UpdateDate = p.UpdateDate,
+                               PartStatusId = p.PartStatusId,
+                               PartStatus = ps.Name,
+                           }).ToListAsync();
+
+            if (x != null && x.Count() > 0)
+            {
+                x = x.OrderByDescending(x => x.UpdateDate).ToList();
+            }
+
+            foreach (var item in x)
+            {
+                item.ChildParts = await (from p in _context.Parts
+                                         join mp in _context.MasterParts
+                                         on p.MasterPartId equals mp.MasterPartId
+                                         where p.ParentPartId == item.PartId
+                                         && p.PartStatusId == 1
+                                         select new Models.Parts
+                                         {
+                                             PartId = p.PartId,
+                                             SerialNumber = p.SerialNumber,
+                                             Description = mp.Description,
+                                             MasterPartId = mp.MasterPartId,
+                                             ParentPartId = p.ParentPartId,
+                                             PartNumber = mp.PartNumber
+                                         }).ToListAsync();
+            }
+            return x;
+        }
+
+        public async Task<List<Parts>> GetPartReplaceOnRepairParentPartByPart(int partId)
+        {
+            var p1 = await _context.Parts.FindAsync(partId);
+            if (p1 != null && p1.ParentPartId == null)
+            {
+                partId = p1.PartId;
+            }
+            else if (p1 != null && p1.ParentPartId > 0)
+            {
+                partId = p1.ParentPartId.Value;
+            }
+
+            var x = await (from p in _context.Parts
+                           join mp in _context.MasterParts
+                           on p.MasterPartId equals mp.MasterPartId
+
+                           join ps in _context.PartStatuses
+                           on p.PartStatusId equals ps.PartStatusId
+
+                           join repairsInfo in _context.Repairs
+                           on p.PartId equals repairsInfo.PartId
+
+                           where p.ParentPartId == partId
+
+                           select new Models.Parts
+                           {
+                               PartId = p.PartId,
+                               SerialNumber = p.SerialNumber,
+                               Description = mp.Description,
+                               MasterPartId = mp.MasterPartId,
+                               ParentPartId = p.ParentPartId,
+                               PartNumber = mp.PartNumber,
+                               UpdateDate = p.UpdateDate,
+                               PartStatusId = p.PartStatusId,
+                               PartStatus = ps.Name,
+                               FailureTypeId = repairsInfo.FailureTypeId,
+                               FailureType = repairsInfo != null && repairsInfo.FailureType != null ? repairsInfo.FailureType.Name : "",
+                               FailureTypePrimaryId = repairsInfo.FailureTypeId,
+                               FailureTypePrimary = repairsInfo != null && repairsInfo.FailureType != null && repairsInfo.FailureType.FailureTypePrimary != null ? repairsInfo.FailureType.FailureTypePrimary.Name : "",
+                               GLCodeId = repairsInfo.GLCodeId,
+                               GLCode = repairsInfo != null && repairsInfo.GLCode != null ? repairsInfo.GLCode.Name : "",
+                               RepairDescription = repairsInfo.Description
+                           }).ToListAsync();
+
+            if (x != null && x.Count() > 0)
+            {
+                x = x.OrderByDescending(x => x.UpdateDate).ToList();
+            }
+
+            foreach (var item in x)
+            {
+                item.ChildParts = await (from p in _context.Parts
+                                         join mp in _context.MasterParts
+                                         on p.MasterPartId equals mp.MasterPartId
+                                         where p.ParentPartId == item.PartId
+                                         select new Models.Parts
+                                         {
+                                             PartId = p.PartId,
+                                             SerialNumber = p.SerialNumber,
+                                             Description = mp.Description,
+                                             MasterPartId = mp.MasterPartId,
+                                             ParentPartId = p.ParentPartId,
+                                             PartNumber = mp.PartNumber
+                                         }).ToListAsync();
+            }
+            return x;
+        }
+
+        public async Task<List<Parts>> GetPartByMasterPart(int masterPartId)
+        {
+            var x = await (from p in _context.Parts
+                           join mp in _context.MasterParts
+                           on p.MasterPartId equals mp.MasterPartId
+
+                           join ps in _context.PartStatuses
+                           on p.PartStatusId equals ps.PartStatusId
+
+                           where p.MasterPartId == masterPartId && p.PartStatusId == 1
+
+                           select new Models.Parts
+                           {
+                               PartId = p.PartId,
+                               SerialNumber = p.SerialNumber,
+                               Description = mp.Description,
+                               MasterPartId = mp.MasterPartId,
+                               ParentPartId = p.ParentPartId,
+                               PartNumber = mp.PartNumber,
+                               UpdateDate = p.UpdateDate,
+                               PartStatusId = p.PartStatusId,
+                               PartStatus = ps.Name,
+                           }).ToListAsync();
+
+            if (x != null && x.Count() > 0)
+            {
+                x = x.OrderByDescending(x => x.UpdateDate).ToList();
+            }
+
+            return x;
+        }
+
         public async Task<bool> AddPart(AddPartModel itemToInsert)
         {
             try
@@ -331,6 +490,17 @@ namespace QBD2.Services
                     else
                     {
                         part.SerialNumber = "";
+                    }
+
+                    if (itemToInsert.SelectedReplacePartId > 0)
+                    {
+                        var replacePart = await _context.Parts.Where(a => a.PartId == itemToInsert.SelectedReplacePartId).FirstOrDefaultAsync();
+                        if (replacePart != null)
+                        {
+                            replacePart.PartStatusId = 2;
+                            _context.Entry(replacePart).State = EntityState.Modified;
+                            await _context.SaveChangesAsync();
+                        }
                     }
 
                     part.MasterPartId = masterPart.MasterPartId;

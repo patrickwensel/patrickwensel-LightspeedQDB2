@@ -28,5 +28,13 @@
         public string InspectionStatus { get; set; }
 
         public int? key { get; set; }
+
+
+        public int? FailureTypeId { get; set; }
+        public string FailureType { get; set; }
+
+        public int? FailureTypePrimaryId { get; set; }
+        public string FailureTypePrimary { get; set; }
+        public string RepairDescription { get; set; }
     }
 }

@@ -17,9 +17,37 @@
 @inject InspectionService InspectionService
 
 <style>
-.autocompletehright40
+    .autocompletehright40
 {
    height: 40px !important;
+}
+    .k-dialog-wrapper {
+    position: inherit;   
+}
+.k-centered {
+    transform: translate(5%, -300%);
+    width: 320px;
+}
+.k-window-titlebar.k-dialog-titlebar.k-header {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding: 10px 10px 20px 10px;
+}
+.k-window-content.k-dialog-content {
+    border-radius: 0;
+}
+label.k-form-label {
+    margin-right: 15px;
+}
+.k-form .k-form-field, .k-form .k-form-field-wrap {
+    display: inline-flex;
+    width: 100%;
+}
+.k-actions-start {
+    float: right;
+}
+.k-window-actions span {
+    color: #fff;
 }
 </style>
 
@@ -180,20 +208,48 @@
 
              <div class="row">
                     <div class="col-md-12 add-reason-btn">
-                            <TelerikButton Class="SaveButton" OnClick="(()=> btnAddPartOnClick())"><i class="fa-light fa-plus"></i> Add Reason</TelerikButton>
+                        <TelerikButton Class="SaveButton" OnClick="(()=> btnAddPartOnClick())"><i class="fa-light fa-plus"></i> Add Reason</TelerikButton>
                      </div>
               </div>
-               
+
          </EditForm>
 
+        <div class="row">
+        <div class="col-md-12" style="text-align:right;">
+            <TelerikButton Class="SaveButton" OnClick="(()=> btnShowPartReplacingPopUpOnClick())"><i class="fa-light fa-add"></i> Add Replace Part</TelerikButton>
+        </div>
+        </div>
 
     </div><!---right column end--->
 </div><!----main row end-->
 
 
+<div class="row">
+    <div class="col-md-12">
+            <h3>Parts Replaced on this Repair</h3>
+            <TelerikGrid Data="@PartReplaceOnRepairData"
+         Pageable="true" Sortable="true"
+         Resizable="true">
+            <GridColumns>
+                <GridColumn Field="@(nameof(Models.Parts.PartNumber))" Title="Part Number" Groupable="false" Width="80px"/>
+                <GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false" Width="100px"/>
+                <GridColumn Field="@(nameof(Models.Parts.RepairDescription))" Title="Description" Groupable="false" Width="200px"/>
+                <GridColumn Field="@(nameof(Models.Parts.GLCode))" Title="GL Code" Groupable="false" Width="150px"/>
+                <GridColumn Field="@(nameof(Models.Parts.FailureTypePrimary))" Title="Primary Failure" Groupable="false" Width="150px"/>
+                 <GridColumn Field="@(nameof(Models.Parts.FailureType))" Title="Secondary Failure" Groupable="false" Width="150px"/>
+                <GridCommandColumn Width="100px" Title="Action">
+                    <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectPartReplaceOnRepairRecord(args.Item as Models.Parts))"><i class="fal fa-edit"></i></GridCommandButton>
+                    <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete" Enabled="false" OnClick="@((args)=> DeletePartReplaceOnRepairRecord(args.Item as Models.Parts))" ></GridCommandButton>
+                </GridCommandColumn>
+            </GridColumns>
+        </TelerikGrid>
+    </div>
+</div>
+
 <div class="row repair-description">
     <div class="col-md-12">
-        <TelerikGrid Data="@MyData"
+        <h3>Current List of currently active Tracked Components</h3>
+        <TelerikGrid Data="@ActivePartData"
          Pageable="true" Sortable="true"
          Resizable="true">
             <GridColumns>
@@ -206,13 +262,13 @@
                         @{
                             var partStatus = context as Models.Parts;
                             var oldPartStatusId = partStatus.PartStatusId;
-                                    <TelerikDropDownList @bind-Value="@partStatus.PartStatusId" Width="100%"
+                                            <TelerikDropDownList @bind-Value="@partStatus.PartStatusId" Width="100%"
                                                  Data="@dataPartStatusDropdown"
                                                  ValueField="DropValue"
                                                  TextField="DropText"
                                                  Class="form-control"
                                                  OnChange="@(() => OnPartStatusesChangeHandler(partStatus,oldPartStatusId))">
-                                    </TelerikDropDownList>
+                                            </TelerikDropDownList>
                         }
                     </Template>
               </GridColumn>
@@ -246,7 +302,7 @@
                               var parts = context as Models.Parts;
                               if (parts != null && !parts.UpdateDate.Equals(DateTime.MinValue))
                               {
-                                          @parts.UpdateDate.ToString("dd/MM/yyyy @ h:mm")
+                                                  @parts.UpdateDate.ToString("dd/MM/yyyy @ h:mm")
                               }
                           }
                     </Template>
@@ -258,6 +314,46 @@
       </TelerikGrid>
     </div>
     <br/> <br/>
+
+   // popup start
+    <TelerikWindow Visible="@(ShowPartReplacingPopUp == true)" Modal="true" Width="900px" Draggable="false">
+    <WindowTitle>
+        <strong>Please select the part you are replacing</strong>
+    </WindowTitle>
+    <WindowActions>
+        <WindowAction Name="Close" OnClick="@OnPartReplacingCancel"></WindowAction>
+    </WindowActions>
+    <WindowContent>
+        <div class="row">
+            <div class="col-md-12">
+                    <TelerikGrid Data="@PopUpPartReplacingData"
+                    Pageable="true" Sortable="true"
+                    Resizable="true">
+                        <GridColumns>
+                            <GridColumn Field="@(nameof(Models.Parts.PartNumber))" Title="Part Number" Groupable="false" Width="80px" />
+                            <GridColumn Field="@(nameof(Models.Parts.SerialNumber))" Title="Serial Number" Groupable="false" Width="100px" />
+                            <GridColumn Field="@(nameof(Models.Parts.Description))" Title="Description" Groupable="false" Width="200px" />
+                            <GridColumn Field="@(nameof(Models.Parts.GLCode))" Title="GL Code" Groupable="false" Width="150px" />
+                            <GridColumn Field="@(nameof(Models.Parts.PartId))" Title="Replace" Groupable="false" Sortable="false" Width="80px">
+                                <Template>
+                                    @{
+                                        var part = context as Models.Parts;
+                                    }
+                                    <TelerikButton ButtonType="@ButtonType.Button" Title="Replace" OnClick="@(()=> SelectPartReplaceRecord(part))">Replace</TelerikButton>
+                                </Template>
+                            </GridColumn>
+                        </GridColumns>
+                    </TelerikGrid>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12" style="text-align: right;padding-top: 20px;">
+                <TelerikButton Icon="cancel" OnClick="(() => OnPartReplacingCancel())" ButtonType="@ButtonType.Button">Cancel</TelerikButton>
+            </div>
+        </div>
+    </WindowContent>
+</TelerikWindow>
+// popup end
 }
 @code {
 
@@ -277,7 +373,15 @@
 
     List<Models.Parts> MyData { get; set; }
 
+    List<Models.Parts> ActivePartData { get; set; }
+
+    List<Models.Parts> PartReplaceOnRepairData { get; set; }
+
+    List<Models.Parts> PopUpPartReplacingData { get; set; }
+
     Models.RepairModel dataRepairModel { get; set; }
+
+    Models.Parts SelectedReplacePart { get; set; }
 
     string SerialNumber { get; set; }
 
@@ -288,6 +392,8 @@
     public bool IsUserHasCanDeleteRepairRights { get; set; } = false;
 
     public string UserId { get; set; }
+
+    public bool ShowPartReplacingPopUp { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -381,10 +487,17 @@
         if (dataRepairModel != null && dataRepairModel.PartId > 0)
         {
             MyData = await PartService.GetParentPartByPart(dataRepairModel.PartId);
+            ActivePartData = await PartService.GetActiveParentPartByPart(dataRepairModel.PartId);
+            PopUpPartReplacingData = await PartService.GetPartByMasterPart(dataRepairModel.MasterPartId);
+            PartReplaceOnRepairData = await PartService.GetPartReplaceOnRepairParentPartByPart(dataRepairModel.PartId);
         }
         else
         {
             MyData = null;
+            ActivePartData = null;
+            PartReplaceOnRepairData = null;
+            PopUpPartReplacingData = null;
+            SelectedReplacePart = null;
         }
         StateHasChanged();
     }
@@ -447,6 +560,14 @@
                 return;
             }
 
+            if (SelectedReplacePart == null)
+            { 
+                toastService.ShowError("Please Select Replacing Part", "Error");
+                return;
+            }
+
+            AddParts.SelectedReplacePartId = SelectedReplacePart.PartId;
+
             if (await PartService.AddPart(AddParts))
             {
                 toastService.ShowInfo("Record Saved Successfully", "Info");
@@ -490,6 +611,8 @@
 
     public async Task btnCancelRepairOnClick()
     {
+        SelectedReplacePart = null;
+        ShowPartReplacingPopUp = false;
         IsAddRecord = true;
         AddParts = null;
         await this.OnInitializedAsync();
@@ -542,6 +665,42 @@
         {
             dataFailureDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureType, AddParts.FailureTypePrimaryId);
             //StateHasChanged();
+        }
+    }
+
+    public async Task SelectPartReplaceOnRepairRecord(Models.Parts parts)
+    {
+        if (parts != null)
+        { 
+
+        }
+    }
+
+    public async Task DeletePartReplaceOnRepairRecord(Models.Parts parts)
+    {
+        if (parts != null)
+        { 
+
+        }
+    }
+
+    protected void OnPartReplacingCancel()
+    {
+        ShowPartReplacingPopUp = false;
+    }
+
+    async Task btnShowPartReplacingPopUpOnClick()
+    {
+        ShowPartReplacingPopUp = true;
+    }
+
+    public async Task SelectPartReplaceRecord(Models.Parts parts)
+    {
+        if (parts != null)
+        {
+            SelectedReplacePart = parts;
+            ShowPartReplacingPopUp = false;
+            StateHasChanged();
         }
     }
 }

@@ -23,5 +23,7 @@ namespace QBD2.Models
 
         //[Required(ErrorMessage = "The Repair Description field is required.")]
         public string? RepairDescription { get; set; }
+
+        public int SelectedReplacePartId { get; set; }
     }
 }

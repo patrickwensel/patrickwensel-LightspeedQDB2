@@ -1,6 +1,7 @@
 ﻿using Blazored.Toast.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.Options;
 using QBD2.Data;
 using QBD2.Models;
@@ -43,6 +44,13 @@ namespace QBD2.Pages.Admin
                 string? path = null;
                 if (selectedFiles != null)
                 {
+                    string subPath = _appSettings.Value.LocalFileUploadPath; // Your code goes here
+
+                    bool exists = System.IO.Directory.Exists(subPath);
+
+                    if (!exists)
+                        System.IO.Directory.CreateDirectory(subPath);
+
                     foreach (var file in selectedFiles)
                     {
                         if (file.Name.EndsWith(".xls") || file.Name.EndsWith(".xlsx"))

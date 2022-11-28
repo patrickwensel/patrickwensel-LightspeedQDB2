@@ -57,7 +57,7 @@
             <GridColumns>
                 <GridColumn Field="Name" Title="Name" Groupable="false" />
                 <GridColumn Field="MasterPart.PartNumber" Title="Number" Groupable="false" />
-                <GridColumn Field="BuildStation.Name" Title="Build Station" Groupable="false" TextAlign="ColumnTextAlign.Left" />
+               @* <GridColumn Field="BuildStation.Name" Title="Build Station" Groupable="false" TextAlign="ColumnTextAlign.Left" />*@
             </GridColumns>
         </TelerikGrid>
     </div>
@@ -91,15 +91,7 @@ else
                         <ValidationMessage For="@(() => AddEditBuildTemplateModel.MasterPartNumber)"></ValidationMessage>
                     </div>
                 </div>
-                <div class="row m-tb">
-                    <label for="PartNumber" class="col-sm-3 col-form-label">Build Station</label>
-                    <div class="col-sm-9">
-                        <TelerikDropDownList @bind-Value="@AddEditBuildTemplateModel.BuildStationId" DefaultText="Select Build Station"
-                                         Data="@BuildStationDropdownData" TextField="DropText" ValueField="DropValue">
-                        </TelerikDropDownList>
-                        <ValidationMessage For="@(() => AddEditBuildTemplateModel.BuildStationId)"></ValidationMessage>
-                    </div>
-                </div>
+               
             </EditForm>
 
             <div class="row m-tb">
@@ -183,7 +175,7 @@ else
                                     @{
                                         var childPart = context as AddEditBuildTemplatePartModel;
                                         <TelerikDropDownList @bind-Value="@childPart.BuildStationId" DefaultText="Select Build Station"
-                                                     Data="@BuildStationDropdownData" TextField="DropText" ValueField="DropValue">
+                                                     Data="@BuildTemplateStationDropdownData" TextField="DropText" ValueField="DropValue">
                                         </TelerikDropDownList>
                                     }
                                 </EditorTemplate>
@@ -232,6 +224,7 @@ else
     AddEditBuildTemplateModel AddEditBuildTemplateModel { get; set; }
     IEnumerable<MasterPart> MasterPartDropdownData { get; set; }
     List<Models.DropDownBind> BuildStationDropdownData { get; set; }
+    List<Models.DropDownBind> BuildTemplateStationDropdownData { get; set; }
     AddEditBuildTemplatePartModel SelectedChildPart { get; set; }
     AddEditBuildTemplateStationModel SelectedStation { get; set; }
     EditContext ECAddEditBuildTemplate { get; set; }
@@ -245,6 +238,16 @@ else
     protected async Task GetBuildTemplatesGridData()
     {
         BuildTemplatesGridData = await BuildTemplateService.Read();
+
+    }
+
+    protected async Task BindTemplateStationDropDownData()
+    {
+        BuildTemplateStationDropdownData = new List<DropDownBind>();
+        foreach(var buildStation in AddEditBuildTemplateModel.AddEditBuildTemplateStationModels)
+        {
+            BuildTemplateStationDropdownData.Add(new Models.DropDownBind { DropText = buildStation.BuildStationName, DropValue = buildStation.BuildStationId.Value });
+        }
     }
 
     protected async Task OnAddEditBuildTemplate()
@@ -266,6 +269,7 @@ else
 
     protected void OnAddChildPart(GridCommandEventArgs args)
     {
+        BindTemplateStationDropDownData();
         Models.AddEditBuildTemplatePartModel item = (Models.AddEditBuildTemplatePartModel)args.Item;
         var lastItem = AddEditBuildTemplateModel.AddEditBuildTemplatePartModels.LastOrDefault();
         if (lastItem != null)
@@ -273,10 +277,10 @@ else
             item.BuildStationId = lastItem.BuildStationId;
             item.SerialNumberRequired = lastItem.SerialNumberRequired;
         }
-        else if (AddEditBuildTemplateModel.BuildStationId > 0)
-        {
-            item.BuildStationId = AddEditBuildTemplateModel.BuildStationId;
-        }
+        //else if (AddEditBuildTemplateModel.BuildStationId > 0)
+        //{
+        //    item.BuildStationId = AddEditBuildTemplateModel.BuildStationId;
+        //}
     }
 
     protected void OnDeleteChildPart(GridCommandEventArgs args)
@@ -312,11 +316,13 @@ else
 
     protected void OnEditChildPart(GridCommandEventArgs args)
     {
+        BindTemplateStationDropDownData();
         SelectedChildPart = (Models.AddEditBuildTemplatePartModel)args.Item;
     }
 
     protected void OnCreateChildPart(GridCommandEventArgs args)
     {
+
         Models.AddEditBuildTemplatePartModel item = (Models.AddEditBuildTemplatePartModel)args.Item;
         MasterPart selectedMasterPart = MasterPartDropdownData.FirstOrDefault(x => x.PartNumber == item.MasterPartNumber);
         if (selectedMasterPart == null)
@@ -339,19 +345,37 @@ else
 
     protected void OnDeleteStation(GridCommandEventArgs args)
     {
+
         Models.AddEditBuildTemplateStationModel item = (Models.AddEditBuildTemplateStationModel)args.Item;
+        
+        if(AddEditBuildTemplateModel.AddEditBuildTemplatePartModels.Any(x => x.BuildStationId == item.BuildStationId))
+        {
+            toastService.ShowError("You can't delete Build station. " + SelectedStation.BuildStationName + " already exist into Parts.", "Error");
+            args.IsCancelled = true;
+            return;
+        }
         AddEditBuildTemplateModel.AddEditBuildTemplateStationModels.Remove(item);
     }
 
     protected void OnUpdateStation(GridCommandEventArgs args)
     {
         Models.AddEditBuildTemplateStationModel item = (Models.AddEditBuildTemplateStationModel)args.Item;
+
+       
         if (AddEditBuildTemplateModel.AddEditBuildTemplateStationModels.Any(x => x.BuildStationId == item.BuildStationId && x.BuildStationId != SelectedStation.BuildStationId))
         {
             toastService.ShowError("Build station already exists.", "Error");
             args.IsCancelled = true;
             return;
         }
+
+         if(SelectedStation.BuildStationId != item.BuildStationId && AddEditBuildTemplateModel.AddEditBuildTemplatePartModels.Any(x => x.BuildStationId == SelectedStation.BuildStationId))
+        {
+            toastService.ShowError("You can't update Build station. " + SelectedStation.BuildStationName + " already exist into Parts.", "Error");
+            args.IsCancelled = true;
+            return;
+        }
+
 
         item.BuildStationName = BuildStationDropdownData.FirstOrDefault(x => x.DropValue == item.BuildStationId.Value)?.DropText;
 

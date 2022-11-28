@@ -15,8 +15,8 @@ namespace QBD2.Entities
         public int MasterPartId { get; set; }
         public virtual MasterPart MasterPart { get; set; }
 
-        [ForeignKey("BuildStation")]
-        public int BuildStationId { get; set; }
-        public virtual BuildStation BuildStation { get; set; }
+        //[ForeignKey("BuildStation")]
+        //public int BuildStationId { get; set; }
+        //public virtual BuildStation BuildStation { get; set; }
     }
 }

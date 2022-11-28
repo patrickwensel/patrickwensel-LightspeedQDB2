@@ -18,15 +18,15 @@ namespace QBD2.Services
             List<Models.BuildTemplateModel> buildTemplateModelList = new List<Models.BuildTemplateModel>();
             buildTemplateModelList = await (from bt in _context.BuildTemplates
                                             join mp in _context.MasterParts on bt.MasterPartId equals mp.MasterPartId
-                                            join b in _context.BuildStations on bt.BuildStationId equals b.BuildStationId
+                                            //join b in _context.BuildStations on bt.BuildStationId equals b.BuildStationId
                                             select new Models.BuildTemplateModel
                                             {
                                                 BuildTemplateId = bt.BuildTemplateId,
                                                 Name = bt.Name,
                                                 MasterPartId = bt.MasterPartId,
                                                 MasterPart = mp,
-                                                BuildStation = b,
-                                                BuildStationId = bt.BuildStationId,
+                                               // BuildStation = b,
+                                               // BuildStationId = bt.BuildStationId,
                                                 BuildTemplateStationList = (from bts in _context.BuildTemplateStations
                                                                             join b3 in _context.BuildStations on bts.BuildStationId equals b3.BuildStationId
                                                                             where bts.BuildTemplateId == bt.BuildTemplateId
@@ -64,7 +64,7 @@ namespace QBD2.Services
                 var buildTemplate = new Entities.BuildTemplate();
                 buildTemplate.Name = model.Name;
                 buildTemplate.MasterPartId = model.MasterPartId;
-                buildTemplate.BuildStationId = model.BuildStationId.Value;
+               // buildTemplate.BuildStationId = model.BuildStationId.Value;
                 _context.BuildTemplates.Add(buildTemplate);
                 await _context.SaveChangesAsync();
 

@@ -36,5 +36,7 @@
         public int? FailureTypePrimaryId { get; set; }
         public string FailureTypePrimary { get; set; }
         public string RepairDescription { get; set; }
+
+        public int? RepairId { get; set; }
     }
 }

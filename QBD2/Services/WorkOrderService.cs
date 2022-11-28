@@ -220,7 +220,7 @@ namespace QBD2.Services
                             part.MasterPartId = buildTemplate.MasterPartId;
                             part.UpdateDate = DateTime.Now;
                             part.PartStatusId = 1;
-                            part.BuildStationId = buildTemplate.BuildStationId;
+                          //  part.BuildStationId = buildTemplate.BuildStationId;
                             part.SerialNumberRequired = true;
                             _context.Parts.Add(part);
                             _context.SaveChanges();

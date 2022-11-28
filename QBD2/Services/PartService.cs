@@ -401,7 +401,8 @@ namespace QBD2.Services
                                FailureTypePrimary = repairsInfo != null && repairsInfo.FailureType != null && repairsInfo.FailureType.FailureTypePrimary != null ? repairsInfo.FailureType.FailureTypePrimary.Name : "",
                                GLCodeId = repairsInfo.GLCodeId,
                                GLCode = repairsInfo != null && repairsInfo.GLCode != null ? repairsInfo.GLCode.Name : "",
-                               RepairDescription = repairsInfo.Description
+                               RepairDescription = repairsInfo.Description,
+                               RepairId = repairsInfo.RepairId
                            }).ToListAsync();
 
             if (x != null && x.Count() > 0)
@@ -468,57 +469,61 @@ namespace QBD2.Services
                 if (selectedPart != null)
                 {
                     MasterPart masterPart = new MasterPart();
-                    masterPart.PartNumber = itemToInsert.PartNumber;
-                    masterPart.Description = "";
-                    _context.MasterParts.Add(masterPart);
-                    await _context.SaveChangesAsync();
+                    //masterPart.PartNumber = itemToInsert.PartNumber;
+                    //masterPart.Description = "";
+                    //_context.MasterParts.Add(masterPart);
+                    //await _context.SaveChangesAsync();
+                    masterPart = _context.MasterParts.FirstOrDefault(x => x.PartNumber == itemToInsert.PartNumber.Trim());
+                    if (masterPart != null)
+                    {
 
-                    Part part = new Part();
-                    if (selectedPart.ParentPartId > 0)
-                    {
-                        part.ParentPartId = selectedPart.ParentPartId;
-                    }
-                    else
-                    {
-                        part.ParentPartId = itemToInsert.SelectedPartId;
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(itemToInsert.SerialNumber))
-                    {
-                        part.SerialNumber = itemToInsert.SerialNumber;
-                    }
-                    else
-                    {
-                        part.SerialNumber = "";
-                    }
-
-                    if (itemToInsert.SelectedReplacePartId > 0)
-                    {
-                        var replacePart = await _context.Parts.Where(a => a.PartId == itemToInsert.SelectedReplacePartId).FirstOrDefaultAsync();
-                        if (replacePart != null)
+                        Part part = new Part();
+                        if (selectedPart.ParentPartId > 0)
                         {
-                            replacePart.PartStatusId = 2;
-                            _context.Entry(replacePart).State = EntityState.Modified;
-                            await _context.SaveChangesAsync();
+                            part.ParentPartId = selectedPart.ParentPartId;
                         }
+                        else
+                        {
+                            part.ParentPartId = itemToInsert.SelectedPartId;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(itemToInsert.SerialNumber))
+                        {
+                            part.SerialNumber = itemToInsert.SerialNumber;
+                        }
+                        else
+                        {
+                            part.SerialNumber = "";
+                        }
+
+                        if (itemToInsert.SelectedReplacePartId > 0)
+                        {
+                            var replacePart = await _context.Parts.Where(a => a.PartId == itemToInsert.SelectedReplacePartId).FirstOrDefaultAsync();
+                            if (replacePart != null)
+                            {
+                                replacePart.PartStatusId = 2;
+                                _context.Entry(replacePart).State = EntityState.Modified;
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+
+                        part.MasterPartId = masterPart.MasterPartId;
+                        part.UpdateDate = DateTime.Now;
+                        part.PartStatusId = 1;
+                        _context.Parts.Add(part);
+                        _context.SaveChanges();
+
+                        Repair repair = new Repair();
+                        repair.Description = itemToInsert.RepairDescription;
+                        repair.GLCodeId = itemToInsert.GLCodeId.Value;
+                        repair.FailureTypeId = itemToInsert.FailureTypeId.Value;
+                        repair.PartId = part.PartId;
+                        repair.UpdateDate = DateTime.Now;
+                        _context.Repairs.Add(repair);
+                        _context.SaveChanges();
+
+                        return true;
                     }
-
-                    part.MasterPartId = masterPart.MasterPartId;
-                    part.UpdateDate = DateTime.Now;
-                    part.PartStatusId = 1;
-                    _context.Parts.Add(part);
-                    _context.SaveChanges();
-
-                    Repair repair = new Repair();
-                    repair.Description = itemToInsert.RepairDescription;
-                    repair.GLCodeId = itemToInsert.GLCodeId.Value;
-                    repair.FailureTypeId = itemToInsert.FailureTypeId.Value;
-                    repair.PartId = part.PartId;
-                    repair.UpdateDate = DateTime.Now;
-                    _context.Repairs.Add(repair);
-                    _context.SaveChanges();
-
-                    return true;
                 }
 
                 return false;
@@ -527,6 +532,11 @@ namespace QBD2.Services
             {
                 return false;
             }
+        }
+
+        public bool ValidPartNumber(string partNumber)
+        {
+            return _context.MasterParts.Any(x => x.PartNumber == partNumber.Trim());
         }
 
         public async Task<bool> UpdatePartStatus(Models.Parts parts)

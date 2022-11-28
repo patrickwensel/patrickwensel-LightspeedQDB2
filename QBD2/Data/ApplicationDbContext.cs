@@ -208,7 +208,7 @@ namespace QBD2.Data
             modelBuilder.Entity<InspectionFailure>().Property(m => m.FailureTypeId).IsRequired(false);
             modelBuilder.Entity<InspectionFailure>().Property(m => m.BuildStationFailureCodeId).IsRequired(false);
             modelBuilder.Entity<InspectionFailure>().Property(m => m.Comment).IsRequired(false);
-            modelBuilder.Entity<BuildStation>().HasMany(s => s.BuildTemplates).WithOne(c => c.BuildStation).OnDelete(DeleteBehavior.Restrict);
+          //  modelBuilder.Entity<BuildStation>().HasMany(s => s.BuildTemplates).WithOne(c => c.BuildStation).OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
 

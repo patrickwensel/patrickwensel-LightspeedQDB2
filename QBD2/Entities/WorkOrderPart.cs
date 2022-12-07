@@ -17,5 +17,7 @@ namespace QBD2.Entities
         public int PartId { get; set; }
         public virtual Part Part { get; set; }
 
+        public bool IsCompleteBuildStation { get; set; }
+
     }
 }

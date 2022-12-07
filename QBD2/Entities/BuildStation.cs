@@ -11,6 +11,6 @@ namespace QBD2.Entities
 
         public string Name { get; set; }
 
-        public virtual List<BuildTemplate> BuildTemplates { get; set; }
+        //public virtual List<BuildTemplate> BuildTemplates { get; set; }
     }
 }

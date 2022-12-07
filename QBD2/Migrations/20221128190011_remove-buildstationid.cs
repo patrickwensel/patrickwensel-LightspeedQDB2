@@ -12,72 +12,58 @@ namespace QBD2.Migrations
                 name: "FK_BuildTemplates_BuildStations_BuildStationId",
                 table: "BuildTemplates");
 
-            migrationBuilder.AlterColumn<int>(
+            migrationBuilder.DropIndex(
+                name: "IX_BuildTemplates_BuildStationId",
+                table: "BuildTemplates");
+
+            migrationBuilder.DropColumn(
                 name: "BuildStationId",
-                table: "BuildTemplates",
-                type: "int",
-                nullable: true,
-                oldClrType: typeof(int),
-                oldType: "int");
+                table: "BuildTemplates");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "22b3bff1-cfd2-4075-a90f-827380656873",
                 column: "ConcurrencyStamp",
-                value: "6bebf5d4-13f5-4fb2-bbc7-c360a329dc8d");
+                value: "4f47da87-6ae4-4fbe-9f8a-27de37d74ce9");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "aec800c6-ea7e-4420-a583-91a23787a3af",
                 column: "ConcurrencyStamp",
-                value: "f40e1df0-f2bb-407a-ab32-18c678a0b18e");
+                value: "556dad75-a05f-436f-acf9-624fecff9591");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "e4e7188b-6ecb-4278-aeee-17271f20d7ce",
                 column: "ConcurrencyStamp",
-                value: "9172c649-ba60-486d-a5ac-6613be849f17");
+                value: "f191361f-bd4a-411b-8e0c-fdab67e1c06f");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "e77174e9-e942-4fc1-bdb5-20a5f318d2ed",
                 column: "ConcurrencyStamp",
-                value: "04836a74-c0bd-4c58-b12b-5273b4dff2d0");
+                value: "4ca306b8-10f0-431e-9b57-374a683faaf8");
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "2e97b939-49c0-4e1e-8376-cb98348103bb",
                 columns: new[] { "ConcurrencyStamp", "SecurityStamp" },
-                values: new object[] { "1c1bbf8b-1c30-4b86-af6b-784b731adad7", "13edaafc-34d1-42a4-b4f9-7c8df2c3992e" });
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_BuildTemplates_BuildStations_BuildStationId",
-                table: "BuildTemplates",
-                column: "BuildStationId",
-                principalTable: "BuildStations",
-                principalColumn: "BuildStationId");
+                values: new object[] { "a1bbdd6c-a86f-4759-8f2c-cc56f5480e9f", "bcbbfb77-980c-4eed-8637-05aa4b80dc0c" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_BuildTemplates_BuildStations_BuildStationId",
-                table: "BuildTemplates");
-
-            migrationBuilder.AlterColumn<int>(
+            migrationBuilder.AddColumn<int>(
                 name: "BuildStationId",
                 table: "BuildTemplates",
                 type: "int",
                 nullable: false,
-                defaultValue: 0,
-                oldClrType: typeof(int),
-                oldType: "int",
-                oldNullable: true);
+                defaultValue: 0);
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
@@ -113,6 +99,11 @@ namespace QBD2.Migrations
                 keyValue: "2e97b939-49c0-4e1e-8376-cb98348103bb",
                 columns: new[] { "ConcurrencyStamp", "SecurityStamp" },
                 values: new object[] { "2769fb3a-0d06-4f82-902d-74f6a32e665e", "a2571dea-9223-47f7-8f4d-0ab534286fa9" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BuildTemplates_BuildStationId",
+                table: "BuildTemplates",
+                column: "BuildStationId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_BuildTemplates_BuildStations_BuildStationId",

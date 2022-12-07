@@ -114,13 +114,17 @@ namespace QBD2.Services
 
             if (workOrderModel != null && workOrderModel.WorkOrderId > 0)
             {
-                var workOrderParts = await _context.WorkOrderParts.Where(x => x.WorkOrderId == workOrderModel.WorkOrderId).Select(x => x.PartId).ToListAsync();
+                var workOrderParts = await _context.WorkOrderParts.Where(x => x.WorkOrderId == workOrderModel.WorkOrderId).ToListAsync();
+                var buildStations = await _context.BuildTemplateStations.Where(x => x.BuildTemplateId == workOrderModel.BuildTemplateId).Select(x => x.BuildStation)
+                    .Select(x => new BuildStationModel { BuildStationId = x.BuildStationId, Name = x.Name }).ToListAsync();
+
                 var part = await (from p in _context.Parts
                                   join mp in _context.MasterParts 
                                   on p.MasterPartId equals mp.MasterPartId
+                                  join wp in _context.WorkOrderParts on p.PartId equals wp.PartId
                                   join i in _context.Inspections on new { WorkOrderId = (int?)workOrderModel.WorkOrderId, PartId = p.PartId } equals new { WorkOrderId = i.WorkOrderId, PartId = i.PartId } into i_join
                                   from i in i_join.DefaultIfEmpty()
-                                  where p.ParentPartId == null && workOrderParts.Contains(p.PartId)
+                                  where p.ParentPartId == null && wp.WorkOrderId == workOrderModel.WorkOrderId
                                   select new Parts
                                   {
                                       PartId = p.PartId,
@@ -134,34 +138,42 @@ namespace QBD2.Services
                                       BuildStationId = p.BuildStationId,
                                       BuildStations = p.BuildStation.Name,
                                       SerialNumberRequired = p.SerialNumberRequired,
+                                      IsCompleteBuildStation = wp.IsCompleteBuildStation,
                                       InspectionStatus = (i.InspectionId > 0 ? (i.Pass ? "Passed" : "Failed") : "Non Inspectioned")
                                   }).ToListAsync();
 
                 foreach (Parts partItems in part)
                 {
-                    partItems.ChildParts = await (from p in _context.Parts
-                                                  join mp in _context.MasterParts 
-                                                  on p.MasterPartId equals mp.MasterPartId
-                                                  join i in _context.Inspections on new { WorkOrderId = (int?)workOrderModel.WorkOrderId, PartId = p.PartId } equals new { WorkOrderId = i.WorkOrderId, PartId = i.PartId } into i_join
-                                                  from i in i_join.DefaultIfEmpty()
-                                                  where p.ParentPartId == partItems.PartId
-                                                  select new Parts
-                                                  {
-                                                      PartId = p.PartId,
-                                                      SerialNumber = p.SerialNumber,
-                                                      Description = mp.Description,
-                                                      MasterPartId = mp.MasterPartId,
-                                                      ParentPartId = p.ParentPartId,
-                                                      PartNumber = mp.PartNumber,
-                                                      PartStatusId = p.PartStatusId,
-                                                      PartStatus = p.PartStatus.Name,
-                                                      BuildStationId = p.BuildStationId,
-                                                      BuildStations = p.BuildStation.Name,
-                                                      SerialNumberRequired = p.SerialNumberRequired,
-                                                      InspectionStatus = (i.InspectionId > 0 ? (i.Pass ? "Passed" : "Failed") : "Non Inspectioned")
-                                                  }).ToListAsync();
+                    foreach (BuildStationModel buildStation in buildStations)
+                    {
+                        buildStation.Parts = await (from p in _context.Parts
+                                                    join mp in _context.MasterParts
+                                                    on p.MasterPartId equals mp.MasterPartId
+                                                    join i in _context.Inspections on new { WorkOrderId = (int?)workOrderModel.WorkOrderId, PartId = p.PartId } equals new { WorkOrderId = i.WorkOrderId, PartId = i.PartId } into i_join
+                                                    from i in i_join.DefaultIfEmpty()
+                                                    where p.BuildStationId == buildStation.BuildStationId
+                                                    && p.ParentPartId == partItems.PartId
+                                                    select new Parts
+                                                    {
+                                                        PartId = p.PartId,
+                                                        SerialNumber = p.SerialNumber,
+                                                        Description = mp.Description,
+                                                        MasterPartId = mp.MasterPartId,
+                                                        ParentPartId = p.ParentPartId,
+                                                        PartNumber = mp.PartNumber,
+                                                        PartStatusId = p.PartStatusId,
+                                                        PartStatus = p.PartStatus.Name,
+                                                        BuildStationId = p.BuildStationId,
+                                                        BuildStations = p.BuildStation.Name,
+                                                        SerialNumberRequired = p.SerialNumberRequired,
+                                                        InspectionStatus = (i.InspectionId > 0 ? (i.Pass ? "Passed" : "Failed") : "Non Inspectioned")
+                                                    }).ToListAsync();
+                    }
+                    partItems.BuildStationsModel = buildStations;
                 }
+               
                 workOrderModel.PartsList = part;
+                
             }
             return workOrderModel;
         }
@@ -179,9 +191,22 @@ namespace QBD2.Services
                 //    return apiResponse;
                 //}
 
+              
+
                 var objWorkOrder = new Entities.WorkOrder();
                 if (addEditWorkOrderModel.WorkOrderId > 0)
                 {
+                    if (addEditWorkOrderModel.WorkOrderStatusId == 3)
+                    {
+                        // If Completed status then first check all workorder part need to completed
+                        if(_context.WorkOrderParts.Any(x => x.WorkOrderId == addEditWorkOrderModel.WorkOrderId && x.IsCompleteBuildStation == false))
+                        {
+                            apiResponse.Success = false;
+                            apiResponse.Message = "There are still few workorder parts incomplete. so, you can't complete workorder. ";
+                            return apiResponse;
+                        }
+                    }
+
                     objWorkOrder = _context.WorkOrders.Where(d => d.WorkOrderId == addEditWorkOrderModel.WorkOrderId).FirstOrDefault();
                     if (objWorkOrder != null)
                     {
@@ -289,6 +314,50 @@ namespace QBD2.Services
                 workOrder = _context.WorkOrders.Any(x => x.WorkOrderTypeId == WorkOrderTypeId && x.WorkOrderStatusId == WorkOrderStatusId && x.WorkOrderPriorityID == WorkOrderPriorityID && x.BuildTemplateId == BuildTemplateId && x.Quantity == Quantity);
 
             return workOrder;
+        }
+
+        public async Task<bool> CompleteBuildInspection(int workOrderId, int partId)
+        {
+            try
+            {
+                Entities.WorkOrderPart objWorkOrderPart = await _context.WorkOrderParts.FirstOrDefaultAsync(x => x.WorkOrderId == workOrderId && x.PartId == partId);
+
+                if (objWorkOrderPart != null && objWorkOrderPart.WorkOrderId > 0)
+                {
+                    objWorkOrderPart.IsCompleteBuildStation = true;
+                    _context.Entry(objWorkOrderPart).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> CheckAllBuildStationInspectionComplete(int workOrderId, int partId)
+        {
+            try
+            {
+                var BuildStations = await (from w in _context.WorkOrders
+                                           join wp in _context.WorkOrderParts on w.WorkOrderId equals wp.WorkOrderId
+                                           join bs in _context.BuildTemplateStations on w.BuildTemplateId equals bs.BuildTemplateId
+                                           join i in _context.BuildStationInspections on new { WorkOrderId = wp.WorkOrderId, PartId = wp.PartId, BuildStationId = bs.BuildStationId } equals new { WorkOrderId = i.WorkOrderId, PartId = i.PartId, BuildStationId = i.BuildStationId } into i_join
+                                           from i in i_join.DefaultIfEmpty()
+                                           where w.WorkOrderId == workOrderId && wp.PartId == partId
+                                           select new
+                                           {
+                                               IsCompleteBuildStation =(i== null ? false : i.IsCompleteBuildStation)
+                                           }).ToListAsync();
+
+                return !BuildStations.Any(x => x.IsCompleteBuildStation == false);
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
         }
     }
 }

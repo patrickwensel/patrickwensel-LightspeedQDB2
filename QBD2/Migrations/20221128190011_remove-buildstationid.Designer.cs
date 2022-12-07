@@ -12,7 +12,7 @@ using QBD2.Data;
 namespace QBD2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221128181646_remove-buildstationid")]
+    [Migration("20221128190011_remove-buildstationid")]
     partial class removebuildstationid
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -317,9 +317,6 @@ namespace QBD2.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BuildTemplateId"), 1L, 1);
 
-                    b.Property<int?>("BuildStationId")
-                        .HasColumnType("int");
-
                     b.Property<int>("MasterPartId")
                         .HasColumnType("int");
 
@@ -328,8 +325,6 @@ namespace QBD2.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("BuildTemplateId");
-
-                    b.HasIndex("BuildStationId");
 
                     b.HasIndex("MasterPartId");
 
@@ -1497,28 +1492,28 @@ namespace QBD2.Migrations
                         new
                         {
                             Id = "22b3bff1-cfd2-4075-a90f-827380656873",
-                            ConcurrencyStamp = "6bebf5d4-13f5-4fb2-bbc7-c360a329dc8d",
+                            ConcurrencyStamp = "4f47da87-6ae4-4fbe-9f8a-27de37d74ce9",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "e4e7188b-6ecb-4278-aeee-17271f20d7ce",
-                            ConcurrencyStamp = "9172c649-ba60-486d-a5ac-6613be849f17",
+                            ConcurrencyStamp = "f191361f-bd4a-411b-8e0c-fdab67e1c06f",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "aec800c6-ea7e-4420-a583-91a23787a3af",
-                            ConcurrencyStamp = "f40e1df0-f2bb-407a-ab32-18c678a0b18e",
+                            ConcurrencyStamp = "556dad75-a05f-436f-acf9-624fecff9591",
                             Name = "CanDeleteFailureCodes",
                             NormalizedName = "CANDELETEFAILURECODES"
                         },
                         new
                         {
                             Id = "e77174e9-e942-4fc1-bdb5-20a5f318d2ed",
-                            ConcurrencyStamp = "04836a74-c0bd-4c58-b12b-5273b4dff2d0",
+                            ConcurrencyStamp = "4ca306b8-10f0-431e-9b57-374a683faaf8",
                             Name = "CanDeleteRepair",
                             NormalizedName = "CANDELETEREPAIR"
                         });
@@ -1538,14 +1533,14 @@ namespace QBD2.Migrations
                         {
                             Id = "2e97b939-49c0-4e1e-8376-cb98348103bb",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "1c1bbf8b-1c30-4b86-af6b-784b731adad7",
+                            ConcurrencyStamp = "a1bbdd6c-a86f-4759-8f2c-cc56f5480e9f",
                             Email = "pwensel@hotmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "PWENSEL@HOTMAIL.COM",
                             NormalizedUserName = "PWENSEL@HOTMAIL.COM",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "13edaafc-34d1-42a4-b4f9-7c8df2c3992e",
+                            SecurityStamp = "bcbbfb77-980c-4eed-8637-05aa4b80dc0c",
                             TwoFactorEnabled = false,
                             UserName = "pwensel@hotmail.com",
                             ADLogin = "DESKTOP-1HVSAG6\\pwens"
@@ -1641,10 +1636,6 @@ namespace QBD2.Migrations
 
             modelBuilder.Entity("QBD2.Entities.BuildTemplate", b =>
                 {
-                    b.HasOne("QBD2.Entities.BuildStation", null)
-                        .WithMany("BuildTemplates")
-                        .HasForeignKey("BuildStationId");
-
                     b.HasOne("QBD2.Entities.MasterPart", "MasterPart")
                         .WithMany()
                         .HasForeignKey("MasterPartId")
@@ -2053,11 +2044,6 @@ namespace QBD2.Migrations
             modelBuilder.Entity("QBD2.Entities.Alert", b =>
                 {
                     b.Navigation("PartAlerts");
-                });
-
-            modelBuilder.Entity("QBD2.Entities.BuildStation", b =>
-                {
-                    b.Navigation("BuildTemplates");
                 });
 
             modelBuilder.Entity("QBD2.Entities.Deviation", b =>

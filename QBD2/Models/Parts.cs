@@ -29,6 +29,8 @@
 
         public int? key { get; set; }
 
+        public bool IsCompleteBuildStation { get; set; }
+        public string BuildInspectionStatus { get { return IsCompleteBuildStation ? "Complete" : "InComplete"; } }
 
         public int? FailureTypeId { get; set; }
         public string FailureType { get; set; }
@@ -38,5 +40,6 @@
         public string RepairDescription { get; set; }
 
         public int? RepairId { get; set; }
+        public List<BuildStationModel> BuildStationsModel { get; set; }
     }
 }

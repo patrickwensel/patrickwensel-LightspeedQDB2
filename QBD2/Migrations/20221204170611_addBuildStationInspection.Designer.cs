@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QBD2.Data;
 
@@ -11,9 +12,10 @@ using QBD2.Data;
 namespace QBD2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221204170611_addBuildStationInspection")]
+    partial class addBuildStationInspection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -320,9 +322,6 @@ namespace QBD2.Migrations
 
                     b.Property<string>("GeneralComments")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsCompleteBuildStation")
-                        .HasColumnType("bit");
 
                     b.Property<int>("PartId")
                         .HasColumnType("int");
@@ -1560,28 +1559,28 @@ namespace QBD2.Migrations
                         new
                         {
                             Id = "22b3bff1-cfd2-4075-a90f-827380656873",
-                            ConcurrencyStamp = "1f80c3ab-86d6-44b2-ae99-5c21baa25922",
+                            ConcurrencyStamp = "0c206ba2-a7ef-4c6b-a718-8fb8504562e1",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "e4e7188b-6ecb-4278-aeee-17271f20d7ce",
-                            ConcurrencyStamp = "8bc95e58-c511-47f7-93ac-b35e7991c773",
+                            ConcurrencyStamp = "e837af98-3dc0-4e6b-bb65-c4a2ec3fe9fd",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "aec800c6-ea7e-4420-a583-91a23787a3af",
-                            ConcurrencyStamp = "3f3c26a7-88de-47c7-aaf8-6244ed199abe",
+                            ConcurrencyStamp = "a22c6ac3-92e9-4421-8c78-f81d3efa0b2f",
                             Name = "CanDeleteFailureCodes",
                             NormalizedName = "CANDELETEFAILURECODES"
                         },
                         new
                         {
                             Id = "e77174e9-e942-4fc1-bdb5-20a5f318d2ed",
-                            ConcurrencyStamp = "633d930b-cd6c-4647-87d1-369f35560a56",
+                            ConcurrencyStamp = "e972b40b-b9a0-4c3a-8c43-a7c287876d9c",
                             Name = "CanDeleteRepair",
                             NormalizedName = "CANDELETEREPAIR"
                         });
@@ -1601,14 +1600,14 @@ namespace QBD2.Migrations
                         {
                             Id = "2e97b939-49c0-4e1e-8376-cb98348103bb",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "66b65be8-a765-4fdf-9d9b-9c550f2246fb",
+                            ConcurrencyStamp = "ca905fc3-ae8a-434e-8739-030a083ef7cd",
                             Email = "pwensel@hotmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "PWENSEL@HOTMAIL.COM",
                             NormalizedUserName = "PWENSEL@HOTMAIL.COM",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "27da4677-8530-4ae7-b90c-f2812a37ad24",
+                            SecurityStamp = "e8eff8a7-da5d-4ea0-b6fc-c4d313b57b74",
                             TwoFactorEnabled = false,
                             UserName = "pwensel@hotmail.com",
                             ADLogin = "DESKTOP-1HVSAG6\\pwens"

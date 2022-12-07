@@ -53,6 +53,9 @@ namespace QBD2.Data
         public DbSet<MRB> MRBs { get; set; }
         public DbSet<MRBDisposition> MRBDispositions { get; set; }
 
+        public DbSet<BuildStationInspectionFailure> BuildStationInspectionFailures { get; set; }
+        public DbSet<BuildStationInspection> BuildStationInspections { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             #region MRBDisposition

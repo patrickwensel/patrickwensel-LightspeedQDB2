@@ -97,6 +97,7 @@
                      Filterable="true" MinLength="3"
                      OnChange="@MyOnChangeHandler"
                      ClearButton="true" 
+                     Enabled=@(AddEditDeviation.DeviationId<=0)
                      Placeholder="Type Part Number And Select Part"
                      />
             </div>
@@ -321,10 +322,13 @@
                  <br/>
                   <div class="form-group row affects-p">
                       <h3 class="affect-p">Affected Parts</h3>
-                        <TelerikGrid Data=@GridParts Sortable="true" Pageable="false">
+                        <TelerikGrid Data=@GridParts Sortable="true" Pageable="false" OnDelete="@OnDeleteDeviationPart">
                             <GridColumns>
                                 <GridColumn Field=@nameof(Part.SerialNumber) Title="Serial Number" Filterable="false">
                                 </GridColumn>
+                                <GridCommandColumn Width="50px" Context="my">
+                                    <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete"></GridCommandButton>
+                                </GridCommandColumn>
                             </GridColumns>
                             <NoDataTemplate>
                                 <text>No Records Available</text>
@@ -378,6 +382,8 @@
     {
         await JSRuntime.InvokeVoidAsync("onlyAllowNumbers");
         GridParts.Clear();
+        selectedMasterPart = string.Empty;
+        selectedMasterPartDescription = string.Empty;
         OriginalRecord = null;
         if (deviation != null)
         {
@@ -629,6 +635,8 @@
                 toastService.ShowInfo("Record Saved Successfully", "Info");
                 SerialNumber = string.Empty;
                 GridParts.Clear();
+                selectedMasterPart = string.Empty;
+                selectedMasterPartDescription = string.Empty;
                 NavigationManager.NavigateTo("deviation", true);
                 StateHasChanged();
             }
@@ -683,5 +691,11 @@
     public async Task ViewErrorSerialNumberDetail()
     {
         IsDisplayRangeTextArea = true;
+    }
+
+    public void OnDeleteDeviationPart(GridCommandEventArgs args)
+    {
+        Part item = (Part)args.Item;
+        GridParts.Remove(item);
     }
 }

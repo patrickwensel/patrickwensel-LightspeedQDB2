@@ -48,21 +48,30 @@ namespace QBD2.Services
                 await _context.SaveChangesAsync();
             }
 
-            if (itemToInsert.AlertId > 0 && itemToInsert.PartAlerts != null && itemToInsert.PartAlerts.Count() > 0)
+            if (itemToInsert.AlertId > 0)
             {
-                foreach (var item in itemToInsert.PartAlerts)
+                var partAlerts = await _context.PartAlerts.Where(x => x.AlertId == itemToInsert.AlertId).ToListAsync();
+                if (partAlerts.Any())
                 {
-                    if (!_context.PartAlerts.Any(x => x.PartId == item.PartId && x.AlertId == itemToInsert.AlertId))
+                    var removeDatas = partAlerts.Where(x => itemToInsert.PartAlerts == null || !itemToInsert.PartAlerts.Any(y => y.PartId == x.PartId)).ToList();
+                    _context.PartAlerts.RemoveRange(removeDatas);
+                }
+
+                if (itemToInsert.PartAlerts != null && itemToInsert.PartAlerts.Any())
+                {
+                    var insertDatas = itemToInsert.PartAlerts.Where(x => !partAlerts.Any(y => y.PartId == x.PartId)).ToList();
+                    if (insertDatas.Any())
                     {
-                        PartAlert partAlert = new PartAlert
+                        List<PartAlert> insertDataList = new List<PartAlert>();
+                        foreach (var insertData in insertDatas)
                         {
-                            AlertId = itemToInsert.AlertId,
-                            PartId = item.PartId
-                        };
-                        _context.PartAlerts.Add(partAlert);
-                        await _context.SaveChangesAsync();
+                            insertDataList.Add(new PartAlert() { AlertId = itemToInsert.AlertId, PartId = insertData.PartId });
+                        }
+                        _context.PartAlerts.AddRange(insertDataList);
                     }
                 }
+
+                await _context.SaveChangesAsync();
             }
 
             return itemToInsert;

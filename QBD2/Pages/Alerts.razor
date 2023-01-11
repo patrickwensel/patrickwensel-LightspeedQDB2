@@ -92,6 +92,7 @@
                      Filterable="true" MinLength="3"
                      OnChange="@MyOnChangeHandler"
                      ClearButton="true" 
+                     Enabled=@(AddEditAlert.AlertId<=0)
                      Placeholder="Type Part Number And Select Part"
                      />
             </div>
@@ -118,7 +119,7 @@
           
             <label for="ExpirationDate" class="col-md-2 col-form-label">Expiration Date </label>
             <div class="col-md-4">
-            <TelerikDatePicker @bind-Value="@AddEditAlert.ExpirationDate" Class="form-control" @ref="theDatePickerExpirationDate" Format="dd/MM/yyyy"></TelerikDatePicker>
+            <TelerikDatePicker @bind-Value="@AddEditAlert.ExpirationDate" Class="form-control" @ref="theDatePickerExpirationDate" Format="MM/dd/yyyy"></TelerikDatePicker>
             <ValidationMessage For="@(() => AddEditAlert.ExpirationDate)"></ValidationMessage></div>
           
          </div>
@@ -249,10 +250,13 @@
                  
                  <div class="form-group row affects-p"> 
                     <h3 class="affect-p">Affected Parts</h3>
-                    <TelerikGrid Data=@GridParts Sortable="true" Pageable="false">
+                        <TelerikGrid Data=@GridParts Sortable="true" Pageable="false" OnDelete="@OnDeleteAlertPart">
                          <GridColumns>
                              <GridColumn Field=@nameof(Part.SerialNumber) Title="Serial Number" Filterable="false">
                              </GridColumn>
+                                <GridCommandColumn Width="50px" Context="my">
+                                    <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete"></GridCommandButton>
+                                </GridCommandColumn>
                          </GridColumns>
                          <NoDataTemplate>
                              <text>No Records Available</text>
@@ -314,6 +318,8 @@
     {
         await JSRuntime.InvokeVoidAsync("onlyAllowNumbers");
         GridParts.Clear();
+        selectedMasterPart = string.Empty;
+        selectedMasterPartDescription = string.Empty;
         OriginalRecord = null;
         if (alert != null)
         {
@@ -503,6 +509,8 @@
                 toastService.ShowInfo("Record Saved Successfully", "Info");
                 SerialNumber = string.Empty;
                 GridParts.Clear();
+                selectedMasterPart = string.Empty;
+                selectedMasterPartDescription = string.Empty;
                 NavigationManager.NavigateTo("alerts",true);
                 StateHasChanged();
             }
@@ -588,5 +596,11 @@
     public async Task ViewErrorSerialNumberDetail()
     {
         IsDisplayRangeTextArea = true;
+    }
+
+    public void OnDeleteAlertPart(GridCommandEventArgs args)
+    {
+        Part item = (Part)args.Item;
+        GridParts.Remove(item);
     }
 }

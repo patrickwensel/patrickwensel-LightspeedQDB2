@@ -63,21 +63,30 @@ namespace QBD2.Services
                 await _context.SaveChangesAsync();
             }
 
-            if (itemToInsert.DeviationId > 0 && itemToInsert.PartDeviations != null && itemToInsert.PartDeviations.Count() > 0)
+            if (itemToInsert.DeviationId > 0)
             {
-                foreach (var item in itemToInsert.PartDeviations)
+                var partDeviations = await _context.PartDeviations.Where(x => x.DeviationId == itemToInsert.DeviationId).ToListAsync();
+                if (partDeviations.Any())
                 {
-                    if(!_context.PartDeviations.Any(x=>x.PartId == item.PartId && x.DeviationId == itemToInsert.DeviationId))
+                    var removeDatas = partDeviations.Where(x => itemToInsert.PartDeviations == null || !itemToInsert.PartDeviations.Any(y => y.PartId == x.PartId)).ToList();
+                    _context.PartDeviations.RemoveRange(removeDatas);
+                }
+
+                if (itemToInsert.PartDeviations != null && itemToInsert.PartDeviations.Any())
+                {
+                    var insertDatas = itemToInsert.PartDeviations.Where(x => !partDeviations.Any(y => y.PartId == x.PartId)).ToList();
+                    if (insertDatas.Any())
                     {
-                        PartDeviation partDeviation = new PartDeviation
+                        List<PartDeviation> insertDataList = new List<PartDeviation>();
+                        foreach (var insertData in insertDatas)
                         {
-                            DeviationId = itemToInsert.DeviationId,
-                            PartId = item.PartId
-                        };
-                        _context.PartDeviations.Add(partDeviation);
-                        await _context.SaveChangesAsync();
+                            insertDataList.Add(new PartDeviation() { DeviationId = itemToInsert.DeviationId, PartId = insertData.PartId });
+                        }
+                        _context.PartDeviations.AddRange(insertDataList);
                     }
                 }
+
+                await _context.SaveChangesAsync();
             }
 
             return itemToInsert;

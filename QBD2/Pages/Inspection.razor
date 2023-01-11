@@ -119,10 +119,11 @@
                         <TelerikAutoComplete Data="@Parts" @bind-Value="@SerialNumber" Class="form-control col-sm-12 autocompletehright40"
                         ValueField="@(nameof(Part.SerialNumber))" ItemHeight="35" ScrollMode="@DropDownScrollMode.Virtual"
                         PageSize="10" Filterable="true" MinLength="3" ClearButton="true"
+                        Enabled=@(SelectedDataInspection==null || SelectedDataInspection.InspectionId<=0)
                         Placeholder="Search for a Serial Number" />
                         </div>
                         <div class=" col-sm-3 b-btn">
-                            <TelerikButton id="btnSearch" OnClick="(()=>btnFindOnClick(true))" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
+                            <TelerikButton id="btnSearch" Hidden=@(SelectedDataInspection!=null && SelectedDataInspection.InspectionId>0) OnClick="(()=>btnFindOnClick(true))" ButtonType="@ButtonType.Submit"><i class="fa fa-search" aria-hidden="true"></i> Find</TelerikButton>
                         </div>
                     </div>
 
@@ -733,6 +734,7 @@
 
     async Task findInspectionsDetail(Entities.Inspection inspection)
     {
+        GridAlertDeviationData = new List<Models.AlertDeviationDetailModel>();
         IsDisplayAddEditInspection = true;
         if (inspection != null && inspection.Part != null)
         {

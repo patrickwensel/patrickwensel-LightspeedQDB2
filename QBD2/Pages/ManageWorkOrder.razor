@@ -1,0 +1,1274 @@
+﻿@page "/manageworkorder"
+@using QBD2.Models
+@using QBD2.Services
+@using QBD2.Entities
+@using static QBD2.Models.Enum
+@attribute [Authorize(Roles = "Admin,WorkOrderAdmin")]
+@inject IToastService toastService
+@inject NavigationManager NavigationManager
+@inject WorkOrderPriorityService WorkOrderPriorityService
+@inject WorkOrderService WorkOrderService
+@inject WorkOrderStatusService WorkOrderStatusService
+@inject WorkOrderTypeService WorkOrderTypeService
+@inject MasterPartService MasterPartService
+@inject IJSRuntime JSRuntime
+@inject PartService PartService
+@inject InspectionService InspectionService
+@inject BuildStationInspectionService BuildStationInspectionService
+@inject BuildStationFailureCodeService BuildStationFailureCodeService
+@inject AuthenticationStateProvider AuthState
+@inject UserService UserService
+@inject PONumberService PONumberService
+
+
+<style>
+    .SaveButton {
+        float: right;
+        width: 100px;
+    }
+
+    .k-dialog-wrapper {
+        position: inherit;
+    }
+
+    .k-centered {
+        transform: translate(5%, -200%);
+        width: 320px;
+    }
+
+    .k-window-titlebar.k-dialog-titlebar.k-header {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        padding: 10px 10px 20px 10px;
+    }
+
+    .k-window-content.k-dialog-content {
+        border-radius: 0;
+    }
+
+    label.k-form-label {
+        margin-right: 15px;
+    }
+
+    .k-form .k-form-field, .k-form .k-form-field-wrap {
+        display: inline-flex;
+        width: 100%;
+    }
+
+    .k-actions-start {
+        float: right;
+    }
+
+    .k-window-actions span {
+        color: #fff;
+    }
+
+    label.col-form-label {
+        text-align: right;
+        font-weight: bold;
+    }
+
+    .no-headers-grid .k-grid-header {
+        display: none;
+    }
+
+    .contests-wrapper {
+        border: solid;
+        padding: 15px;
+        border-color: rgba(0, 0, 0, 0.08);
+        border-width: 1px;
+    }
+
+    .alert-edit-page .k-tabstrip-items-wrapper.k-hstack {
+        border-color: rgba(0, 0, 0, 0.08);
+        border-style: solid;
+        border-width: 1px;
+    }
+
+    .alert-edit-page .k-tabstrip-content.k-state-active, .k-tabstrip > .k-content.k-state-active {
+        border: solid;
+        padding: 15px;
+        border-color: rgba(0, 0, 0, 0.08);
+        border-width: 1px;
+        margin-top: 0px;
+    }
+</style>
+
+<div class="row alerts-row">
+    <div class="col-md-9">
+        @if (AddEditWorkOrderModel != null && AddEditWorkOrderModel.WorkOrderId == 0)
+        {
+            <h3 class="alert-title"><label @onclick="(()=> btnCancelEditWorkOrderOnClick())"><i class="fa fa-th-list" aria-hidden="true"></i></label>&nbsp;&nbsp;Work Order</h3>
+        }
+        else if (AddEditWorkOrderModel != null && AddEditWorkOrderModel.WorkOrderId > 0)
+        {
+            <h3 class="alert-title"><label @onclick="(()=> btnCancelEditWorkOrderOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Edit Work Order</h3>
+        }
+        else
+        {
+            <h3 class="alert-title"><i class="fa fa-th-list" aria-hidden="true"></i>&nbsp;&nbsp;Work Order</h3>
+        }
+    </div>
+    <div class="col-md-3 add-alrert-btn">
+        @if (AddEditWorkOrderModel == null)
+        {
+            <TelerikButton Icon="add" OnClick="(() => SelectRecord(null))">Add New Work Order</TelerikButton>
+        }
+    </div>
+</div>
+<hr />
+
+@if (IsDisplayPopUpWindow == true)
+{
+    <h3 class="alert-table-title">Listed Work Orders</h3>
+    <div class="al-table">
+        <TelerikGrid Data="@GridData"
+                 Pageable="true"
+                 Sortable="true"
+                 FilterMode="@GridFilterMode.FilterRow">
+            <DetailTemplate Context="context">
+                @{
+                    var workOrderModel = context as Models.WorkOrderModel;
+                    <TelerikGrid Data="workOrderModel.PartsList" Pageable="true" PageSize="5">
+
+                        <DetailTemplate Context="childPartContext">
+                            @{
+                                <TelerikGrid Data="childPartContext.ChildParts" Pageable="true" PageSize="5">
+
+                                    <GridColumns>
+                                        <GridColumn Field="PartId" Title="Part">
+                                            <Template Context="myContext">
+                                                @{
+                                                    var part = myContext as Parts;
+                                                    if (part != null)
+                                                    {
+                                                        <lable>@part.PartId</lable>
+                                                    }
+                                                }
+                                            </Template>
+                                        </GridColumn>
+                                        <GridColumn Field="SerialNumber" Title="Serial Number">
+                                            <Template Context="myContext">
+                                                @{
+                                                    var part = myContext as Parts;
+                                                    if (part != null)
+                                                    {
+                                                        <lable>@part.SerialNumber</lable>
+                                                    }
+                                                }
+                                            </Template>
+                                        </GridColumn>
+
+                                        <GridColumn Field="PartNumber" Title="Part Number">
+                                            <Template Context="myContext">
+                                                @{
+                                                    var part = myContext as Parts;
+                                                    if (part != null)
+                                                    {
+                                                        <lable>@part.PartNumber</lable>
+                                                    }
+                                                }
+                                            </Template>
+                                        </GridColumn>
+
+                                        <GridColumn Field="Parts.BuildStations>" Title="Build Station">
+                                            <Template Context="myContext">
+                                                @{
+                                                    var part = myContext as Parts;
+                                                    if (part != null && part.BuildStations != null)
+                                                    {
+                                                        <lable>@part.BuildStations</lable>
+                                                    }
+                                                }
+                                            </Template>
+                                        </GridColumn>
+                                        <GridColumn Field="Parts.PartStatus>" Title="Part Status">
+                                            <Template Context="myContext">
+                                                @{
+                                                    var part = myContext as Parts;
+                                                    if (part != null && part.PartStatus != null)
+                                                    {
+                                                        <lable>@part.PartStatus</lable>
+                                                    }
+                                                }
+                                            </Template>
+                                        </GridColumn>
+                                        <GridColumn Field="Parts.SerialNumberRequired>" Title="Serial Number Required">
+                                            <Template Context="myContext">
+                                                @{
+                                                    var part = myContext as Parts;
+                                                    if (part != null)
+                                                    {
+                                                        if (part != null && part.SerialNumberRequired == true)
+                                                        {
+                                                            <lable style="color:green">Yes</lable>
+                                                        }
+                                                        else
+                                                        {
+                                                            <lable style="color:red;">No</lable>
+                                                        }
+                                                    }
+                                                }
+                                            </Template>
+                                        </GridColumn>
+                                    </GridColumns>
+
+                                </TelerikGrid>
+                            }
+                        </DetailTemplate>
+
+                        <GridColumns>
+                            <GridColumn Field="PartId" Title="Part">
+                                <Template Context="myContext">
+                                    @{
+                                        var part = myContext as Parts;
+                                        if (part != null)
+                                        {
+                                            <lable>@part.PartId</lable>
+                                        }
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="SerialNumber" Title="Serial Number">
+                                <Template Context="myContext">
+                                    @{
+                                        var part = myContext as Parts;
+                                        if (part != null)
+                                        {
+                                            <lable>@part.SerialNumber</lable>
+                                        }
+                                    }
+                                </Template>
+                            </GridColumn>
+
+                            <GridColumn Field="PartNumber" Title="Part Number">
+                                <Template Context="myContext">
+                                    @{
+                                        var part = myContext as Parts;
+                                        if (part != null)
+                                        {
+                                            <lable>@part.PartNumber</lable>
+                                        }
+                                    }
+                                </Template>
+                            </GridColumn>
+
+                            <GridColumn Field="Parts.BuildStations>" Title="Build Station">
+                                <Template Context="myContext">
+                                    @{
+                                        var part = myContext as Parts;
+                                        if (part != null && part.BuildStations != null)
+                                        {
+                                            <lable>@part.BuildStations</lable>
+                                        }
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="Parts.PartStatus>" Title="Part Status">
+                                <Template Context="myContext">
+                                    @{
+                                        var part = myContext as Parts;
+                                        if (part != null && part.PartStatus != null)
+                                        {
+                                            <lable>@part.PartStatus</lable>
+                                        }
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="Parts.SerialNumberRequired>" Title="Serial Number Required">
+                                <Template Context="myContext">
+                                    @{
+                                        var part = myContext as Parts;
+                                        if (part != null)
+                                        {
+                                            if (part != null && part.SerialNumberRequired == true)
+                                            {
+                                                <lable style="color:green">Yes</lable>
+                                            }
+                                            else
+                                            {
+                                                <lable style="color:red;">No</lable>
+                                            }
+                                        }
+                                    }
+                                </Template>
+                            </GridColumn>
+                        </GridColumns>
+                    </TelerikGrid>
+                }
+            </DetailTemplate>
+            <GridColumns>
+                <GridColumn Field="@(nameof(Models.WorkOrderModel.CreateDate))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}" />
+                <GridColumn Field="WorkOrderType.Name" Title="Work Order Type" Filterable="true" />
+                <GridColumn Field="WorkOrderStatus.Name" Title="Work Order Status" Filterable="true" />
+                <GridColumn Field="WorkOrderPriority.Name" Title="Work Order Priority" Filterable="true" />
+                <GridColumn Field="BuildTemplateMasterPartName" Title="Build Template" Filterable="true" />
+                <GridColumn Field="Quantity" Title="Quantity" Filterable="true" />
+                <GridCommandColumn Width="100px">
+                    <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Models.WorkOrderModel))"><i class="fal fa-edit"></i></GridCommandButton>
+                    <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Models.WorkOrderModel))" Enabled="false"></GridCommandButton>
+                </GridCommandColumn>
+            </GridColumns>
+        </TelerikGrid>
+    </div>
+}
+
+@if (AddEditWorkOrderModel != null && IsDisplayPopUpWindow == false)
+{
+    <br />
+    <div class="alert-edit-page">
+        <EditForm EditContext="@ECAddEditWorkOrder">
+            <DataAnnotationsValidator />
+            <div class="form-group row">
+                <label for="BuildTemplateMasterPartName" class="col-sm-2 col-form-label">Build Template: </label>
+                <div class="col-md-4">
+                    <label class="col-form-label">@OriginalRecord.BuildTemplateMasterPartName</label>
+                </div>
+
+                <label for="WorkOrderTypeId" class="col-md-2 col-form-label">Type </label>
+                <div class="col-md-4">
+                    <TelerikDropDownList @bind-Value="@AddEditWorkOrderModel.WorkOrderTypeId" Width="100%"
+                                     DefaultText="-select-" Data="@dataWorkOrderTypesDropdown" TextField="DropText" ValueField="DropValue" Class="form-control" Enabled="true" OnChange="OnDropDopChangeHandler"></TelerikDropDownList>
+                    <ValidationMessage For="@(() => AddEditWorkOrderModel.WorkOrderTypeId)" style="width:unset!important;"></ValidationMessage>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="Quantity" class="col-sm-2 col-form-label">Quantity: </label>
+                <div class="col-md-4">
+                    <label class="col-form-label">@AddEditWorkOrderModel.Quantity</label>
+                </div>
+
+                <label for="WorkOrderStatusId" class="col-md-2 col-form-label">Status </label>
+                <div class="col-md-4">
+                    <TelerikDropDownList @bind-Value="@AddEditWorkOrderModel.WorkOrderStatusId" Width="100%"
+                                     DefaultText="-select-" Data="@dataWorkOrderStatusesDropdown" TextField="DropText" ValueField="DropValue" Class="form-control" Enabled="true" OnChange="OnDropDopChangeHandler"></TelerikDropDownList>
+                    <ValidationMessage For="@(() => AddEditWorkOrderModel.WorkOrderStatusId)" style="width:unset!important;"></ValidationMessage>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-6">
+                </div>
+
+                <label for="WorkOrderPriorityID" class="col-md-2 col-form-label">Priority </label>
+                <div class="col-md-4">
+                    <TelerikDropDownList @bind-Value="@AddEditWorkOrderModel.WorkOrderPriorityID" Width="100%"
+                                     DefaultText="-select-" Data="@dataWorkOrderPrioritiesDropdown" TextField="DropText" ValueField="DropValue" Class="form-control" Enabled="true" OnChange="OnDropDopChangeHandler"></TelerikDropDownList>
+                    <ValidationMessage For="@(() => AddEditWorkOrderModel.WorkOrderPriorityID)" style="width:unset!important;"></ValidationMessage>
+                </div>
+            </div>
+        </EditForm>
+        <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <TelerikPager PageSize="@PageSize" Total="TotalCount" ButtonCount="7" PageChanged="@PageChangedHandler"></TelerikPager>
+
+                <div class="contests-wrapper">
+                    @{
+                        var part = EditWorkOrderPartGridData.Skip((Page - 1) * PageSize).Take(PageSize).FirstOrDefault();
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <EditForm EditContext="@ECEditPart">
+                                    <DataAnnotationsValidator />
+                                    <div class="form-group row">
+                                        <label for="PartNumber" class="col-sm-4 col-form-label">Part Number:</label>
+                                        <div class="col-md-8">
+                                            <label class="col-form-label">@EditPartModel.PartNumber</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="SerialNumber" class="col-sm-4 col-form-label">Serial Number: </label>
+                                        <div class="col-md-8">
+                                            <InputText type="text" class="form-control" @bind-Value="@EditPartModel.SerialNumber" @onblur="@EditSerialNumberOnBlur" />
+                                        </div>
+                                    </div>
+                                </EditForm>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label">Build Inspection Status: </label>
+
+                                    @if (part.IsCompleteBuildStation)
+                                    {
+                                        <lable class="col-sm-3 col-form-label" style="color:green">@part.BuildInspectionStatus</lable>
+                                    }
+                                    else
+                                    {
+                                        <lable class="col-sm-3 col-form-label" style="color:red;">@part.BuildInspectionStatus</lable>
+                                    }
+                                    <label class="col-sm-1 col-form-label"></label>
+                                    <div class="col-md-4 bg-w save-btn">
+                                        <TelerikButton ButtonType="@ButtonType.Button" Enabled=@(!part.IsCompleteBuildStation) OnClick="@btnCompleteBuildOnClick"><i class="fa-solid fa-floppy-disk"></i> Complete Build</TelerikButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <TelerikTabStrip ActiveTabIndexChanged="@PartTabChangedHandler">
+                            @{
+
+                                foreach (BuildStationModel buildStation in part.BuildStationsModel)
+                                {
+                                    var title = buildStation.Name;
+                                    <TabStripTab Title="@title" @key="@buildStation.BuildStationId">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <TelerikGrid Data="@buildStation.Parts.ToList()" Pageable="false">
+                                                    <GridColumns>
+                                                        <GridColumn Field="PartNumber" Title="Part Number">
+                                                            <Template Context="myContext">
+                                                                @{
+                                                                    var part = myContext as Parts;
+                                                                    if (part != null)
+                                                                    {
+                                                                        <lable>@part.PartNumber</lable>
+                                                                    }
+                                                                }
+                                                            </Template>
+                                                        </GridColumn>
+                                                        <GridColumn Field="SerialNumber" Title="Serial Number">
+                                                            <Template Context="myContext">
+                                                                @{
+                                                                    var part = myContext as Parts;
+                                                                    if (part != null)
+                                                                    {
+                                                                        <lable>@part.SerialNumber</lable>
+                                                                    }
+                                                                }
+                                                            </Template>
+                                                        </GridColumn>
+                                                        <GridCommandColumn Width="100px" Title="Action">
+                                                            <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> EditSerialNumber(args.Item as Models.Parts))"><i class="fal fa-edit"></i></GridCommandButton>
+                                                        </GridCommandColumn>
+                                                    </GridColumns>
+                                                </TelerikGrid>
+                                            </div>
+                                            <div class="col-md-8">
+                                                @if (EditPartModel != null)
+                                                {
+                                                    //<EditForm EditContext="@ECEditPart">
+                                                    //    <DataAnnotationsValidator />
+
+
+                                                    if (OriginalBuildStationInspection != null)
+                                                    {
+                                                        <div class="form-group row" style="margin-top:10px">
+                                                            <label for="PartNumber" class="col-sm-3 col-form-label">Status:</label>
+                                                            <div class="col-md-3">
+                                                                <ul class="switch-btn">
+                                                                    <li class="@(OriginalBuildStationInspection.Pass?"active":"")" @onclick="(() => OnDataStatusChangeHandler(true))"><i class="fa-regular fa-circle-check"></i> Passed</li>
+                                                                    <li class="failed @(OriginalBuildStationInspection.Pass?"":"active")" @onclick="(() => OnDataStatusChangeHandler(false))"><i class="fa-light fa-circle-xmark"></i> Failed</li>
+                                                                </ul>
+                                                            </div>
+
+
+                                                            @if (OriginalBuildStationInspection.IsCompleteBuildStation)
+                                                            {
+                                                                <lable class="col-sm-3 col-form-label" style="color:green">Complete</lable>
+                                                            }
+                                                            else
+                                                            {
+                                                                <lable class="col-sm-3 col-form-label" style="color:red;">InComplete</lable>
+                                                            }
+
+                                                            <div class="col-md-3 bg-w save-btn">
+                                                                <TelerikButton ButtonType="@ButtonType.Button" Enabled=@(!OriginalBuildStationInspection.IsCompleteBuildStation && (OriginalBuildStationInspection.BuildStationInspectionId > 0)) OnClick="@btnCompleteInspectionOnClick"><i class="fa-solid fa-floppy-disk"></i> Complete Inspection</TelerikButton>
+                                                            </div>
+                                                        </div>
+
+                                                        if (!OriginalBuildStationInspection.Pass)
+                                                        {
+                                                            <div class="form-group row" style="margin-top:10px">
+                                                                <label class="col-sm-4 col-form-label">Primary:</label>
+                                                                <div class="col-md-8">
+                                                                    <TelerikDropDownList Data="@dataFailurePrimaryDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                                                     @bind-Value="@OriginalBuildStationInspection.BuildStationInspectionFailed.FailurePrimaryTypeId" DefaultText="Select Failure Primary" OnChange="@PrimaryDDOnChangeHandler">
+                                                                    </TelerikDropDownList>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row" style="margin-top:10px">
+                                                                <label class="col-sm-4 col-form-label">Secondary:</label>
+                                                                <div class="col-md-8">
+                                                                    <TelerikDropDownList Data="@dataFailureDropdown" class="col-sm-11" TextField="DropText" ValueField="DropValue"
+                                                                     @bind-Value="@OriginalBuildStationInspection.BuildStationInspectionFailed.FailureTypeId" DefaultText="Select Failure">
+                                                                    </TelerikDropDownList>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row" style="margin-top:10px">
+                                                                <label class="col-sm-4 col-form-label">Comment:</label>
+                                                                <div class="col-md-8">
+                                                                    <TelerikTextArea @bind-Value="@OriginalBuildStationInspection.BuildStationInspectionFailed.Comment"></TelerikTextArea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row" style="margin-top:10px">
+                                                                <label class="col-sm-4 col-form-label"></label>
+                                                                <div class="col-sm-8 add-reason-btn">
+                                                                    <TelerikButton id="btnSearch" ButtonType="@ButtonType.Button" Enabled=@(!OriginalBuildStationInspection.IsCompleteBuildStation) OnClick="@btnAddOnClick"><i class="fa-light fa-plus"></i> Add Reason</TelerikButton>
+                                                                </div>
+                                                            </div>
+                                                            <div class="reason-section">
+                                                                <h3>Reasons</h3>
+                                                                <TelerikGrid Data="@OriginalBuildStationInspection.BuildStationInspectionFailedList"
+                                                 Sortable="true"
+                                                 Resizable="true"
+                                                 EditMode="Telerik.Blazor.GridEditMode.Inline"
+                                                 OnDelete=@DeleteHandler>
+                                                                    <GridColumns>
+                                                                        <GridColumn Field="FailurePrimaryName" Title="Primary" Groupable="false" />
+                                                                        <GridColumn Field="FailureName" Title="Secondary" Groupable="false" />
+                                                                        <GridColumn Field="Comment" Title="Comments" Groupable="false" />
+                                                                        @if (IsUserCanDeleteFailureCodeRights)
+                                                                        {
+                                                                            <GridCommandColumn Width="10%">
+                                                                                <GridCommandButton Command="Delete" Icon="delete"></GridCommandButton>
+                                                                            </GridCommandColumn>
+                                                                        }
+                                                                    </GridColumns>
+                                                                </TelerikGrid>
+                                                            </div>
+                                                        }
+
+                                                        <div class="form-group row m-tb" style="padding-bottom: 20px;">
+                                                            <label class="col-sm-4 col-form-label"></label>
+                                                            <div class="col-md-8 bg-w save-btn">
+                                                                <TelerikButton ButtonType="@ButtonType.Button" Enabled=@(!isSaveInspectionClick && !OriginalBuildStationInspection.IsCompleteBuildStation) OnClick="@btnSaveInspectionOnClick"><i class="fa-solid fa-floppy-disk"></i> Save Inspection</TelerikButton>
+                                                            </div>
+                                                        </div>
+                                                    }
+
+
+
+                                                    //</EditForm>
+
+                                                }
+                                            </div>
+                                        </div>
+
+
+                                    </TabStripTab>
+                                }
+                            }
+                        </TelerikTabStrip>
+
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+}
+
+<TelerikWindow Visible="@(AddEditWorkOrderModel != null && IsDisplayPopUpWindow == true)" Modal="true" Width="600px" Draggable="false">
+    <WindowTitle>
+        @{
+            if (AddEditWorkOrderModel.WorkOrderId == 0)
+            {
+                <strong>Add new Work Order</strong>
+            }
+            else
+            {
+                <strong>Edit Work Order</strong>
+            }
+        }
+    </WindowTitle>
+    <WindowContent>
+        <EditForm Model="@AddEditWorkOrderModel" OnValidSubmit="@HandleValidSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="WorkOrderTypeId" class="col-sm-4 col-form-label">Work Order Type </label>
+                        <div class="col-sm-8">
+                            <TelerikDropDownList @bind-Value="@AddEditWorkOrderModel.WorkOrderTypeId" Width="100%"
+                                                 DefaultText="-select-" Data="@dataWorkOrderTypesDropdown" TextField="DropText" ValueField="DropValue" Class="form-control" Enabled="true">
+                            </TelerikDropDownList>
+                            <ValidationMessage For="@(() => AddEditWorkOrderModel.WorkOrderTypeId)" style="width:unset!important;"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="WorkOrderStatusId" class="col-sm-4 col-form-label">Work Order Status </label>
+                        <div class="col-sm-8">
+                            <TelerikDropDownList @bind-Value="@AddEditWorkOrderModel.WorkOrderStatusId" Width="100%"
+                                                 DefaultText="-select-" Data="@dataWorkOrderStatusesDropdown" TextField="DropText" ValueField="DropValue" Class="form-control" Enabled="true">
+                            </TelerikDropDownList>
+                            <ValidationMessage For="@(() => AddEditWorkOrderModel.WorkOrderStatusId)" style="width:unset!important;"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="WorkOrderPriorityID" class="col-sm-4 col-form-label">Work Order Priority </label>
+                        <div class="col-sm-8">
+                            <TelerikDropDownList @bind-Value="@AddEditWorkOrderModel.WorkOrderPriorityID" Width="100%"
+                                                 DefaultText="-select-" Data="@dataWorkOrderPrioritiesDropdown" TextField="DropText" ValueField="DropValue" Class="form-control" Enabled="true">
+                            </TelerikDropDownList>
+                            <ValidationMessage For="@(() => AddEditWorkOrderModel.WorkOrderPriorityID)" style="width:unset!important;"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="MasterPartId" class="col-sm-4 col-form-label">Part </label>
+                        <div class="col-sm-8">
+                            <TelerikComboBox Data="@dataMasterPartsDropdown" Class="form-control" Placeholder="-select-" TextField="DropText" ValueField="DropValue" @bind-Value="AddEditWorkOrderModel.BuildTemplateId" Filterable="true">
+                            </TelerikComboBox>
+                            <ValidationMessage For="@(() => AddEditWorkOrderModel.BuildTemplateId)" style="width:unset!important;"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="Quantity" class="col-sm-4 col-form-label">Quantity </label>
+                        <div class="col-sm-8">
+                            <TelerikNumericTextBox @bind-Value="@AddEditWorkOrderModel.Quantity" Class="form-control"></TelerikNumericTextBox>
+                            <ValidationMessage For="@(() => AddEditWorkOrderModel.Quantity)" style="width:unset!important;"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="Quantity" class="col-sm-4 col-form-label">Purchase Order Number </label>
+                        <div class="col-sm-8">
+                            <TelerikComboBox Data="@dataPoNumberDropdown" TextField="DropText" ValueField="DropValue"
+                                             ItemHeight="30" PageSize="10" Filterable="true" ScrollMode="@DropDownScrollMode.Virtual"
+                                             @bind-Value="@AddEditWorkOrderModel.PONumber" Placeholder="-select-">
+                                <ComboBoxSettings>
+                                    <DropDownListPopupSettings Height="Auto" MaxHeight="150px" />
+                                </ComboBoxSettings>
+                            </TelerikComboBox>
+                            <ValidationMessage For="@(() => AddEditWorkOrderModel.PONumber)" style="width:unset!important;"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <br />
+            <div class="form-row">
+                @{
+                    if (AddEditWorkOrderModel.WorkOrderId == 0)
+                    {
+                        <TelerikButton Icon="save" ButtonType="@ButtonType.Submit">Save</TelerikButton>
+                    }
+                    else
+                    {
+                        <TelerikButton Icon="save" ButtonType="@ButtonType.Submit">Update</TelerikButton>
+                    }
+                }
+                &nbsp;
+                <TelerikButton Icon="cancel" OnClick="(() => btnCancelScarCarOnClick())" ButtonType="@ButtonType.Button">Cancel</TelerikButton>
+            </div>
+        </EditForm>
+    </WindowContent>
+</TelerikWindow>
+
+<TelerikWindow Visible="@(EditChildPartModel != null)" Modal="true" Width="600px" Draggable="false">
+    <WindowTitle>
+        <strong>Edit Serial Number</strong>
+    </WindowTitle>
+    <WindowActions>
+        <WindowAction Name="Close" OnClick="@OnEditSerialNumberCancel"></WindowAction>
+    </WindowActions>
+    <WindowContent>
+        <EditForm Model="@EditChildPartModel" OnValidSubmit="@OnEditSerialNumberSave">
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label for="SerialNumber" class="col-sm-4 col-form-label">Serial Number: </label>
+                <div class="col-md-8">
+                    <InputText type="text" class="form-control" @bind-Value="@EditChildPartModel.SerialNumber" />
+                </div>
+            </div>
+            <hr />
+            <div class="form-row" style="float:right;">
+                <TelerikButton Icon="save" ButtonType="@ButtonType.Submit">Save</TelerikButton>
+                &nbsp;
+                <TelerikButton Icon="cancel" OnClick="@OnEditSerialNumberCancel" ButtonType="@ButtonType.Button">Cancel</TelerikButton>
+            </div>
+        </EditForm>
+    </WindowContent>
+</TelerikWindow>
+@code {
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 1;
+    public int TotalCount { get; set; }
+    public int ActiveTabIndex { get; set; } = 0;
+    public string AddActiveCssClass { get; set; } = "active";
+    public string AddInActiveCssClass { get; set; }
+
+    public Models.BuildStationInspectionModel OriginalBuildStationInspection { get; set; }
+    List<Models.BuildStationInspectionFailed> dataFailureGrid { get; set; }
+
+    public void OnDataStatusChangeHandler(bool value)
+    {
+        OriginalBuildStationInspection.Pass = value;
+    }
+
+    List<Models.DropDownBind> dataFailurePrimaryDropdown { get; set; }
+    List<Models.DropDownBind> dataFailureDropdown { get; set; }
+
+    public bool IsUserCanDeleteFailureCodeRights { get; set; } = false;
+
+
+    public async Task CheckLoginUserHasDeleteRepairRights()
+    {
+        if (!string.IsNullOrWhiteSpace(UserId))
+        {
+            var resultRoles = await UserService.GetUserRolesById(UserId);
+            if (resultRoles != null && resultRoles.Count() > 0 && resultRoles.Any(x => x.ToLower() == RoleType.CanDeleteFailureCodes.ToString().ToLower()))
+            {
+                IsUserCanDeleteFailureCodeRights = true;
+            }
+            else
+            {
+                IsUserCanDeleteFailureCodeRights = false;
+            }
+        }
+    }
+
+    void PrimaryDDOnChangeHandler()
+    {
+        dataFailureDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureType, OriginalBuildStationInspection.BuildStationInspectionFailed.FailurePrimaryTypeId);
+
+    }
+
+    async Task btnAddOnClick()
+    {
+
+        if (OriginalBuildStationInspection.BuildStationInspectionFailedList == null)
+        {
+            dataFailureGrid = new List<Models.BuildStationInspectionFailed>();
+        }
+        else
+        {
+            dataFailureGrid = OriginalBuildStationInspection.BuildStationInspectionFailedList;
+        }
+
+        if (OriginalBuildStationInspection.BuildStationInspectionFailed.FailurePrimaryTypeId <= 0)
+        {
+            toastService.ShowError("Please Select Failure Primary Type", "Error");
+            return;
+        }
+
+        if (OriginalBuildStationInspection.BuildStationInspectionFailed.FailureTypeId <= 0)
+        {
+            toastService.ShowError("Please Select Failure Type", "Error");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(OriginalBuildStationInspection.BuildStationInspectionFailed.Comment))
+        {
+            toastService.ShowError("Please Enter Comment", "Error");
+            return;
+        }
+
+        if (dataFailureGrid.Count > 0)
+        {
+            if (dataFailureGrid.Any(p => p.FailureTypeId == OriginalBuildStationInspection.BuildStationInspectionFailed.FailureTypeId && p.FailurePrimaryTypeId == OriginalBuildStationInspection.BuildStationInspectionFailed.FailurePrimaryTypeId))
+            {
+                toastService.ShowError("Record Already there !", "Error");
+                return;
+            }
+        }
+        dataFailureGrid.Add(new Models.BuildStationInspectionFailed
+            {
+                Comment = OriginalBuildStationInspection.BuildStationInspectionFailed.Comment,
+                FailurePrimaryTypeId = OriginalBuildStationInspection.BuildStationInspectionFailed.FailurePrimaryTypeId,
+                FailureTypeId = OriginalBuildStationInspection.BuildStationInspectionFailed.FailureTypeId,
+                FailurePrimaryName = dataFailurePrimaryDropdown.FirstOrDefault(p => p.DropValue == OriginalBuildStationInspection.BuildStationInspectionFailed.FailurePrimaryTypeId)?.DropText,
+                FailureName = dataFailureDropdown.FirstOrDefault(p => p.DropValue == OriginalBuildStationInspection.BuildStationInspectionFailed.FailureTypeId)?.DropText,
+            });
+
+        OriginalBuildStationInspection.BuildStationInspectionFailed = new Models.BuildStationInspectionFailed();
+
+        PrimaryDDOnChangeHandler();
+        dataFailureGrid = new List<Models.BuildStationInspectionFailed>(dataFailureGrid);
+        OriginalBuildStationInspection.BuildStationInspectionFailedList = dataFailureGrid;
+
+    }
+
+    async Task DeleteHandler(GridCommandEventArgs args)
+    {
+        Models.BuildStationInspectionFailed item = (Models.BuildStationInspectionFailed)args.Item;
+        dataFailureGrid.Remove(item);
+
+    }
+
+    List<Models.DropDownBind> dataBuildStationFailureCodeDropdown { get; set; }
+    bool isSaveInspectionClick { get; set; }
+
+    async Task btnSaveInspectionOnClick()
+    {
+        try
+        {
+            if (isSaveInspectionClick)
+                return;
+
+            isSaveInspectionClick = true;
+
+            //if (string.IsNullOrEmpty(EditPartModel.SerialNumber))
+            //{
+            //    toastService.ShowError("Please enter serial number.", "Error");
+            //    return;
+            //}
+
+            //if (!OriginalBuildStationInspection.Pass)
+            //{
+
+            //    if (string.IsNullOrWhiteSpace(OriginalBuildStationInspection.BuildStationInspectionFailed.Comment))
+            //    {
+            //        toastService.ShowError("Please Enter Comment.", "Error");
+            //        return;
+            //    }
+            //}
+
+            var isSuccess = await BuildStationInspectionService.SaveBuildStationInspection(OriginalBuildStationInspection);
+            if (isSuccess)
+            {
+                await GetWorkOrderPartDataByWorkOrder(OriginalRecord.WorkOrderId);
+                toastService.ShowSuccess("Build Station Inspection Saved Successfully.", "Success");
+            }
+            else
+            {
+                toastService.ShowError("Error while saving build station inspection.", "Error");
+            }
+        }
+        finally
+        {
+            isSaveInspectionClick = false;
+            StateHasChanged();
+        }
+    }
+
+    List<Models.WorkOrderModel> GridData { get; set; }
+
+    List<Models.Parts> EditWorkOrderPartGridData { get; set; }
+
+    List<Models.DropDownBindString> dataPoNumberDropdown { get; set; }
+    List<Models.DropDownBind> dataWorkOrderTypesDropdown { get; set; }
+
+    List<Models.DropDownBind> dataWorkOrderPrioritiesDropdown { get; set; }
+
+    List<Models.DropDownBind> dataWorkOrderStatusesDropdown { get; set; }
+
+    List<Models.DropDownBind> dataMasterPartsDropdown { get; set; }
+
+    AddEditWorkOrderModel AddEditWorkOrderModel { get; set; }
+
+    Models.WorkOrderModel OriginalRecord { get; set; }
+
+    EditContext ECAddEditWorkOrder { get; set; }
+
+    EditPartModel EditPartModel { get; set; }
+
+    EditPartModel EditChildPartModel { get; set; }
+
+    EditContext ECEditPart { get; set; }
+
+    bool IsDisplayPopUpWindow { get; set; } = true;
+
+    Models.Parts OriginalPartRecord { get; set; }
+
+    public string UserId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthState.GetAuthenticationStateAsync();
+        if (state != null)
+        {
+            UserId = state.User.Claims
+            .Where(c => c.Type.Contains("UserId"))
+            .Select(c => c.Value)
+            .FirstOrDefault() ?? string.Empty;
+        }
+        await CheckLoginUserHasDeleteRepairRights();
+
+        await GetWorkOrderGridData();
+        base.OnInitialized();
+    }
+
+    async Task GetWorkOrderGridData()
+    {
+        GridData = await WorkOrderService.ReadWorkOrder();
+        StateHasChanged();
+    }
+
+    async Task GetWorkOrderPartDataByWorkOrder(int workOrderId)
+    {
+        var result = await WorkOrderService.GetWorkOrderByWorkOrderId(workOrderId);
+        if (result != null)
+        {
+            AddEditWorkOrderModel = new AddEditWorkOrderModel()
+                {
+                    WorkOrderId = result.WorkOrderId,
+                    WorkOrderTypeId = result.WorkOrderTypeId,
+                    WorkOrderStatusId = result.WorkOrderStatusId,
+                    WorkOrderPriorityID = result.WorkOrderPriorityID,
+                    CreateDate = result.CreateDate,
+                    Quantity = result.Quantity,
+                    BuildTemplateId = result.BuildTemplateId
+                };
+
+            TotalCount = result.PartsList.Count();
+        }
+
+        if (result != null && result.PartsList != null && result.PartsList.Count() > 0)
+        {
+            EditWorkOrderPartGridData = result.PartsList;
+            TotalCount = EditWorkOrderPartGridData.Count();
+            int key = 1;
+            foreach (Parts partitem in EditWorkOrderPartGridData)
+            {
+                partitem.key = key;
+                key = key + 1;
+            }
+        }
+        else
+        {
+            EditWorkOrderPartGridData = null;
+        }
+
+        if (AddEditWorkOrderModel != null)
+        {
+            ECAddEditWorkOrder = new EditContext(AddEditWorkOrderModel);
+        }
+
+        if (EditPartModel == null && EditWorkOrderPartGridData != null)
+        {
+            await SelectPart(EditWorkOrderPartGridData.FirstOrDefault());
+        }
+
+        StateHasChanged();
+    }
+
+    async Task GetDropDownData()
+    {
+        dataWorkOrderTypesDropdown = WorkOrderTypeService.DropDownData();
+        dataWorkOrderPrioritiesDropdown = WorkOrderPriorityService.DropDownData();
+        dataWorkOrderStatusesDropdown = WorkOrderStatusService.DropDownData();
+        dataMasterPartsDropdown = MasterPartService.GetBuildTemplateMasterPartDropDownData();
+        dataFailurePrimaryDropdown = InspectionService.DropDownData(Models.Enum.DropDownType.FailureTypePrimary, null);
+        dataPoNumberDropdown = await PONumberService.GetPONumberList();
+    }
+
+    public async Task SelectRecord(Models.WorkOrderModel workOrder)
+    {
+        await GetDropDownData();
+        OriginalRecord = null;
+        if (workOrder != null)
+        {
+            OriginalRecord = workOrder;
+            IsDisplayPopUpWindow = false;
+            await GetWorkOrderPartDataByWorkOrder(OriginalRecord.WorkOrderId);
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("ModelBodyOverflowShown");
+            AddEditWorkOrderModel = new AddEditWorkOrderModel();
+            AddEditWorkOrderModel.WorkOrderId = 0;
+            IsDisplayPopUpWindow = true;
+
+            if (AddEditWorkOrderModel != null)
+            {
+                ECAddEditWorkOrder = new EditContext(AddEditWorkOrderModel);
+            }
+            StateHasChanged();
+        }
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        if (AddEditWorkOrderModel != null)
+        {
+            var result = await WorkOrderService.Save(AddEditWorkOrderModel);
+            if (result != null)
+            {
+                if (result != null && result.Success)
+                {
+                    toastService.ShowInfo(result.Message, "Info");
+                    await btnCancelScarCarOnClick();
+                    await GetWorkOrderGridData();
+                    StateHasChanged();
+                }
+                else
+                {
+                    toastService.ShowError(result.Message, "Error");
+                }
+            }
+        }
+    }
+
+    public async Task DeleteRecord(Models.WorkOrderModel item)
+    {
+        if (item != null)
+        {
+            await WorkOrderService.Delete(item);
+            await GetWorkOrderGridData();
+        }
+    }
+
+    public async Task btnCancelScarCarOnClick()
+    {
+        AddEditWorkOrderModel = null;
+        await JSRuntime.InvokeVoidAsync("ModelBodyOverflowHidden");
+        await GetWorkOrderGridData();
+        StateHasChanged();
+    }
+
+    public async Task OnDropDopChangeHandler()
+    {
+        var isValid = ECAddEditWorkOrder.Validate();
+        if (isValid && AddEditWorkOrderModel != null)
+        {
+            var result = await WorkOrderService.Save(AddEditWorkOrderModel);
+            if (result != null)
+            {
+                if (result != null && result.Success)
+                {
+                    if (OriginalRecord != null && OriginalRecord.WorkOrderId > 0)
+                    {
+                        await GetWorkOrderPartDataByWorkOrder(OriginalRecord.WorkOrderId);
+                    }
+                    StateHasChanged();
+                }
+                else
+                {
+                    toastService.ShowError(result.Message, "Error");
+                }
+            }
+        }
+    }
+
+    public async Task SelectPart(Parts part)
+    {
+        OriginalBuildStationInspection = null;
+        if (part != null)
+        {
+            OriginalPartRecord = part;
+            EditPartModel = new EditPartModel()
+                {
+                    PartId = OriginalPartRecord.PartId,
+                    PartNumber = OriginalPartRecord.PartNumber,
+                    SerialNumber = OriginalPartRecord.SerialNumber,
+                    BuildStationId = OriginalPartRecord.BuildStationId,
+                    BuildStations = OriginalPartRecord.BuildStations,
+                    MasterPartId = OriginalPartRecord.MasterPartId
+                };
+
+            dataBuildStationFailureCodeDropdown = BuildStationFailureCodeService.DropDownData(OriginalPartRecord.BuildStationId);
+
+            int buildStationId = part.BuildStationsModel[ActiveTabIndex].BuildStationId;
+
+            if (OriginalRecord != null && OriginalRecord.WorkOrderId > 0)
+            {
+                OriginalBuildStationInspection = await BuildStationInspectionService.GetInspectionByWorkOrderIdAndPartId(OriginalRecord.WorkOrderId, OriginalPartRecord.PartId, buildStationId);
+                if (OriginalBuildStationInspection.BuildStationInspectionId <= 0)
+                {
+                    OriginalBuildStationInspection.Pass = true;
+                    OriginalBuildStationInspection.GeneralComments = string.Empty;
+                    OriginalBuildStationInspection.PartId = OriginalPartRecord.PartId;
+
+                    OriginalBuildStationInspection.WorkOrderId = OriginalRecord.WorkOrderId;
+                    OriginalBuildStationInspection.BuildStationId = buildStationId;
+                    OriginalBuildStationInspection.BuildStationInspectionFailed = new Models.BuildStationInspectionFailed();
+                }
+            }
+        }
+        else
+        {
+            OriginalPartRecord = null;
+            EditPartModel = null;
+        }
+
+        if (EditPartModel != null)
+        {
+            ECEditPart = new EditContext(EditPartModel);
+        }
+        StateHasChanged();
+    }
+
+    public async Task EditSerialNumberOnBlur()
+    {
+        var isValid = ECEditPart.Validate();
+        if (string.IsNullOrEmpty(EditPartModel.SerialNumber))
+        {
+            toastService.ShowError("Please enter serial number.", "Error");
+            return;
+        }
+
+        try
+        {
+            isSaveInspectionClick = true;
+            if (isValid == true && !string.IsNullOrWhiteSpace(EditPartModel.SerialNumber) && EditPartModel.PartId >= 0)
+            {
+                var result = await PartService.UpdatePartSerialNumber(EditPartModel);
+                if (result != null)
+                {
+                    if (result.Success)
+                    {
+                        toastService.ShowInfo("Record Saved Successfully", "Info");
+                        if (OriginalRecord != null && OriginalRecord.WorkOrderId > 0)
+                        {
+                            await GetWorkOrderPartDataByWorkOrder(OriginalRecord.WorkOrderId);
+                        }
+                    }
+                    else
+                    {
+                        toastService.ShowError(result.Message, "Error");
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError("Error while saving serial number.", "Error");
+            return;
+        }
+        finally
+        {
+            isSaveInspectionClick = false;
+        }
+    }
+
+    public async Task btnCancelEditWorkOrderOnClick()
+    {
+        AddEditWorkOrderModel = null;
+        EditPartModel = null;
+        OriginalRecord = null;
+        OriginalPartRecord = null;
+        await GetWorkOrderGridData();
+        IsDisplayPopUpWindow = true;
+        await JSRuntime.InvokeVoidAsync("ModelBodyOverflowHidden");
+        StateHasChanged();
+    }
+
+    void PageChangedHandler(int newPage)
+    {
+        Page = newPage;
+        PartTabChangedHandler(ActiveTabIndex);
+    }
+
+    public async Task PartTabChangedHandler(int seletedIndex)
+    {
+        ActiveTabIndex = seletedIndex;
+        seletedIndex = seletedIndex + 1;
+        //var part = EditWorkOrderPartGridData.Where(x=>x.key == seletedIndex).FirstOrDefault();
+
+        var part = EditWorkOrderPartGridData.Skip((Page - 1) * PageSize).Take(PageSize).FirstOrDefault();
+        if (part != null)
+        {
+            await SelectPart(part);
+        }
+        StateHasChanged();
+    }
+
+    public async Task btnCompleteInspectionOnClick()
+    {
+        var isSuccess = await BuildStationInspectionService.CompleteInspection(OriginalBuildStationInspection);
+        if (!isSuccess)
+            toastService.ShowError("Some error on complete inspection.", "Error");
+
+    }
+    public async Task btnCompleteBuildOnClick()
+    {
+        var isSuccess = await WorkOrderService.CheckAllBuildStationInspectionComplete(OriginalRecord.WorkOrderId, EditPartModel.PartId.Value);
+        if (isSuccess)
+        {
+            isSuccess = await WorkOrderService.CompleteBuildInspection(OriginalRecord.WorkOrderId, EditPartModel.PartId.Value);
+            if (!isSuccess)
+                toastService.ShowError("Some error on complete build.", "Error");
+        }
+        else
+        {
+            toastService.ShowError("Some Build Stations are still incomplete.", "Error");
+        }
+
+        StateHasChanged();
+    }
+
+    public async Task EditSerialNumber(Models.Parts part)
+    {
+        if (part != null)
+        {
+
+            EditChildPartModel = new EditPartModel()
+                {
+                    PartId = part.PartId,
+                    PartNumber = part.PartNumber,
+                    SerialNumber = part.SerialNumber,
+                    BuildStationId = part.BuildStationId,
+                    BuildStations = part.BuildStations,
+                    MasterPartId = part.MasterPartId
+                };
+
+        }
+    }
+
+    public async Task OnEditSerialNumberSave()
+    {
+        if (string.IsNullOrEmpty(EditChildPartModel.SerialNumber))
+        {
+            toastService.ShowError("Please enter serial number.", "Error");
+            return;
+        }
+
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(EditChildPartModel.SerialNumber) && EditChildPartModel.PartId >= 0)
+            {
+                var result = await PartService.UpdatePartSerialNumber(EditChildPartModel);
+                if (result != null)
+                {
+                    if (result.Success)
+                    {
+                        EditChildPartModel = null;
+                        toastService.ShowInfo("Record Saved Successfully", "Info");
+                        if (OriginalRecord != null && OriginalRecord.WorkOrderId > 0)
+                        {
+                            await GetWorkOrderPartDataByWorkOrder(OriginalRecord.WorkOrderId);
+                        }
+                    }
+                    else
+                    {
+                        toastService.ShowError(result.Message, "Error");
+                    }
+                    if (!result.Success)
+                    {
+                        toastService.ShowError(result.Message, "Error");
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError("Error while saving serial number.", "Error");
+            return;
+        }
+    }
+
+    protected void OnEditSerialNumberCancel()
+    {
+        EditChildPartModel = null;
+    }
+}

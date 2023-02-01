@@ -23,5 +23,7 @@ namespace QBD2.Models
 
         [Required(ErrorMessage = "The Quantity field is required.")]
         public int? Quantity { get; set; }
+
+        public string? PONumber { get; set; }
     }
 }

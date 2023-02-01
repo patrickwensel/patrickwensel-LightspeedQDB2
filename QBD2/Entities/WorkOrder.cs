@@ -31,5 +31,7 @@ namespace QBD2.Entities
         public virtual BuildTemplate BuildTemplate { get; set; }
 
         public int Quantity { get; set; }
+
+        public string? PONumber { get; set; }
     }
 }

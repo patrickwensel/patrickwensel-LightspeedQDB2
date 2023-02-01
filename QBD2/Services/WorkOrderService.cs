@@ -8,10 +8,12 @@ namespace QBD2.Services
     public class WorkOrderService
     {
         private readonly ApplicationDbContext _context;
+        private readonly BuildStationInspectionService _buildStationInspectionService;
 
-        public WorkOrderService(ApplicationDbContext context)
+        public WorkOrderService(ApplicationDbContext context, BuildStationInspectionService buildStationInspectionService)
         {
             _context = context;
+            _buildStationInspectionService = buildStationInspectionService;
         }
 
         public async Task<List<Models.WorkOrderModel>> ReadWorkOrder()
@@ -42,7 +44,7 @@ namespace QBD2.Services
             {
                 var workOrderParts = await _context.WorkOrderParts.Where(x => x.WorkOrderId == item.WorkOrderId).Select(x => x.PartId).ToListAsync();
                 var part = await (from p in _context.Parts
-                                  join mp in _context.MasterParts 
+                                  join mp in _context.MasterParts
                                   on p.MasterPartId equals mp.MasterPartId
                                   where p.ParentPartId == null && workOrderParts.Contains(p.PartId)
                                   select new Parts
@@ -62,7 +64,7 @@ namespace QBD2.Services
 
                 foreach (Parts partItems in part)
                 {
-                    partItems.ChildParts =   await (from p in _context.Parts
+                    partItems.ChildParts = await (from p in _context.Parts
                                                   join mp in _context.MasterParts
                                                   on p.MasterPartId equals mp.MasterPartId
                                                   where p.ParentPartId == partItems.PartId
@@ -90,7 +92,7 @@ namespace QBD2.Services
         public async Task<Models.WorkOrderModel> GetWorkOrderByWorkOrderId(int workOrderId)
         {
             WorkOrderModel workOrderModel = new WorkOrderModel();
-            workOrderModel =  await (from wo in _context.WorkOrders
+            workOrderModel = await (from wo in _context.WorkOrders
                                     join wot in _context.WorkOrderTypes on wo.WorkOrderTypeId equals wot.WorkOrderTypeId
                                     join wos in _context.WorkOrderStatuses on wo.WorkOrderStatusId equals wos.WorkOrderStatusId
                                     join wop in _context.WorkOrderPriorities on wo.WorkOrderPriorityID equals wop.WorkOrderPriorityId
@@ -119,7 +121,7 @@ namespace QBD2.Services
                     .Select(x => new BuildStationModel { BuildStationId = x.BuildStationId, Name = x.Name }).ToListAsync();
 
                 var part = await (from p in _context.Parts
-                                  join mp in _context.MasterParts 
+                                  join mp in _context.MasterParts
                                   on p.MasterPartId equals mp.MasterPartId
                                   join wp in _context.WorkOrderParts on p.PartId equals wp.PartId
                                   join i in _context.Inspections on new { WorkOrderId = (int?)workOrderModel.WorkOrderId, PartId = p.PartId } equals new { WorkOrderId = i.WorkOrderId, PartId = i.PartId } into i_join
@@ -171,9 +173,9 @@ namespace QBD2.Services
                     }
                     partItems.BuildStationsModel = buildStations;
                 }
-               
+
                 workOrderModel.PartsList = part;
-                
+
             }
             return workOrderModel;
         }
@@ -191,7 +193,7 @@ namespace QBD2.Services
                 //    return apiResponse;
                 //}
 
-              
+
 
                 var objWorkOrder = new Entities.WorkOrder();
                 if (addEditWorkOrderModel.WorkOrderId > 0)
@@ -199,7 +201,7 @@ namespace QBD2.Services
                     if (addEditWorkOrderModel.WorkOrderStatusId == 3)
                     {
                         // If Completed status then first check all workorder part need to completed
-                        if(_context.WorkOrderParts.Any(x => x.WorkOrderId == addEditWorkOrderModel.WorkOrderId && x.IsCompleteBuildStation == false))
+                        if (_context.WorkOrderParts.Any(x => x.WorkOrderId == addEditWorkOrderModel.WorkOrderId && x.IsCompleteBuildStation == false))
                         {
                             apiResponse.Success = false;
                             apiResponse.Message = "There are still few workorder parts incomplete. so, you can't complete workorder. ";
@@ -228,7 +230,9 @@ namespace QBD2.Services
                         WorkOrderStatusId = addEditWorkOrderModel.WorkOrderStatusId.Value,
                         WorkOrderPriorityID = addEditWorkOrderModel.WorkOrderPriorityID.Value,
                         BuildTemplateId = addEditWorkOrderModel.BuildTemplateId.Value,
-                        Quantity = addEditWorkOrderModel.Quantity.Value
+                        Quantity = addEditWorkOrderModel.Quantity.Value,
+                        PONumber = addEditWorkOrderModel.PONumber
+
                     };
                     _context.WorkOrders.Add(objWorkOrder);
 
@@ -245,7 +249,7 @@ namespace QBD2.Services
                             part.MasterPartId = buildTemplate.MasterPartId;
                             part.UpdateDate = DateTime.Now;
                             part.PartStatusId = 1;
-                          //  part.BuildStationId = buildTemplate.BuildStationId;
+                            //  part.BuildStationId = buildTemplate.BuildStationId;
                             part.SerialNumberRequired = true;
                             _context.Parts.Add(part);
                             _context.SaveChanges();
@@ -309,7 +313,7 @@ namespace QBD2.Services
         {
             var workOrder = false;
             if (WorkOrderId > 0)
-                workOrder = _context.WorkOrders.Any(x => x.WorkOrderTypeId == WorkOrderTypeId && x.WorkOrderStatusId == WorkOrderStatusId && x.WorkOrderPriorityID == WorkOrderPriorityID  && x.BuildTemplateId == BuildTemplateId && x.Quantity == Quantity   && x.WorkOrderId != WorkOrderId);
+                workOrder = _context.WorkOrders.Any(x => x.WorkOrderTypeId == WorkOrderTypeId && x.WorkOrderStatusId == WorkOrderStatusId && x.WorkOrderPriorityID == WorkOrderPriorityID && x.BuildTemplateId == BuildTemplateId && x.Quantity == Quantity && x.WorkOrderId != WorkOrderId);
             else
                 workOrder = _context.WorkOrders.Any(x => x.WorkOrderTypeId == WorkOrderTypeId && x.WorkOrderStatusId == WorkOrderStatusId && x.WorkOrderPriorityID == WorkOrderPriorityID && x.BuildTemplateId == BuildTemplateId && x.Quantity == Quantity);
 
@@ -349,14 +353,136 @@ namespace QBD2.Services
                                            where w.WorkOrderId == workOrderId && wp.PartId == partId
                                            select new
                                            {
-                                               IsCompleteBuildStation =(i== null ? false : i.IsCompleteBuildStation)
+                                               IsCompleteBuildStation = (i == null ? false : i.IsCompleteBuildStation)
                                            }).ToListAsync();
 
                 return !BuildStations.Any(x => x.IsCompleteBuildStation == false);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return false;
+            }
+        }
+
+        public async Task<List<WorkOrderDropDown>> GetWorkOrderListByPoNumber(string PONumber)
+        {
+            List<WorkOrderDropDown> workOrderDropDowns = new List<WorkOrderDropDown>();
+            if (!string.IsNullOrWhiteSpace(PONumber))
+            {
+                workOrderDropDowns = await _context.WorkOrders.Include(x => x.WorkOrderParts)
+                    .Where(x => (x.PONumber == PONumber || string.IsNullOrWhiteSpace(x.PONumber)) && x.WorkOrderParts.Any(y => y.IsCompleteBuildStation == false))
+                    .OrderByDescending(x => x.PONumber)
+                    .Select(x => new WorkOrderDropDown()
+                    {
+                        DisplayName = x.WorkOrderId.ToString(),
+                        WorkOrderId = x.WorkOrderId,
+                        PONumber = x.PONumber
+                    }).ToListAsync();
+            }
+
+            return workOrderDropDowns;
+        }
+
+        public async Task<UserWorkOrderDetail> GetUserWorkOrderDetail(int WorkOrderId)
+        {
+            UserWorkOrderDetail userWorkOrderDetail = new UserWorkOrderDetail();
+            var workOrder = await _context.WorkOrders.Include(x => x.WorkOrderType).Include(x => x.WorkOrderStatus).Include(x => x.WorkOrderPriority)
+                .Where(x => x.WorkOrderId == WorkOrderId)
+                .Select(x => x).FirstOrDefaultAsync();
+
+            if (workOrder != null)
+            {
+                userWorkOrderDetail.Type = workOrder.WorkOrderType.Name;
+                userWorkOrderDetail.Status = workOrder.WorkOrderStatus.Name;
+                userWorkOrderDetail.Priority = workOrder.WorkOrderPriority.Name;
+            }
+
+            var workOrderParts = await _context.WorkOrderParts.Where(x => x.WorkOrderId == WorkOrderId && x.IsCompleteBuildStation == false).OrderBy(x => x.WorkOrderPartId).ToListAsync();
+            if (!workOrderParts.Any())
+            {
+                userWorkOrderDetail.IsFoundInCompleteStation = false;
+                userWorkOrderDetail.ErrorMessage = "All stations completed for this work order.";
+            }
+            else
+            {
+                var buildTemplateStations = await _context.BuildTemplateStations.Include(x => x.BuildStation).Where(x => x.BuildTemplateId == workOrder.BuildTemplateId).OrderBy(x => x.OrderNumber).ToListAsync();
+                if (!buildTemplateStations.Any())
+                {
+                    userWorkOrderDetail.IsFoundInCompleteStation = false;
+                    userWorkOrderDetail.ErrorMessage = "Station not found for this work order.";
+                }
+                else
+                {
+                    int? PartId = null;
+                    int? BuildStationId = null;
+                    var buildStationInspections = await _context.BuildStationInspections.Where(x => x.WorkOrderId == WorkOrderId).ToListAsync();
+                    foreach (var workOrderPart in workOrderParts)
+                    {
+                        foreach (var buildTemplateStation in buildTemplateStations)
+                        {
+                            var buildStationInspection = buildStationInspections.FirstOrDefault(x => x.PartId == workOrderPart.PartId && x.BuildStationId == buildTemplateStation.BuildStationId);
+                            if (!(buildStationInspection != null && buildStationInspection.IsCompleteBuildStation == true))
+                            {
+                                PartId = workOrderPart.PartId;
+                                BuildStationId = buildTemplateStation.BuildStationId;
+                                userWorkOrderDetail.StationName = buildTemplateStation.BuildStation.Name;
+                                break;
+                            }
+                        }
+
+                        if (PartId.HasValue)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (PartId.HasValue)
+                    {
+
+                        userWorkOrderDetail.Parts = await _context.Parts.Include(x => x.MasterPart)
+                            .Where(x => x.ParentPartId == PartId && x.BuildStationId == BuildStationId)
+                              .Select(x => new EditPartModel()
+                              {
+                                  PartId = x.PartId,
+                                  SerialNumber = x.SerialNumber,
+                                  MasterPartId = x.MasterPartId,
+                                  BuildStationId = x.BuildStationId,
+                                  PartNumber = x.MasterPart.PartNumber
+                              }).ToListAsync();
+
+                        var buildStationInspection = await _buildStationInspectionService.GetInspectionByWorkOrderIdAndPartId(WorkOrderId, PartId!.Value, BuildStationId!.Value);
+                        if (buildStationInspection.BuildStationInspectionId <= 0)
+                        {
+                            buildStationInspection.Pass = true;
+                            buildStationInspection.GeneralComments = string.Empty;
+                            buildStationInspection.PartId = PartId.Value;
+
+                            buildStationInspection.WorkOrderId = WorkOrderId;
+                            buildStationInspection.BuildStationId = BuildStationId.Value;
+                            buildStationInspection.BuildStationInspectionFailed = new Models.BuildStationInspectionFailed();
+                        }
+                        userWorkOrderDetail.BuildStationInspectionModel = buildStationInspection;
+                        userWorkOrderDetail.IsFoundInCompleteStation = true;
+                    }
+                    else
+                    {
+                        userWorkOrderDetail.IsFoundInCompleteStation = false;
+                        userWorkOrderDetail.ErrorMessage = "All stations completed for this work order.";
+                    }
+                }
+            }
+
+            return userWorkOrderDetail;
+        }
+
+        public async Task UpdateWorkOrderPONumber(int WorkOrderId, string PONumber)
+        {
+            var workOrder = await _context.WorkOrders.FindAsync(WorkOrderId);
+            if (workOrder != null)
+            {
+                workOrder.PONumber = PONumber;
+                _context.Entry(workOrder).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
             }
         }
     }

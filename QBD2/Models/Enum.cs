@@ -30,7 +30,8 @@
             Admin = 1,
             User = 2,
             CanDeleteFailureCodes = 3,
-            CanDeleteRepair = 4
+            CanDeleteRepair = 4,
+            WorkOrderAdmin = 5,
         }
     }
 }

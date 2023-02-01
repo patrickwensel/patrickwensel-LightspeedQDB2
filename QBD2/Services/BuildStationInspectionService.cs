@@ -114,10 +114,6 @@ namespace QBD2.Services
                
                 inspection.BuildStationInspectionId = objInspection.BuildStationInspectionId;
 
-                Entities.BuildStationInspectionFailure objInspectionFailure = new Entities.BuildStationInspectionFailure();
-               
-
-
                 if (inspection.Pass)
                 {
                     //if (objInspectionFailure != null && objInspectionFailure.BuildStationInspectionFailureId > 0)
@@ -131,9 +127,10 @@ namespace QBD2.Services
                 {
                     foreach(var BuildInspectionFailed in inspection.BuildStationInspectionFailedList)
                     {
+                        Entities.BuildStationInspectionFailure objInspectionFailure = new Entities.BuildStationInspectionFailure();
                         if (BuildInspectionFailed.BuildStationInspectionFailureId > 0)
                         {
-                            objInspectionFailure = await _context.BuildStationInspectionFailures.FirstOrDefaultAsync(x => x.BuildStationInspectionFailureId == inspection.BuildStationInspectionFailed.BuildStationInspectionFailureId);
+                            objInspectionFailure = await _context.BuildStationInspectionFailures.FirstOrDefaultAsync(x => x.BuildStationInspectionFailureId == BuildInspectionFailed.BuildStationInspectionFailureId);
                         }
 
                         objInspectionFailure.Comment = BuildInspectionFailed.Comment;
@@ -148,10 +145,12 @@ namespace QBD2.Services
                         {
                             _context.BuildStationInspectionFailures.Add(objInspectionFailure);
                         }
+                        await _context.SaveChangesAsync();
+                        BuildInspectionFailed.BuildStationInspectionFailureId= objInspectionFailure.BuildStationInspectionFailureId;
                     }
                    
                     //await _context.SaveChangesAsync();
-                    inspection.BuildStationInspectionFailed.BuildStationInspectionFailureId = objInspectionFailure.BuildStationInspectionFailureId;
+                    //inspection.BuildStationInspectionFailed.BuildStationInspectionFailureId = objInspectionFailure.BuildStationInspectionFailureId;
                 }
                 await _context.SaveChangesAsync();
                 return true;

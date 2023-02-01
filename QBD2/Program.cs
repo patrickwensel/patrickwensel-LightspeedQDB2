@@ -68,6 +68,7 @@ builder.Services.AddScoped<BuildStationFailureCodeService>();
 builder.Services.AddScoped<BuildTemplateService>();
 builder.Services.AddScoped<MRBService>();
 builder.Services.AddScoped<BuildStationInspectionService>();
+builder.Services.AddScoped<PONumberService>();
 //builder.Services.AddScoped<BuildTemplatePartService>();
 builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformer>();
 

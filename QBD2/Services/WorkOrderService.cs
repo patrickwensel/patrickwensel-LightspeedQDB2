@@ -369,8 +369,8 @@ namespace QBD2.Services
             List<WorkOrderDropDown> workOrderDropDowns = new List<WorkOrderDropDown>();
             if (!string.IsNullOrWhiteSpace(PONumber))
             {
-                workOrderDropDowns = await _context.WorkOrders.Include(x => x.WorkOrderParts)
-                    .Where(x => (x.PONumber == PONumber || string.IsNullOrWhiteSpace(x.PONumber)) && x.WorkOrderParts.Any(y => y.IsCompleteBuildStation == false))
+                workOrderDropDowns = await _context.WorkOrders
+                    .Where(x => (x.PONumber == PONumber || string.IsNullOrWhiteSpace(x.PONumber)) && x.WorkOrderStatusId != 3)
                     .OrderByDescending(x => x.PONumber)
                     .Select(x => new WorkOrderDropDown()
                     {
@@ -389,6 +389,7 @@ namespace QBD2.Services
             var workOrder = await _context.WorkOrders.Include(x => x.WorkOrderType).Include(x => x.WorkOrderStatus).Include(x => x.WorkOrderPriority)
                 .Where(x => x.WorkOrderId == WorkOrderId)
                 .Select(x => x).FirstOrDefaultAsync();
+            userWorkOrderDetail.IsAllowSave = false;
 
             if (workOrder != null)
             {
@@ -397,24 +398,27 @@ namespace QBD2.Services
                 userWorkOrderDetail.Priority = workOrder.WorkOrderPriority.Name;
             }
 
-            var workOrderParts = await _context.WorkOrderParts.Where(x => x.WorkOrderId == WorkOrderId && x.IsCompleteBuildStation == false).OrderBy(x => x.WorkOrderPartId).ToListAsync();
+            var workOrderParts = await _context.WorkOrderParts.Where(x => x.WorkOrderId == WorkOrderId).OrderBy(x => x.WorkOrderPartId).ToListAsync();
             if (!workOrderParts.Any())
             {
-                userWorkOrderDetail.IsFoundInCompleteStation = false;
-                userWorkOrderDetail.ErrorMessage = "All stations completed for this work order.";
+                userWorkOrderDetail.IsFoundStation = false;
+                userWorkOrderDetail.ErrorMessage = "Station not found for this work order.";
             }
             else
             {
                 var buildTemplateStations = await _context.BuildTemplateStations.Include(x => x.BuildStation).Where(x => x.BuildTemplateId == workOrder.BuildTemplateId).OrderBy(x => x.OrderNumber).ToListAsync();
                 if (!buildTemplateStations.Any())
                 {
-                    userWorkOrderDetail.IsFoundInCompleteStation = false;
+                    userWorkOrderDetail.IsFoundStation = false;
                     userWorkOrderDetail.ErrorMessage = "Station not found for this work order.";
                 }
                 else
                 {
+                    int? LastCompletedPartId = null;
+                    int? LastCompletedBuildStationId = null;
                     int? PartId = null;
                     int? BuildStationId = null;
+                    var lastBuildTemplateStation = buildTemplateStations.Last();
                     var buildStationInspections = await _context.BuildStationInspections.Where(x => x.WorkOrderId == WorkOrderId).ToListAsync();
                     foreach (var workOrderPart in workOrderParts)
                     {
@@ -428,17 +432,37 @@ namespace QBD2.Services
                                 userWorkOrderDetail.StationName = buildTemplateStation.BuildStation.Name;
                                 break;
                             }
+                            else if (buildStationInspection != null && buildStationInspection.IsCompleteBuildStation == true)
+                            {
+                                LastCompletedPartId = workOrderPart.PartId;
+                                LastCompletedBuildStationId = buildTemplateStation.BuildStationId;
+                                userWorkOrderDetail.StationName = buildTemplateStation.BuildStation.Name;
+                            }
                         }
 
                         if (PartId.HasValue)
                         {
+                            userWorkOrderDetail.IsAllowSave = true;
+                            break;
+                        }
+                        else if (workOrderPart.IsCompleteBuildStation == false)
+                        {
+                            userWorkOrderDetail.IsAllowSave = true;
+                            PartId = workOrderPart.PartId;
+                            BuildStationId = lastBuildTemplateStation.BuildStationId;
+                            userWorkOrderDetail.StationName = lastBuildTemplateStation.BuildStation.Name;
                             break;
                         }
                     }
 
+                    if (!PartId.HasValue && LastCompletedPartId.HasValue)
+                    {
+                        PartId = LastCompletedPartId;
+                        BuildStationId = LastCompletedBuildStationId;
+                    }
+
                     if (PartId.HasValue)
                     {
-
                         userWorkOrderDetail.Parts = await _context.Parts.Include(x => x.MasterPart)
                             .Where(x => x.ParentPartId == PartId && x.BuildStationId == BuildStationId)
                               .Select(x => new EditPartModel()
@@ -462,12 +486,12 @@ namespace QBD2.Services
                             buildStationInspection.BuildStationInspectionFailed = new Models.BuildStationInspectionFailed();
                         }
                         userWorkOrderDetail.BuildStationInspectionModel = buildStationInspection;
-                        userWorkOrderDetail.IsFoundInCompleteStation = true;
+                        userWorkOrderDetail.IsFoundStation = true;
                     }
                     else
                     {
-                        userWorkOrderDetail.IsFoundInCompleteStation = false;
-                        userWorkOrderDetail.ErrorMessage = "All stations completed for this work order.";
+                        userWorkOrderDetail.IsFoundStation = false;
+                        userWorkOrderDetail.ErrorMessage = "Station not found for this work order.";
                     }
                 }
             }

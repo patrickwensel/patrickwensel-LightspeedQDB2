@@ -249,7 +249,7 @@
                                  Resizable="true"
                                  EditMode="Telerik.Blazor.GridEditMode.Inline"
                                  OnDelete=@DeleteHandler>
-                                        <GridColumns >
+                                        <GridColumns>
                                             <GridColumn Field="FailurePrimaryName" Title="Primary" Groupable="false" />
                                             <GridColumn Field="FailureName" Title="Secondary" Groupable="false" />
                                             <GridColumn Field="Comment" Title="Comments" Groupable="false" />
@@ -272,7 +272,7 @@
                             <div class="form-group row m-tb" style="padding-bottom: 20px;">
                                 <label class="col-sm-3 col-form-label"></label>
                                 <div class="col-md-9 bg-w save-btn">
-                                    <TelerikButton ButtonType="@ButtonType.Button" Enabled=@(!isSaveInspectionClick && !UserWorkOrder.UserWorkOrderDetail.BuildStationInspectionModel.IsCompleteBuildStation) OnClick="@btnSaveInspectionOnClick"><i class="fa-solid fa-floppy-disk"></i> Save Inspection</TelerikButton>
+                                    <TelerikButton ButtonType="@ButtonType.Button" Enabled=@(!isSaveInspectionClick && UserWorkOrder.UserWorkOrderDetail.IsAllowSave) OnClick="@btnSaveInspectionOnClick"><i class="fa-solid fa-floppy-disk"></i> Save Inspection</TelerikButton>
                                 </div>
                             </div>
                         }
@@ -368,7 +368,7 @@
         {
             UserWorkOrder.WorkOrderId = workoders[0].WorkOrderId;
             WorkOrderNumber = UserWorkOrder.WorkOrderId;
-            await FindInCompleteStation(UserWorkOrder.WorkOrderId);
+            await FindStation(UserWorkOrder.WorkOrderId);
         }
     }
 
@@ -378,7 +378,7 @@
         if (UserWorkOrder != null && WorkOrderNumber.HasValue)
         {
             UserWorkOrder.WorkOrderId = WorkOrderNumber.Value;
-            await FindInCompleteStation(UserWorkOrder.WorkOrderId);
+            await FindStation(UserWorkOrder.WorkOrderId);
         }
         else
         {
@@ -387,7 +387,7 @@
         }
     }
 
-    private async Task FindInCompleteStation(int workOrderId)
+    private async Task FindStation(int workOrderId)
     {
         if (!IsWorking)
         {
@@ -396,7 +396,7 @@
             {
                 UserWorkOrder.UserWorkOrderDetail = null;
                 var data = await WorkOrderService.GetUserWorkOrderDetail(workOrderId);
-                if (data.IsFoundInCompleteStation)
+                if (data.IsFoundStation)
                 {
                     UserWorkOrder.UserWorkOrderDetail = data;
                 }
@@ -548,10 +548,41 @@
 
             isSaveInspectionClick = true;
             await WorkOrderService.UpdateWorkOrderPONumber(UserWorkOrder!.WorkOrderId, UserWorkOrder!.PONumber);
+
+            if (UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.Pass == true)
+            {
+                UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.IsCompleteBuildStation = true;
+            }
             var isSuccess = await BuildStationInspectionService.SaveBuildStationInspection(UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel);
             if (isSuccess)
             {
-                toastService.ShowSuccess("Build Station Inspection Saved Successfully.", "Success");
+                if (UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.Pass == true)
+                {
+                    var isCompleted = await WorkOrderService.CheckAllBuildStationInspectionComplete(UserWorkOrder!.WorkOrderId, UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.PartId);
+                    if (isCompleted)
+                    {
+                        var isUpdated = await WorkOrderService.CompleteBuildInspection(UserWorkOrder!.WorkOrderId, UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.PartId);
+                        if (isUpdated)
+                        {
+                            await FindStation(UserWorkOrder!.WorkOrderId);
+                            toastService.ShowSuccess("Build Station Inspection Saved Successfully.", "Success");
+                        }
+                        else
+                        {
+                            toastService.ShowError("Error while updating build station status.", "Error");
+                        }
+                    }
+                    else
+                    {
+                        await FindStation(UserWorkOrder!.WorkOrderId);
+                        toastService.ShowSuccess("Build Station Inspection Saved Successfully.", "Success");
+                    }
+                }
+                else
+                {
+                    await FindStation(UserWorkOrder!.WorkOrderId);
+                    toastService.ShowSuccess("Build Station Inspection Saved Successfully.", "Success");
+                }
             }
             else
             {

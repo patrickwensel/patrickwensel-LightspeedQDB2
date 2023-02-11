@@ -475,7 +475,7 @@
                                                             }
 
                                                             <div class="col-md-3 bg-w save-btn">
-                                                                <TelerikButton ButtonType="@ButtonType.Button" Enabled=@(!OriginalBuildStationInspection.IsCompleteBuildStation && (OriginalBuildStationInspection.BuildStationInspectionId > 0)) OnClick="@btnCompleteInspectionOnClick"><i class="fa-solid fa-floppy-disk"></i> Complete Inspection</TelerikButton>
+                                                                <TelerikButton ButtonType="@ButtonType.Button" Enabled=@(!OriginalBuildStationInspection.IsCompleteBuildStation && (OriginalBuildStationInspection.BuildStationInspectionId > 0 && OriginalBuildStationInspection.Pass==true)) OnClick="@btnCompleteInspectionOnClick"><i class="fa-solid fa-floppy-disk"></i> Complete Inspection</TelerikButton>
                                                             </div>
                                                         </div>
 
@@ -1185,9 +1185,9 @@
 
     public async Task btnCompleteInspectionOnClick()
     {
-        var isSuccess = await BuildStationInspectionService.CompleteInspection(OriginalBuildStationInspection);
-        if (!isSuccess)
-            toastService.ShowError("Some error on complete inspection.", "Error");
+        var message = await BuildStationInspectionService.CompleteInspection(OriginalBuildStationInspection);
+        if (!string.IsNullOrWhiteSpace(message))
+            toastService.ShowError(message, "Error");
 
     }
     public async Task btnCompleteBuildOnClick()

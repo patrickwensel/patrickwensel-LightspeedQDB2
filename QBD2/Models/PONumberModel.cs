@@ -26,7 +26,8 @@
         public string Status { get; set; }
         public string Priority { get; set; }
         public string StationName { get; set; }
-        public bool IsFoundInCompleteStation { get; set; }
+        public bool IsAllowSave { get; set; }
+        public bool IsFoundStation { get; set; }
         public string ErrorMessage { get; set; }
         public List<EditPartModel> Parts { get; set; }
         public BuildStationInspectionModel BuildStationInspectionModel { get; set; }

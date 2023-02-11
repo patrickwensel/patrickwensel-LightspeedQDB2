@@ -101,6 +101,7 @@ namespace QBD2.Services
                 objInspection.PartId = inspection.PartId;
                 objInspection.WorkOrderId = inspection.WorkOrderId;
                 objInspection.BuildStationId = inspection.BuildStationId;
+                objInspection.IsCompleteBuildStation = inspection.IsCompleteBuildStation;
                 objInspection.UpdateDate = DateTime.Now;
                 if (inspection.BuildStationInspectionId > 0)
                 {
@@ -162,8 +163,9 @@ namespace QBD2.Services
         }
 
        
-        public async Task<bool> CompleteInspection(Models.BuildStationInspectionModel inspection)
+        public async Task<string> CompleteInspection(Models.BuildStationInspectionModel inspection)
         {
+            string message = "Some error on complete inspection.";
             try
             {
                 Entities.BuildStationInspection objInspection = new Entities.BuildStationInspection();
@@ -173,19 +175,24 @@ namespace QBD2.Services
                     objInspection = await _context.BuildStationInspections.FirstOrDefaultAsync(x => x.BuildStationInspectionId == inspection.BuildStationInspectionId);
                 }
 
-               
-
                 if (objInspection.BuildStationInspectionId > 0)
                 {
-                    objInspection.IsCompleteBuildStation = true;
-                    _context.Entry(objInspection).State = EntityState.Modified;
-                    await _context.SaveChangesAsync();
-                    return true;
+                    if (objInspection.Pass == true)
+                    {
+                        objInspection.IsCompleteBuildStation = true;
+                        _context.Entry(objInspection).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                        return string.Empty;
+                    }
+                    else
+                    {
+                        return "station not passed.";
+                    }
                 }
-                return false;
+                return message;
             }catch(Exception ex)
             {
-                return false;
+                return message;
             }
         }
     }

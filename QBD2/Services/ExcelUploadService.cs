@@ -37,57 +37,63 @@ namespace QBD2.Services
             AddPartsToDeviationModel addPartsToDeviationModel = new AddPartsToDeviationModel();
             List<string> excelRows = new List<string>();
 
-            if (this._appSettings.Value.FileUploadType.ToLower() == FileUploadType.Azure.ToString().ToLower())
+            //if (this._appSettings.Value.FileUploadType.ToLower() == FileUploadType.Azure.ToString().ToLower())
+            //{
+            //    CloudBlob file = await this._blobService.DownloadFile(fileName, this._appSettings.Value.FileUploadContainer);
+
+            //    if (await file.ExistsAsync())
+            //    {
+            //        MemoryStream ms = new MemoryStream();
+            //        await file.DownloadToStreamAsync(ms);
+
+            //        DataSet dsexcelRecords = new DataSet();
+            //        using (var reader = ExcelReaderFactory.CreateReader(file.OpenReadAsync().Result))
+            //        {
+            //            dsexcelRecords = reader.AsDataSet();
+
+            //            if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
+            //            {
+            //                DataTable dtRecords = dsexcelRecords.Tables[0];
+            //                if (dtRecords.Rows.Count > 1)
+            //                {
+            //                    for (int i = 1; i < dtRecords.Rows.Count; i++)
+            //                    {
+            //                        excelRows.Add(Convert.ToString(dtRecords.Rows[i][0]));
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+            //else
+            //{
+
+            using (FileStream stream = File.OpenRead(fileName))
             {
-                CloudBlob file = await this._blobService.DownloadFile(fileName, this._appSettings.Value.FileUploadContainer);
+                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+                DataSet dsexcelRecords = new DataSet();
 
-                if (await file.ExistsAsync())
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
                 {
-                    MemoryStream ms = new MemoryStream();
-                    await file.DownloadToStreamAsync(ms);
+                    dsexcelRecords = reader.AsDataSet();
 
-                    DataSet dsexcelRecords = new DataSet();
-                    using (var reader = ExcelReaderFactory.CreateReader(file.OpenReadAsync().Result))
+                    if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
                     {
-                        dsexcelRecords = reader.AsDataSet();
-
-                        if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
+                        DataTable dtRecords = dsexcelRecords.Tables[0];
+                        if (dtRecords.Rows.Count > 1)
                         {
-                            DataTable dtRecords = dsexcelRecords.Tables[0];
-                            if (dtRecords.Rows.Count > 1)
+                            for (int i = 0; i < dtRecords.Rows.Count; i++)
                             {
-                                for (int i = 1; i < dtRecords.Rows.Count; i++)
+                                if (!string.IsNullOrWhiteSpace(Convert.ToString(dtRecords.Rows[i][0])))
                                 {
-                                    excelRows.Add(Convert.ToString(dtRecords.Rows[i][0]));
+                                    excelRows.Add(Convert.ToString(dtRecords.Rows[i][0]).Trim());
                                 }
                             }
                         }
                     }
                 }
             }
-            else
-            {
-                using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read))
-                {
-                    DataSet dsexcelRecords = new DataSet();
-                    using (var reader = ExcelReaderFactory.CreateReader(stream))
-                    {
-                        dsexcelRecords = reader.AsDataSet();
-
-                        if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
-                        {
-                            DataTable dtRecords = dsexcelRecords.Tables[0];
-                            if (dtRecords.Rows.Count > 1)
-                            {
-                                for (int i = 1; i < dtRecords.Rows.Count; i++)
-                                {
-                                    excelRows.Add(Convert.ToString(dtRecords.Rows[i][0]));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            //}
 
             if (excelRows.Count > 0)
             {
@@ -103,57 +109,62 @@ namespace QBD2.Services
             AddPartsToAlertModel addPartsToAlertModel = new AddPartsToAlertModel();
             List<string> excelRows = new List<string>();
 
-            if (this._appSettings.Value.FileUploadType.ToLower() == FileUploadType.Azure.ToString().ToLower())
+            //if (this._appSettings.Value.FileUploadType.ToLower() == FileUploadType.Azure.ToString().ToLower())
+            //{
+            //    CloudBlob file = await this._blobService.DownloadFile(fileName, this._appSettings.Value.FileUploadContainer);
+
+            //    if (await file.ExistsAsync())
+            //    {
+            //        MemoryStream ms = new MemoryStream();
+            //        await file.DownloadToStreamAsync(ms);
+
+            //        DataSet dsexcelRecords = new DataSet();
+            //        using (var reader = ExcelReaderFactory.CreateReader(file.OpenReadAsync().Result))
+            //        {
+            //            dsexcelRecords = reader.AsDataSet();
+
+            //            if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
+            //            {
+            //                DataTable dtRecords = dsexcelRecords.Tables[0];
+            //                if (dtRecords.Rows.Count > 1)
+            //                {
+            //                    for (int i = 1; i < dtRecords.Rows.Count; i++)
+            //                    {
+            //                        excelRows.Add(Convert.ToString(dtRecords.Rows[i][0]));
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            using (FileStream stream = File.OpenRead(fileName))
             {
-                CloudBlob file = await this._blobService.DownloadFile(fileName, this._appSettings.Value.FileUploadContainer);
+                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+                DataSet dsexcelRecords = new DataSet();
 
-                if (await file.ExistsAsync())
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
                 {
-                    MemoryStream ms = new MemoryStream();
-                    await file.DownloadToStreamAsync(ms);
+                    dsexcelRecords = reader.AsDataSet();
 
-                    DataSet dsexcelRecords = new DataSet();
-                    using (var reader = ExcelReaderFactory.CreateReader(file.OpenReadAsync().Result))
+                    if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
                     {
-                        dsexcelRecords = reader.AsDataSet();
-
-                        if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
+                        DataTable dtRecords = dsexcelRecords.Tables[0];
+                        if (dtRecords.Rows.Count > 1)
                         {
-                            DataTable dtRecords = dsexcelRecords.Tables[0];
-                            if (dtRecords.Rows.Count > 1)
+                            for (int i = 0; i < dtRecords.Rows.Count; i++)
                             {
-                                for (int i = 1; i < dtRecords.Rows.Count; i++)
+                                if (!string.IsNullOrWhiteSpace(Convert.ToString(dtRecords.Rows[i][0])))
                                 {
-                                    excelRows.Add(Convert.ToString(dtRecords.Rows[i][0]));
+                                    excelRows.Add(Convert.ToString(dtRecords.Rows[i][0]).Trim());
                                 }
                             }
                         }
                     }
                 }
             }
-            else
-            {
-                using (var stream = File.Open(fileName, FileMode.Open, FileAccess.Read))
-                {
-                    DataSet dsexcelRecords = new DataSet();
-                    using (var reader = ExcelReaderFactory.CreateReader(stream))
-                    {
-                        dsexcelRecords = reader.AsDataSet();
-
-                        if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
-                        {
-                            DataTable dtRecords = dsexcelRecords.Tables[0];
-                            if (dtRecords.Rows.Count > 1)
-                            {
-                                for (int i = 1; i < dtRecords.Rows.Count; i++)
-                                {
-                                    excelRows.Add(Convert.ToString(dtRecords.Rows[i][0]));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            //}
 
             if (excelRows.Count > 0)
             {
@@ -359,8 +370,8 @@ namespace QBD2.Services
                                                         var y = masterPart1.PartNumber.Length;
 
                                                         var x = masterPart1.PartNumber.IndexOf(letter);
-                                                        
-                                                        var revision = masterPart1.PartNumber.Substring(x+1);
+
+                                                        var revision = masterPart1.PartNumber.Substring(x + 1);
 
                                                         MasterPartRevision masterPartRevision = new MasterPartRevision
                                                         {
@@ -384,17 +395,17 @@ namespace QBD2.Services
 
 
 
-                                                    //If they are not in the Parts table, add them
-                                                    var childPart = new Entities.Part
-                                                    {
-                                                        SerialNumber = childItem.SerialNumber,
-                                                        MasterPartId = masterPartIdToUse,
-                                                        PartStatusId = 1,
-                                                        ParentPartId = partFromQDB.PartId,
-                                                        UpdateDate = DateTime.Now
-                                                    };
+                                                //If they are not in the Parts table, add them
+                                                var childPart = new Entities.Part
+                                                {
+                                                    SerialNumber = childItem.SerialNumber,
+                                                    MasterPartId = masterPartIdToUse,
+                                                    PartStatusId = 1,
+                                                    ParentPartId = partFromQDB.PartId,
+                                                    UpdateDate = DateTime.Now
+                                                };
 
-                                                    partsList.Add(childPart);
+                                                partsList.Add(childPart);
 
                                             }
                                         }
@@ -453,7 +464,7 @@ namespace QBD2.Services
             public int MasterPartId { get; set; }
             public string Letter { get; set; }
             public int Revision { get; set; }
-                
+
         }
     }
 }

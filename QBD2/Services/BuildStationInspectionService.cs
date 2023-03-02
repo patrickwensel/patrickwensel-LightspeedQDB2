@@ -29,7 +29,7 @@ namespace QBD2.Services
             //}
             //else
             //{
-                inspectionModel.BuildStationInspectionFailed = new Models.BuildStationInspectionFailed();
+            inspectionModel.BuildStationInspectionFailed = new Models.BuildStationInspectionFailed();
             //}
 
             return inspectionModel;
@@ -62,23 +62,23 @@ namespace QBD2.Services
 
                                                                          join t in _context.FailureTypes on new { FailureTypeId = f.FailureTypeId }
                                                              equals new { FailureTypeId = (int?)t.FailureTypeId } into t_join
-                                                             from t in t_join.DefaultIfEmpty()
+                                                                         from t in t_join.DefaultIfEmpty()
 
-                                                             join p in _context.FailureTypePrimaries on new { FailureTypePrimaryId = t.FailureTypePrimaryId }
-                                                             equals new { FailureTypePrimaryId = p.FailureTypePrimaryId } into p_join
-                                                             from p in p_join.DefaultIfEmpty()
-                                                          
+                                                                         join p in _context.FailureTypePrimaries on new { FailureTypePrimaryId = t.FailureTypePrimaryId }
+                                                                         equals new { FailureTypePrimaryId = p.FailureTypePrimaryId } into p_join
+                                                                         from p in p_join.DefaultIfEmpty()
 
-                                                             where f.BuildStationInspectionId == inspection.BuildStationInspectionId
+
+                                                                         where f.BuildStationInspectionId == inspection.BuildStationInspectionId
                                                                          select new Models.BuildStationInspectionFailed
                                                                          {
                                                                              BuildStationInspectionFailureId = f.BuildStationInspectionFailureId,
-                                                                 FailureTypeId = f.FailureTypeId,
-                                                                 Comment = f.Comment,
-                                                                 FailureName = t.Name,
-                                                                 FailurePrimaryName = p.Name,
-                                                                 FailurePrimaryTypeId = p.FailureTypePrimaryId
-                                                             }).ToListAsync();
+                                                                             FailureTypeId = f.FailureTypeId,
+                                                                             Comment = f.Comment,
+                                                                             FailureName = t.Name,
+                                                                             FailurePrimaryName = p.Name,
+                                                                             FailurePrimaryTypeId = p.FailureTypePrimaryId
+                                                                         }).ToListAsync();
                 }
             }
             catch (Exception e)
@@ -91,6 +91,18 @@ namespace QBD2.Services
         {
             try
             {
+                var buildStationInspectionCount = await _context.BuildStationInspections.CountAsync(x => x.WorkOrderId == inspection.WorkOrderId);
+                if (buildStationInspectionCount == 0)
+                {
+                    var workOrder = await _context.WorkOrders.FirstOrDefaultAsync(x => x.WorkOrderId == inspection.WorkOrderId);
+                    if (workOrder != null)
+                    {
+                        workOrder.WorkOrderStatusId = 2;//InProgress
+                        _context.Entry(workOrder).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
                 Entities.BuildStationInspection objInspection = new Entities.BuildStationInspection();
                 if (inspection.BuildStationInspectionId > 0)
                 {
@@ -112,7 +124,7 @@ namespace QBD2.Services
                     _context.BuildStationInspections.Add(objInspection);
                     await _context.SaveChangesAsync();
                 }
-               
+
                 inspection.BuildStationInspectionId = objInspection.BuildStationInspectionId;
 
                 if (inspection.Pass)
@@ -126,30 +138,32 @@ namespace QBD2.Services
                 }
                 else
                 {
-                    foreach(var BuildInspectionFailed in inspection.BuildStationInspectionFailedList)
+                    if (inspection.BuildStationInspectionFailedList != null)
                     {
-                        Entities.BuildStationInspectionFailure objInspectionFailure = new Entities.BuildStationInspectionFailure();
-                        if (BuildInspectionFailed.BuildStationInspectionFailureId > 0)
+                        foreach (var BuildInspectionFailed in inspection.BuildStationInspectionFailedList)
                         {
-                            objInspectionFailure = await _context.BuildStationInspectionFailures.FirstOrDefaultAsync(x => x.BuildStationInspectionFailureId == BuildInspectionFailed.BuildStationInspectionFailureId);
-                        }
+                            Entities.BuildStationInspectionFailure objInspectionFailure = new Entities.BuildStationInspectionFailure();
+                            if (BuildInspectionFailed.BuildStationInspectionFailureId > 0)
+                            {
+                                objInspectionFailure = await _context.BuildStationInspectionFailures.FirstOrDefaultAsync(x => x.BuildStationInspectionFailureId == BuildInspectionFailed.BuildStationInspectionFailureId);
+                            }
 
-                        objInspectionFailure.Comment = BuildInspectionFailed.Comment;
-                        objInspectionFailure.BuildStationInspectionId = inspection.BuildStationInspectionId;
+                            objInspectionFailure.Comment = BuildInspectionFailed.Comment;
+                            objInspectionFailure.BuildStationInspectionId = inspection.BuildStationInspectionId;
 
-                        objInspectionFailure.FailureTypeId = BuildInspectionFailed.FailureTypeId;
-                        if (BuildInspectionFailed.BuildStationInspectionFailureId > 0)
-                        {
-                            _context.Entry(objInspectionFailure).State = EntityState.Modified;
+                            objInspectionFailure.FailureTypeId = BuildInspectionFailed.FailureTypeId;
+                            if (BuildInspectionFailed.BuildStationInspectionFailureId > 0)
+                            {
+                                _context.Entry(objInspectionFailure).State = EntityState.Modified;
+                            }
+                            else
+                            {
+                                _context.BuildStationInspectionFailures.Add(objInspectionFailure);
+                            }
+                            await _context.SaveChangesAsync();
+                            BuildInspectionFailed.BuildStationInspectionFailureId = objInspectionFailure.BuildStationInspectionFailureId;
                         }
-                        else
-                        {
-                            _context.BuildStationInspectionFailures.Add(objInspectionFailure);
-                        }
-                        await _context.SaveChangesAsync();
-                        BuildInspectionFailed.BuildStationInspectionFailureId= objInspectionFailure.BuildStationInspectionFailureId;
                     }
-                   
                     //await _context.SaveChangesAsync();
                     //inspection.BuildStationInspectionFailed.BuildStationInspectionFailureId = objInspectionFailure.BuildStationInspectionFailureId;
                 }
@@ -162,7 +176,7 @@ namespace QBD2.Services
             }
         }
 
-       
+
         public async Task<string> CompleteInspection(Models.BuildStationInspectionModel inspection)
         {
             string message = "Some error on complete inspection.";
@@ -190,7 +204,8 @@ namespace QBD2.Services
                     }
                 }
                 return message;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return message;
             }

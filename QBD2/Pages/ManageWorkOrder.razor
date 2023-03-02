@@ -304,6 +304,7 @@
                 <GridColumn Field="WorkOrderPriority.Name" Title="Work Order Priority" Filterable="true" />
                 <GridColumn Field="BuildTemplateMasterPartName" Title="Build Template" Filterable="true" />
                 <GridColumn Field="Quantity" Title="Quantity" Filterable="true" />
+                <GridColumn Field="PONumber" Title="PO Number" Filterable="true" />
                 <GridCommandColumn Width="100px">
                     <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Models.WorkOrderModel))"><i class="fal fa-edit"></i></GridCommandButton>
                     <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete" OnClick="@((args)=> DeleteRecord(args.Item as Models.WorkOrderModel))" Enabled="false"></GridCommandButton>
@@ -1197,7 +1198,14 @@
         {
             isSuccess = await WorkOrderService.CompleteBuildInspection(OriginalRecord.WorkOrderId, EditPartModel.PartId.Value);
             if (!isSuccess)
+            {
                 toastService.ShowError("Some error on complete build.", "Error");
+            }
+            else
+            {
+                await WorkOrderService.SetWorkOrderToCompletedIfAllStationCompleted(OriginalRecord.WorkOrderId);
+                await GetWorkOrderPartDataByWorkOrder(OriginalRecord.WorkOrderId);
+            }
         }
         else
         {

@@ -37,6 +37,7 @@ namespace QBD2.Services
                                             BuildTemplateId = wo.BuildTemplateId,
                                             BuildTemplate = bt,
                                             Quantity = wo.Quantity,
+                                            PONumber = wo.PONumber,
                                             BuildTemplateMasterPartName = bt.Name + " " + bt.MasterPart.PartNumber,
                                         }).ToListAsync();
 
@@ -318,6 +319,21 @@ namespace QBD2.Services
                 workOrder = _context.WorkOrders.Any(x => x.WorkOrderTypeId == WorkOrderTypeId && x.WorkOrderStatusId == WorkOrderStatusId && x.WorkOrderPriorityID == WorkOrderPriorityID && x.BuildTemplateId == BuildTemplateId && x.Quantity == Quantity);
 
             return workOrder;
+        }
+
+        public async Task SetWorkOrderToCompletedIfAllStationCompleted(int workOrderId)
+        {
+            var inCompletedCount = await _context.WorkOrderParts.CountAsync(x => x.WorkOrderId == workOrderId && x.IsCompleteBuildStation != true);
+            if (inCompletedCount == 0)
+            {
+                var workOrder = await _context.WorkOrders.FirstOrDefaultAsync(x => x.WorkOrderId == workOrderId);
+                if (workOrder != null)
+                {
+                    workOrder.WorkOrderStatusId = 3;//Completed
+                    _context.Entry(workOrder).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                }
+            }
         }
 
         public async Task<bool> CompleteBuildInspection(int workOrderId, int partId)

@@ -11,7 +11,7 @@ namespace QBD2.Services
     public class BlobService
     {
         private IOptions<ApplicationSettings> _appSettings;
-        
+
         public BlobService(IOptions<ApplicationSettings> appSettings)
         {
             _appSettings = appSettings;
@@ -24,36 +24,37 @@ namespace QBD2.Services
 
             try
             {
-                if (this._appSettings.Value.FileUploadType.ToLower() == FileUploadType.Azure.ToString().ToLower())
-                {
-                    var connectionString = this._appSettings.Value.StorageConnectionString;
-                    string containerName = this._appSettings.Value.FileUploadContainer;
+                //if (this._appSettings.Value.FileUploadType.ToLower() == FileUploadType.Azure.ToString().ToLower())
+                //{
+                //    var connectionString = this._appSettings.Value.StorageConnectionString;
+                //    string containerName = this._appSettings.Value.FileUploadContainer;
 
-                    var serviceClient = new BlobServiceClient(connectionString);
-                    var containerClient = serviceClient.GetBlobContainerClient(containerName);
-                    var blobClient = containerClient.GetBlobClient(browserFile.Name);
-                    Stream stream = browserFile.OpenReadStream();
-                    await blobClient.UploadAsync(stream, true);
-                    stream.Close();
-                    stream.Dispose();
-                    return blobClient.Uri.AbsoluteUri;
-                }
-                else
+                //    var serviceClient = new BlobServiceClient(connectionString);
+                //    var containerClient = serviceClient.GetBlobContainerClient(containerName);
+                //    var blobClient = containerClient.GetBlobClient(browserFile.Name);
+                //    Stream stream = browserFile.OpenReadStream();
+                //    await blobClient.UploadAsync(stream, true);
+                //    stream.Close();
+                //    stream.Dispose();
+                //    return blobClient.Uri.AbsoluteUri;
+                //}
+                //else
+                //{
+                var folderPath = this._appSettings.Value.LocalFileUploadPath;
+                if (!Directory.Exists(folderPath))
                 {
-                    var folderPath = this._appSettings.Value.LocalFileUploadPath;
-                    if (!Directory.Exists(folderPath))
-                    {
-                        Directory.CreateDirectory(folderPath);
-                    }
-
-                    Stream stream = browserFile.OpenReadStream();
-                    var path = $"{this._appSettings.Value.LocalFileUploadPath}{browserFile.Name}";
-                    FileStream fs = File.Create(path);
-                    await stream.CopyToAsync(fs);
-                    stream.Close();
-                    fs.Close();
-                    return path;
+                    Directory.CreateDirectory(folderPath);
                 }
+
+                Stream stream = browserFile.OpenReadStream(100000000);//100MB
+                var path = $"{_appSettings.Value.LocalFileUploadPath}{Guid.NewGuid()}-{browserFile.Name}";
+                FileStream fs = File.Create(path);
+                await stream.CopyToAsync(fs);
+                stream.Close();
+                fs.Close();
+
+                return path;
+                //}
             }
             catch (Exception)
             {

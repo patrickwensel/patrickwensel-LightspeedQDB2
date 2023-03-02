@@ -564,6 +564,7 @@
                         var isUpdated = await WorkOrderService.CompleteBuildInspection(UserWorkOrder!.WorkOrderId, UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.PartId);
                         if (isUpdated)
                         {
+                            await WorkOrderService.SetWorkOrderToCompletedIfAllStationCompleted(UserWorkOrder!.WorkOrderId);
                             await FindStation(UserWorkOrder!.WorkOrderId);
                             toastService.ShowSuccess("Build Station Inspection Saved Successfully.", "Success");
                         }

@@ -34,24 +34,24 @@
 </style>
 <div class="row alerts-row">
     <div class="col-md-8">
-           @if (AddEditAlert != null && AddEditAlert.AlertId == 0)
-           {
-               <h3 class="alert-title"><label @onclick="(()=> btnCancelAlertOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add new Alert</h3>
-           }
-           else if(AddEditAlert != null && AddEditAlert.AlertId > 0)
-           {
-               <h3 class="alert-title"><label @onclick="(()=> btnCancelAlertOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Edit Alert</h3>
-           }
-           else
-           {
-                <h3 class="alert-title"><i class="fa fa-bell" aria-hidden="true"></i>&nbsp;&nbsp;Alerts</h3>
-           }
+        @if (AddEditAlert != null && AddEditAlert.AlertId == 0)
+        {
+            <h3 class="alert-title"><label @onclick="(()=> btnCancelAlertOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add new Alert</h3>
+        }
+        else if (AddEditAlert != null && AddEditAlert.AlertId > 0)
+        {
+            <h3 class="alert-title"><label @onclick="(()=> btnCancelAlertOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Edit Alert</h3>
+        }
+        else
+        {
+            <h3 class="alert-title"><i class="fa fa-bell" aria-hidden="true"></i>&nbsp;&nbsp;Alerts</h3>
+        }
     </div>
     <div class="col-md-4 add-alrert-btn">
-         @if (AddEditAlert == null)
-         {
-             <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Alert</TelerikButton>
-         }
+        @if (AddEditAlert == null)
+        {
+            <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Alert</TelerikButton>
+        }
     </div>
 </div>
 
@@ -61,126 +61,127 @@
 {
     <h3 class="alert-table-title">Listed Alerts</h3>
     <div class="al-table">
-    <TelerikGrid Data="@GridData"
-             Pageable="true"
-             Sortable="true"
-             FilterMode="@GridFilterMode.FilterRow">
-        
-         
-             <GridColumns>
-            <GridColumn Field="@(nameof(Alert.DateCreated))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}"/>
-            <GridColumn Field="@(nameof(Alert.Title))" Title="Title" Filterable="false"/>
-            <GridColumn Field="@(nameof(Alert.MasterPartNumber))" Title="Part Number" Filterable="false"/>
-            <GridColumn Field="@(nameof(Alert.MasterPartDescription))" Title="Description" Filterable="false"/>
-            <GridCommandColumn Width="100px">
-                 <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Alert))"><i class="fal fa-edit"></i></GridCommandButton>
-                 <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete"></GridCommandButton>
-            </GridCommandColumn>
-        </GridColumns>
-    </TelerikGrid>
+        <TelerikGrid Data="@GridData"
+                 Pageable="true"
+                 Sortable="true"
+                 FilterMode="@GridFilterMode.FilterRow">
+
+
+            <GridColumns>
+                <GridColumn Field="@(nameof(Alert.DateCreated))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}" />
+                <GridColumn Field="@(nameof(Alert.Title))" Title="Title" Filterable="false" />
+                <GridColumn Field="@(nameof(Alert.MasterPartNumber))" Title="Part Number" Filterable="false" />
+                <GridColumn Field="@(nameof(Alert.MasterPartDescription))" Title="Description" Filterable="false" />
+                <GridCommandColumn Width="100px">
+                    <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Alert))"><i class="fal fa-edit"></i></GridCommandButton>
+                    <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete"></GridCommandButton>
+                </GridCommandColumn>
+            </GridColumns>
+        </TelerikGrid>
     </div>
 }
 
 @if (AddEditAlert != null)
 {
-    <div class="alert-edit-page"> 
+    <div class="alert-edit-page">
         <div class="form-group row m-tb">
             <label for="PartNumber" class="col-sm-2 col-form-label">Part Number</label>
             <div class="col-md-10 bg-w">
-                 <TelerikAutoComplete Data="@MasterParts" @bind-Value="@selectedMasterPart"
-                     ValueField="@( nameof(MasterPart.PartNumber) )"
-                     Filterable="true" MinLength="3"
-                     OnChange="@MyOnChangeHandler"
-                     ClearButton="true" 
-                     Enabled=@(AddEditAlert.AlertId<=0)
-                     Placeholder="Type Part Number And Select Part"
-                     />
+                <TelerikAutoComplete Data="@MasterParts" @bind-Value="@selectedMasterPart"
+                                 ValueField="@( nameof(MasterPart.PartNumber) )"
+                                 Filterable="true" MinLength="3"
+                                 OnChange="@MyOnChangeHandler"
+                                 ClearButton="true"
+                                 Enabled=@(AddEditAlert.AlertId<=0)
+                                 Placeholder="Type Part Number And Select Part" />
             </div>
         </div>
 
-    <EditForm EditContext="@ECAddEditAlert">
-        <DataAnnotationsValidator />
+        <EditForm EditContext="@ECAddEditAlert">
+            <DataAnnotationsValidator />
 
-        <div class="form-group row m-tb">
-            <label for="PortDescription" class="col-sm-2 col-form-label">Part Description</label>
-            <div class="col-md-10 bg-w">
-                <label style="padding-top:10px;">@selectedMasterPartDescription</label>
+            <div class="form-group row m-tb">
+                <label for="PortDescription" class="col-sm-2 col-form-label">Part Description</label>
+                <div class="col-md-10 bg-w">
+                    <label style="padding-top:10px;">@selectedMasterPartDescription</label>
+                </div>
             </div>
-        </div>
 
-         <div class="form-group row m-tb">
-          
-            <label for="Title" class="col-md-2 col-form-label">Title </label>
-            <div class="col-md-4">
-            <TelerikTextBox @bind-Value="@AddEditAlert.Title" Class="form-control"></TelerikTextBox>
-            <ValidationMessage For="@(() => AddEditAlert.Title)"></ValidationMessage></div>
-           
+            <div class="form-group row m-tb">
 
-          
-            <label for="ExpirationDate" class="col-md-2 col-form-label">Expiration Date </label>
-            <div class="col-md-4">
-            <TelerikDatePicker @bind-Value="@AddEditAlert.ExpirationDate" Class="form-control" @ref="theDatePickerExpirationDate" Format="MM/dd/yyyy"></TelerikDatePicker>
-            <ValidationMessage For="@(() => AddEditAlert.ExpirationDate)"></ValidationMessage></div>
-          
-         </div>
-            
-        
+                <label for="Title" class="col-md-2 col-form-label">Title </label>
+                <div class="col-md-4">
+                    <TelerikTextBox @bind-Value="@AddEditAlert.Title" Class="form-control"></TelerikTextBox>
+                    <ValidationMessage For="@(() => AddEditAlert.Title)"></ValidationMessage>
+                </div>
 
-        <div class="form-group row m-tb">          
-            <label for="ReasonforManufacturingDeviation" class="col-md-2 col-form-label">Reason for Manufacturing Deviation</label>
-            <div class="col-md-10">
-            <textarea @bind-value="AddEditAlert.ReasonforManufacturingDeviation" class="form-control" rows="8" @bind-value:event="oninput"></textarea>
-            <ValidationMessage For="@(() => AddEditAlert.ReasonforManufacturingDeviation)"></ValidationMessage>
+
+
+                <label for="ExpirationDate" class="col-md-2 col-form-label">Expiration Date </label>
+                <div class="col-md-4">
+                    <TelerikDatePicker @bind-Value="@AddEditAlert.ExpirationDate" Class="form-control" @ref="theDatePickerExpirationDate" Format="MM/dd/yyyy"></TelerikDatePicker>
+                    <ValidationMessage For="@(() => AddEditAlert.ExpirationDate)"></ValidationMessage>
+                </div>
+
             </div>
-        </div>
-       
 
-        <br />
-        <div class="row">
-            <div class="col-md-12">
-                <hr>
-                <h5>Affected Serial Numbers</h5>
-                
+
+
+            <div class="form-group row m-tb">
+                <label for="ReasonforManufacturingDeviation" class="col-md-2 col-form-label">Reason for Manufacturing Deviation</label>
+                <div class="col-md-10">
+                    <textarea @bind-value="AddEditAlert.ReasonforManufacturingDeviation" class="form-control" rows="8" @bind-value:event="oninput"></textarea>
+                    <ValidationMessage For="@(() => AddEditAlert.ReasonforManufacturingDeviation)"></ValidationMessage>
+                </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-6">
-                 <TelerikTabStrip @bind-ActiveTabIndex="@ActiveTabIndex" @ref="mySerialNumberTabStrip">
-                    <TabStripTab Title="Manually">
-                        @if (RangeAddPartsToAlertError != null && RangeAddPartsToAlertError.Count() > 0)
-                        {
-                            <div class="row">
-                                <label class="text-danger">Total&nbsp;@RangeAddPartsToAlertError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br/><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
-                                @if (IsDisplayRangeTextArea)
-                                {
-                                    string errorSerialNumber = string.Join(", ", RangeAddPartsToAlertError.Select(x=>x.SerialNumber));
-                                    <textarea @bind-value="errorSerialNumber" class="form-control" rows="4" @bind-value:event="oninput" style="width: 56%;margin-left: 12px;margin-bottom: 20px;"></textarea>
-                                }
-                            </div>
-                        }
-                        <div class="row">
-                            <div class="col-md-10">
-                                <input type="text" class="form-control numeric" @bind-value="@SerialNumber" placeholder="ADD SERIAL NUMBER"/>
-                            </div>
-                            <div class="col-md-2">
-                                <TelerikButton Class="RightButton" @onclick="(()=> btnAddFindSerailNumberOnClick())" Icon="add">Add</TelerikButton>
-                            </div>
-                         </div>
-                    </TabStripTab>
-                    <TabStripTab Title="Range">
-                       <form Model="@serialNumberRange" @onsubmit="OnSubmitRange">
-                            @*<DataAnnotationsValidator />*@
-                            <ValidationSummary />
+
+            <br />
+            <div class="row">
+                <div class="col-md-12">
+                    <hr>
+                    <h5>Affected Serial Numbers</h5>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <TelerikTabStrip @bind-ActiveTabIndex="@ActiveTabIndex" @ref="mySerialNumberTabStrip">
+                        <TabStripTab Title="Manually">
                             @if (RangeAddPartsToAlertError != null && RangeAddPartsToAlertError.Count() > 0)
                             {
+                                <div class="row">
+                                    <label class="text-danger">Total&nbsp;@RangeAddPartsToAlertError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br /><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
+                                    @if (IsDisplayRangeTextArea)
+                                    {
+                                        string errorSerialNumber = string.Join(", ", RangeAddPartsToAlertError.Select(x => x.SerialNumber));
+                                        <textarea @bind-value="errorSerialNumber" class="form-control" rows="4" @bind-value:event="oninput" style="width: 56%;margin-left: 12px;margin-bottom: 20px;"></textarea>
+                                    }
+                                </div>
+                            }
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <input type="text" class="form-control numeric" @bind-value="@SerialNumber" placeholder="ADD SERIAL NUMBER" />
+                                </div>
+                                <div class="col-md-2">
+                                    <TelerikButton Class="RightButton" @onclick="(()=> btnAddFindSerailNumberOnClick())" Icon="add">Add</TelerikButton>
+                                </div>
+                            </div>
+                        </TabStripTab>
+                        <TabStripTab Title="Range">
+                            <form Model="@serialNumberRange" @onsubmit="OnSubmitRange">
+                                @*<DataAnnotationsValidator />*@
+                                <ValidationSummary />
+                                @if (RangeAddPartsToAlertError != null && RangeAddPartsToAlertError.Count() > 0)
+                                {
                                     <div class="row">
-                                        @if(!string.IsNullOrWhiteSpace(serialNumberRange.StartSerialNumber) && !string.IsNullOrWhiteSpace(serialNumberRange.EndSerialNumber))
+                                        @if (!string.IsNullOrWhiteSpace(serialNumberRange.StartSerialNumber) && !string.IsNullOrWhiteSpace(serialNumberRange.EndSerialNumber))
                                         {
-                                            <label class="text-danger">Total&nbsp;@RangeAddPartsToAlertError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br/><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
+                                            <label class="text-danger">Total&nbsp;@RangeAddPartsToAlertError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br /><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
                                             @if (IsDisplayRangeTextArea)
                                             {
-                                                string errorSerialNumber = string.Join(", ", RangeAddPartsToAlertError.Select(x=>x.SerialNumber));
+                                                string errorSerialNumber = string.Join(", ", RangeAddPartsToAlertError.Select(x => x.SerialNumber));
                                                 <textarea @bind-value="errorSerialNumber" class="form-control" rows="4" @bind-value:event="oninput" style="width: 56%;margin-left: 12px;"></textarea>
                                             }
                                         }
@@ -189,89 +190,89 @@
                                             RangeAddPartsToAlertError = new List<AddPartsToAlertError>();
                                         }
                                     </div>
-                             }
-                            <div class="form-group row">
-                                <label for="startSerialNumber" class="col-md-10 col-form-label h-40 input-label postion-top">
-                                    <span class="title-u">Start Serial Number</span>
-                                    <TelerikTextBox @bind-Value="@serialNumberRange.StartSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
-                                </label>
-                                
-                                <div class="col-sm-2"></div>
-                            </div>
-                            <div class="row">
+                                }
+                                <div class="form-group row">
+                                    <label for="startSerialNumber" class="col-md-10 col-form-label h-40 input-label postion-top">
+                                        <span class="title-u">Start Serial Number</span>
+                                        <TelerikTextBox @bind-Value="@serialNumberRange.StartSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
+                                    </label>
+
+                                    <div class="col-sm-2"></div>
+                                </div>
+                                <div class="row">
                                     <div class="col-md-1 m-left"><img src="images/line-dash.png"></div>
                                 </div>
-                            <div class="form-group row">
-                                <label for="endSerialNumber" class="col-md-10 col-form-label h-40 input-label postion-bottom">
-                                    <span class="title-u">End Serial Number</span>
-                                    <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
-                                </label>
-                                <div class="col-sm-2"></div>
-                            </div>
-                            <div class="form-group row" style="margin-top:15px;">
-                                <div class="col-md-12">
-                                <div class="range-add"><TelerikButton Class="SaveButton">+ Add Range</TelerikButton></div>
+                                <div class="form-group row">
+                                    <label for="endSerialNumber" class="col-md-10 col-form-label h-40 input-label postion-bottom">
+                                        <span class="title-u">End Serial Number</span>
+                                        <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
+                                    </label>
+                                    <div class="col-sm-2"></div>
                                 </div>
-                            </div>
-                        </form>
-                    </TabStripTab>
-                    <TabStripTab Title="Upload Excel">
-                        @if (ExcelAddPartsToAlertError != null && ExcelAddPartsToAlertError.Count() > 0)
-                        {
-                            <div class="row">
-                                <label class="text-danger">Total&nbsp;@ExcelAddPartsToAlertError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br/><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
-                                @if (IsDisplayRangeTextArea)
-                                {
-                                    string errorSerialNumber = string.Join(", ", ExcelAddPartsToAlertError.Select(x=>x.SerialNumber));
-                                    <textarea @bind-value="errorSerialNumber" class="form-control" rows="4" @bind-value:event="oninput" style="width: 56%;margin-left: 12px;"></textarea>
-                                }
-                            </div>
-                        }
-                        <br />
-                        <form @onsubmit="OnSubmitExcelFile">
-                            <div class="form-group row">
-                                <div class="col-md-12">
-                                <div class="uplaod-box">
-                                <span>Select an Excel File to upload...</span>
-                                <InputFile OnChange="OnInputFileChange" />
+                                <div class="form-group row" style="margin-top:15px;">
+                                    <div class="col-md-12">
+                                        <div class="range-add"><TelerikButton Class="SaveButton">+ Add Range</TelerikButton></div>
+                                    </div>
                                 </div>
+                            </form>
+                        </TabStripTab>
+                        <TabStripTab Title="Upload Excel">
+                            @if (ExcelAddPartsToAlertError != null && ExcelAddPartsToAlertError.Count() > 0)
+                            {
+                                <div class="row">
+                                    <label class="text-danger">Total&nbsp;@ExcelAddPartsToAlertError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br /><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
+                                    @if (IsDisplayRangeTextArea)
+                                    {
+                                        string errorSerialNumber = string.Join(", ", ExcelAddPartsToAlertError.Select(x => x.SerialNumber));
+                                        <textarea @bind-value="errorSerialNumber" class="form-control" rows="4" @bind-value:event="oninput" style="width: 56%;margin-left: 12px;"></textarea>
+                                    }
                                 </div>
-                                
-                              </div>
-                             <div class="form-group row">
-                               <div class="col-md-12"><TelerikButton Class="UploadexlButton" Icon="upload">Upload Selected File</TelerikButton></div>
-                               
-                            </div>
-                        </form>
-                    </TabStripTab>
-                </TelerikTabStrip>
-            </div>
-             <div class="col-md-6">
-                 
-                 <div class="form-group row affects-p"> 
-                    <h3 class="affect-p">Affected Parts</h3>
+                            }
+                            <br />
+                            <form @onsubmit="OnSubmitExcelFile">
+                                <div class="form-group row">
+                                    <div class="col-md-12">
+                                        <div class="uplaod-box">
+                                            <span>Select an Excel File to upload...</span>
+                                            <InputFile OnChange="OnInputFileChange" accept=".xlsx;.xls" />
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-12"><TelerikButton Class="UploadexlButton" Icon="upload">Upload Excel File</TelerikButton></div>
+
+                                </div>
+                            </form>
+                        </TabStripTab>
+                    </TelerikTabStrip>
+                </div>
+                <div class="col-md-6">
+
+                    <div class="form-group row affects-p">
+                        <h3 class="affect-p">Affected Parts</h3>
                         <TelerikGrid Data=@GridParts Sortable="true" Pageable="false" OnDelete="@OnDeleteAlertPart">
-                         <GridColumns>
-                             <GridColumn Field=@nameof(Part.SerialNumber) Title="Serial Number" Filterable="false">
-                             </GridColumn>
+                            <GridColumns>
+                                <GridColumn Field=@nameof(Part.SerialNumber) Title="Serial Number" Filterable="false">
+                                </GridColumn>
                                 <GridCommandColumn Width="50px" Context="my">
                                     <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete"></GridCommandButton>
                                 </GridCommandColumn>
-                         </GridColumns>
-                         <NoDataTemplate>
-                             <text>No Records Available</text>
-                         </NoDataTemplate>
-                    </TelerikGrid>
+                            </GridColumns>
+                            <NoDataTemplate>
+                                <text>No Records Available</text>
+                            </NoDataTemplate>
+                        </TelerikGrid>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <br />
-        <div class="row">
-            <TelerikButton Class="SaveButton" OnClick="(()=>HandleValidSubmit())">Save</TelerikButton>
-        </div>
-        <br />
-    </EditForm>
+
+            <br />
+            <div class="row">
+                <TelerikButton Class="SaveButton" OnClick="(()=>HandleValidSubmit())">Save</TelerikButton>
+            </div>
+            <br />
+        </EditForm>
     </div>
 }
 
@@ -325,14 +326,14 @@
         {
             OriginalRecord = alert;
             AddEditAlert = new Alert()
-            {
-                AlertId = OriginalRecord.AlertId,
-                DateCreated = OriginalRecord.DateCreated,
-                MasterPartId =  OriginalRecord.MasterPartId,
-                ReasonforManufacturingDeviation = OriginalRecord.ReasonforManufacturingDeviation,
-                Title = OriginalRecord.Title,
-                ExpirationDate = OriginalRecord.ExpirationDate
-            };
+                {
+                    AlertId = OriginalRecord.AlertId,
+                    DateCreated = OriginalRecord.DateCreated,
+                    MasterPartId = OriginalRecord.MasterPartId,
+                    ReasonforManufacturingDeviation = OriginalRecord.ReasonforManufacturingDeviation,
+                    Title = OriginalRecord.Title,
+                    ExpirationDate = OriginalRecord.ExpirationDate
+                };
 
             if (AddEditAlert.ExpirationDate.Equals(DateTime.MinValue))
             {
@@ -373,13 +374,19 @@
         StateHasChanged();
     }
 
-    string Message = "No file(s) selected";
-    IReadOnlyList<IBrowserFile> selectedFiles;
+    IBrowserFile selectedFile;
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
-        selectedFiles = e.GetMultipleFiles();
-        Message = $"{selectedFiles.Count} file(s) selected";
+        if (e.File.Name.ToLower().EndsWith(".xls") || e.File.Name.ToLower().EndsWith(".xlsx"))
+        {
+            selectedFile = e.File;
+        }
+        else
+        {
+            selectedFile = null;
+            toastService.ShowError("Please Select Excel File.", "Error");
+        }
         this.StateHasChanged();
     }
 
@@ -391,28 +398,45 @@
             return;
         }
 
-        foreach (var file in selectedFiles)
+        if (selectedFile == null)
         {
-            var path = await BlobService.UploadBlob(file);
-            MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditAlert.MasterPartId).FirstOrDefault();
-
-            var errors = await ExcelUploadService.AlertProcessSerialNumberExcelFile(path, selectedMasterPart);
-            if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
-            {
-                GridParts.AddRange(errors.Parts);
-                GridParts = new List<Part>(GridParts.Distinct().ToList());
-            }
-
-            if (errors != null && errors.AddPartsToAlertError != null && errors.AddPartsToAlertError.Count() > 0)
-            {
-                ExcelAddPartsToAlertError = errors.AddPartsToAlertError;
-            }
-            else
-            {
-                ExcelAddPartsToAlertError = null;
-            }
+            toastService.ShowError("Please Select Excel File.", "Error");
+            return;
         }
-        Message = $"{selectedFiles.Count} file(s) uploaded on server";
+
+        MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditAlert.MasterPartId).FirstOrDefault();
+
+        if (selectedMasterPart == null)
+        {
+            toastService.ShowError("Master Part Not Found.", "Error");
+            return;
+        }
+
+        //foreach (var file in selectedFiles)
+        //{
+        var path = await BlobService.UploadBlob(selectedFile);
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            toastService.ShowError("Error in upload file.", "Error");
+            return;
+        }
+        selectedFile = null;
+        var errors = await ExcelUploadService.AlertProcessSerialNumberExcelFile(path, selectedMasterPart);
+        if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
+        {
+            GridParts.AddRange(errors.Parts);
+            GridParts = new List<Part>(GridParts.Distinct().ToList());
+        }
+
+        if (errors != null && errors.AddPartsToAlertError != null && errors.AddPartsToAlertError.Count() > 0)
+        {
+            ExcelAddPartsToAlertError = errors.AddPartsToAlertError;
+        }
+        else
+        {
+            ExcelAddPartsToAlertError = null;
+        }
+        //}
         this.StateHasChanged();
     }
 
@@ -448,7 +472,7 @@
                     return;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 toastService.ShowError("Please enter valid serial number.", "Error");
                 return;
@@ -481,7 +505,7 @@
     private async Task HandleValidSubmit()
     {
         if (AddEditAlert != null)
-        { 
+        {
             if (AddEditAlert.MasterPartId == 0)
             {
                 toastService.ShowError("Please Select Master Part", "Error");
@@ -490,10 +514,10 @@
 
             if (GridParts != null && GridParts.Count() > 0)
             {
-                List<PartAlert> partAlerts = new List<PartAlert>();  
-                foreach(var part in GridParts)
+                List<PartAlert> partAlerts = new List<PartAlert>();
+                foreach (var part in GridParts)
                 {
-                    if (part.PartId > 0 && !partAlerts.Any(x=>x.PartId == part.PartId))
+                    if (part.PartId > 0 && !partAlerts.Any(x => x.PartId == part.PartId))
                     {
                         PartAlert partAlert = new PartAlert();
                         partAlert.PartId = part.PartId;
@@ -511,7 +535,7 @@
                 GridParts.Clear();
                 selectedMasterPart = string.Empty;
                 selectedMasterPartDescription = string.Empty;
-                NavigationManager.NavigateTo("alerts",true);
+                NavigationManager.NavigateTo("alerts", true);
                 StateHasChanged();
             }
             else
@@ -526,7 +550,7 @@
         var result = string.Format("The user confirmed: {0}", (string)theUserChoice);
 
         MasterPart selectedMasterPart = MasterParts.Where(x => x.PartNumber == (string)theUserChoice).FirstOrDefault();
-        if(selectedMasterPart != null)
+        if (selectedMasterPart != null)
         {
             selectedMasterPartDescription = selectedMasterPart.Description;
             if (AddEditAlert == null)
@@ -558,10 +582,10 @@
         var x = serialNumberRange;
 
         try
-        { 
+        {
             errors = await PartService.AddPartsToAlertByStartEnd(selectedMasterPart, long.Parse(SerialNumber), long.Parse(SerialNumber));
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             toastService.ShowError("Please enter valid serial number.", "Error");
             return;

@@ -15,7 +15,8 @@
 <style>
     table, th, td {
         /*border: 2px solid;*/
-    } 
+    }
+
     .RightButton {
         height: 38px;
         width: 75px;
@@ -35,25 +36,25 @@
 
 <div class="row alerts-row">
     <div class="col-md-9">
-           @if (AddEditDeviation != null && AddEditDeviation.DeviationId == 0)
-           {
-               <h3 class="alert-title"><label @onclick="(()=> btnCancelDeviationOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add new Deviation</h3>
-           }
-           else if(AddEditDeviation != null && AddEditDeviation.DeviationId > 0)
-           {
-               <h3 class="alert-title"><label @onclick="(()=> btnCancelDeviationOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Edit Deviation</h3>
-           }
-           else
-           {
-                <h3 class="alert-title"><i class="fa fa-car" aria-hidden="true"></i>&nbsp;&nbsp;Deviations</h3>
-           }
+        @if (AddEditDeviation != null && AddEditDeviation.DeviationId == 0)
+        {
+            <h3 class="alert-title"><label @onclick="(()=> btnCancelDeviationOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add new Deviation</h3>
+        }
+        else if (AddEditDeviation != null && AddEditDeviation.DeviationId > 0)
+        {
+            <h3 class="alert-title"><label @onclick="(()=> btnCancelDeviationOnClick())" style="cursor:pointer;"><i class="fas fa-chevron-left"></i>&nbsp;&nbsp;</label><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;&nbsp;Edit Deviation</h3>
+        }
+        else
+        {
+            <h3 class="alert-title"><i class="fa fa-car" aria-hidden="true"></i>&nbsp;&nbsp;Deviations</h3>
+        }
     </div>
     <div class="col-md-3 add-alrert-btn">
-    @if (AddEditDeviation == null)
-    {
-        <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Deviation</TelerikButton>
-    }
- </div>
+        @if (AddEditDeviation == null)
+        {
+            <TelerikButton Icon="add" @onclick="(() => SelectRecord(null))">Add new Deviation</TelerikButton>
+        }
+    </div>
 </div>
 
 <hr />
@@ -61,23 +62,23 @@
 @if (AddEditDeviation == null)
 {
     <h3 class="alert-table-title">Listed Deviations</h3>
-     <div class="al-table">
-    <TelerikGrid Data="@GridData"
-             Pageable="true"
-             Sortable="true"
-             FilterMode="@GridFilterMode.FilterRow">
-        
-        <GridColumns>
-            <GridColumn Field="@(nameof(Deviation.DateCreated))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}" />
-            <GridColumn Field="@(nameof(Deviation.MasterPartNumber))" Title="Part Number" Filterable="false" />
-            <GridColumn Field="@(nameof(Deviation.MasterPartDescription))" Title="Description" Filterable="false" />
-            <GridCommandColumn Width="100px">
-                @*<GridCommandButton Command="Save" Icon="eye"></GridCommandButton>*@
-                <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Deviation))"><i class="fal fa-edit"></i></GridCommandButton>
-                <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete"></GridCommandButton>
-            </GridCommandColumn>
-        </GridColumns>
-    </TelerikGrid>
+    <div class="al-table">
+        <TelerikGrid Data="@GridData"
+                 Pageable="true"
+                 Sortable="true"
+                 FilterMode="@GridFilterMode.FilterRow">
+
+            <GridColumns>
+                <GridColumn Field="@(nameof(Deviation.DateCreated))" Title="Date Created" DisplayFormat="{0:dd-MM-yyyy}" />
+                <GridColumn Field="@(nameof(Deviation.MasterPartNumber))" Title="Part Number" Filterable="false" />
+                <GridColumn Field="@(nameof(Deviation.MasterPartDescription))" Title="Description" Filterable="false" />
+                <GridCommandColumn Width="100px">
+                    @*<GridCommandButton Command="Save" Icon="eye"></GridCommandButton>*@
+                    <GridCommandButton Class="edit-btn bgb-none" Icon="" OnClick="@((args)=> SelectRecord(args.Item as Deviation))"><i class="fal fa-edit"></i></GridCommandButton>
+                    <GridCommandButton Class="del-btn bgb-none" Command="Delete" Icon="delete"></GridCommandButton>
+                </GridCommandColumn>
+            </GridColumns>
+        </TelerikGrid>
     </div>
 }
 
@@ -93,53 +94,52 @@
             <label for="PartNumber" class="col-sm-2 col-form-label">Part Number</label>
             <div class="col-md-10 bg-w">
                 <TelerikAutoComplete Data="@MasterParts" @bind-Value="@selectedMasterPart"
-                     ValueField="@( nameof(MasterPart.PartNumber) )"
-                     Filterable="true" MinLength="3"
-                     OnChange="@MyOnChangeHandler"
-                     ClearButton="true" 
-                     Enabled=@(AddEditDeviation.DeviationId<=0)
-                     Placeholder="Type Part Number And Select Part"
-                     />
+                                 ValueField="@( nameof(MasterPart.PartNumber) )"
+                                 Filterable="true" MinLength="3"
+                                 OnChange="@MyOnChangeHandler"
+                                 ClearButton="true"
+                                 Enabled=@(AddEditDeviation.DeviationId<=0)
+                                 Placeholder="Type Part Number And Select Part" />
             </div>
         </div>
 
-    <EditForm EditContext="@ECAddEditDeviation">
-        <DataAnnotationsValidator />
+        <EditForm EditContext="@ECAddEditDeviation">
+            <DataAnnotationsValidator />
 
 
-        @*                <div class="form-group row">
-            <label for="ItemPortNumber" class="col-sm-2 col-form-label">Item Number</label>
-            <div class="col-md-11">
-            <TelerikTextBox @bind-Value="@AddEditDeviation.MasterPart." Class="form-control"></TelerikTextBox>
-            <ValidationMessage For="@(() => AddEditDeviation.ItemPortNumber)"></ValidationMessage>
-            </div>
-            </div>*@
-
-         <div class="form-group row m-tb">
-            <label for="PortDescription" class="col-sm-2 col-form-label">Part Description</label>
-            <div class="col-md-10 bg-w">
-                <label style="padding-top:10px;">@selectedMasterPartDescription</label>
-            </div>
+            @*                <div class="form-group row">
+        <label for="ItemPortNumber" class="col-sm-2 col-form-label">Item Number</label>
+        <div class="col-md-11">
+        <TelerikTextBox @bind-Value="@AddEditDeviation.MasterPart." Class="form-control"></TelerikTextBox>
+        <ValidationMessage For="@(() => AddEditDeviation.ItemPortNumber)"></ValidationMessage>
         </div>
+        </div>*@
 
-        <div class="form-group row m-tb">
-           <label for="Title" class="col-sm-2 col-form-label">Title</label>
-           <div class="col-md-10">
-            <TelerikTextBox @bind-Value="@AddEditDeviation.Title" Class="form-control"></TelerikTextBox>
-           <ValidationMessage For="@(() => AddEditDeviation.Title)"></ValidationMessage>
-                
+            <div class="form-group row m-tb">
+                <label for="PortDescription" class="col-sm-2 col-form-label">Part Description</label>
+                <div class="col-md-10 bg-w">
+                    <label style="padding-top:10px;">@selectedMasterPartDescription</label>
+                </div>
             </div>
-        </div>
 
-        <div class="form-group row m-tb">
-           <label for="ReasonforManufacturingDeviation" class="col-sm-2 col-form-label">Reason for Manufacturing Deviation</label>
-           <div class="col-md-10">
-           <textarea @bind-value="AddEditDeviation.ReasonforManufacturingDeviation" class="form-control" rows="8" @bind-value:event="oninput"></textarea>
-           <ValidationMessage For="@(() => AddEditDeviation.ReasonforManufacturingDeviation)"></ValidationMessage>
-           </div>
-        </div>
+            <div class="form-group row m-tb">
+                <label for="Title" class="col-sm-2 col-form-label">Title</label>
+                <div class="col-md-10">
+                    <TelerikTextBox @bind-Value="@AddEditDeviation.Title" Class="form-control"></TelerikTextBox>
+                    <ValidationMessage For="@(() => AddEditDeviation.Title)"></ValidationMessage>
 
-        
+                </div>
+            </div>
+
+            <div class="form-group row m-tb">
+                <label for="ReasonforManufacturingDeviation" class="col-sm-2 col-form-label">Reason for Manufacturing Deviation</label>
+                <div class="col-md-10">
+                    <textarea @bind-value="AddEditDeviation.ReasonforManufacturingDeviation" class="form-control" rows="8" @bind-value:event="oninput"></textarea>
+                    <ValidationMessage For="@(() => AddEditDeviation.ReasonforManufacturingDeviation)"></ValidationMessage>
+                </div>
+            </div>
+
+
             <div class="form-group row location-section-dev">
                 <div class="col-md-12">
                     <table>
@@ -174,71 +174,71 @@
                     </table>
                 </div>
             </div>
-        
-        
-        <div class="form-group row m-tb">
-            <label for="ECORequired" class="col-sm-2 col-form-label">ECO Required</label>
-            <div class="col-sm-7">
-                @*<InputRadioGroup Name="ECORequired" @bind-Value="AddEditDeviation.ECORequired">
-                    <InputRadio Name="ECORequired" Value="@(true)" /> Yes
-                    <InputRadio Name="ECORequired" Value="@(false)" /> No
-                </InputRadioGroup>*@
-                <ul class="switch-btn dev">
-                   <li class="@AddActiveCssClass" @onclick="(() => OnECORequiredChangeHandler(true))"> Yes</li>
-                   <li class="@AddInActiveCssClass" @onclick="(() => OnECORequiredChangeHandler(false))"> No</li>
-                </ul>
-                <ValidationMessage For="@(() => AddEditDeviation.ECORequired)"></ValidationMessage>
-            </div>
-        </div>
 
-        @if (AddEditDeviation.ECORequired)
-        {
+
             <div class="form-group row m-tb">
-                <label for="ECONumber" class="col-sm-2 col-form-label">ECO Number</label>
-                <div class="col-md-2 h-40">
-                    <TelerikTextBox @bind-Value="@AddEditDeviation.ECONumber" Class="form-control"></TelerikTextBox>
-                    <ValidationMessage For="@(() => AddEditDeviation.ECONumber)"></ValidationMessage>
+                <label for="ECORequired" class="col-sm-2 col-form-label">ECO Required</label>
+                <div class="col-sm-7">
+                    @*<InputRadioGroup Name="ECORequired" @bind-Value="AddEditDeviation.ECORequired">
+                <InputRadio Name="ECORequired" Value="@(true)" /> Yes
+                <InputRadio Name="ECORequired" Value="@(false)" /> No
+                </InputRadioGroup>*@
+                    <ul class="switch-btn dev">
+                        <li class="@AddActiveCssClass" @onclick="(() => OnECORequiredChangeHandler(true))"> Yes</li>
+                        <li class="@AddInActiveCssClass" @onclick="(() => OnECORequiredChangeHandler(false))"> No</li>
+                    </ul>
+                    <ValidationMessage For="@(() => AddEditDeviation.ECORequired)"></ValidationMessage>
                 </div>
-                <div class="col-md-8"></div>
             </div>
-        }
 
-        <div class="form-group row m-tb">
-            
+            @if (AddEditDeviation.ECORequired)
+            {
+                <div class="form-group row m-tb">
+                    <label for="ECONumber" class="col-sm-2 col-form-label">ECO Number</label>
+                    <div class="col-md-2 h-40">
+                        <TelerikTextBox @bind-Value="@AddEditDeviation.ECONumber" Class="form-control"></TelerikTextBox>
+                        <ValidationMessage For="@(() => AddEditDeviation.ECONumber)"></ValidationMessage>
+                    </div>
+                    <div class="col-md-8"></div>
+                </div>
+            }
+
+            <div class="form-group row m-tb">
+
                 <label class="col-sm-2 col-form-label" for="ReasonforManufacturingDeviation">Comment <br>Corrective <br>Action</label><br>
                 <div class="col-md-10">
-                <textarea @bind-value="AddEditDeviation.CommentCorrectiveAction" class="form-control" rows="4" @bind-value:event="oninput"></textarea>
-                <ValidationMessage For="@(() => AddEditDeviation.CommentCorrectiveAction)"></ValidationMessage>
+                    <textarea @bind-value="AddEditDeviation.CommentCorrectiveAction" class="form-control" rows="4" @bind-value:event="oninput"></textarea>
+                    <ValidationMessage For="@(() => AddEditDeviation.CommentCorrectiveAction)"></ValidationMessage>
+                </div>
+
             </div>
 
-        </div>
-
-        <br />
-        <div class="row">
-            <div class="col-md-12">
-                 <hr>
-                <h5>Affected Serial Numbers</h5>
+            <br />
+            <div class="row">
+                <div class="col-md-12">
+                    <hr>
+                    <h5>Affected Serial Numbers</h5>
+                </div>
             </div>
-        </div>
 
-        <div class="row">
-             <div class="col-md-6">
-                 <TelerikTabStrip @bind-ActiveTabIndex="@ActiveTabIndex">
+            <div class="row">
+                <div class="col-md-6">
+                    <TelerikTabStrip @bind-ActiveTabIndex="@ActiveTabIndex">
                         <TabStripTab Title="Manually">
                             @if (RangeAddPartsToDeviationError != null && RangeAddPartsToDeviationError.Count() > 0)
                             {
                                 <div class="row">
-                                    <label class="text-danger">Total&nbsp;@RangeAddPartsToDeviationError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br/><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
+                                    <label class="text-danger">Total&nbsp;@RangeAddPartsToDeviationError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br /><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
                                     @if (IsDisplayRangeTextArea)
                                     {
-                                        string errorSerialNumber = string.Join(", ", RangeAddPartsToDeviationError.Select(x=>x.SerialNumber));
+                                        string errorSerialNumber = string.Join(", ", RangeAddPartsToDeviationError.Select(x => x.SerialNumber));
                                         <textarea @bind-value="errorSerialNumber" class="form-control" rows="4" @bind-value:event="oninput" style="width: 56%;margin-left: 12px;margin-bottom: 20px;"></textarea>
                                     }
                                 </div>
                             }
                             <div class="row">
                                 <div class="col-md-10">
-                                    <input type="text" class="form-control numeric" @bind-value="@SerialNumber" placeholder="ADD SERIAL NUMBER"/>
+                                    <input type="text" class="form-control numeric" @bind-value="@SerialNumber" placeholder="ADD SERIAL NUMBER" />
                                 </div>
                                 <div class="col-md-2">
                                     <TelerikButton Class="RightButton" @onclick="(()=> btnAddFindSerailNumberOnClick())">Add</TelerikButton>
@@ -246,18 +246,18 @@
                             </div>
                         </TabStripTab>
                         <TabStripTab Title="Range">
-                           <form Model="@serialNumberRange" @onsubmit="OnSubmitRange">
+                            <form Model="@serialNumberRange" @onsubmit="OnSubmitRange">
                                 @*<DataAnnotationsValidator />*@
                                 <ValidationSummary />
                                 @if (RangeAddPartsToDeviationError != null && RangeAddPartsToDeviationError.Count() > 0)
                                 {
                                     <div class="row">
-                                        @if(!string.IsNullOrWhiteSpace(serialNumberRange.StartSerialNumber) && !string.IsNullOrWhiteSpace(serialNumberRange.EndSerialNumber))
+                                        @if (!string.IsNullOrWhiteSpace(serialNumberRange.StartSerialNumber) && !string.IsNullOrWhiteSpace(serialNumberRange.EndSerialNumber))
                                         {
-                                            <label class="text-danger">Total&nbsp;@RangeAddPartsToDeviationError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br/><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
+                                            <label class="text-danger">Total&nbsp;@RangeAddPartsToDeviationError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br /><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
                                             @if (IsDisplayRangeTextArea)
                                             {
-                                                string errorSerialNumber = string.Join(", ", RangeAddPartsToDeviationError.Select(x=>x.SerialNumber));
+                                                string errorSerialNumber = string.Join(", ", RangeAddPartsToDeviationError.Select(x => x.SerialNumber));
                                                 <textarea @bind-value="errorSerialNumber" class="form-control" rows="4" @bind-value:event="oninput" style="width: 56%;margin-left: 12px;"></textarea>
                                             }
                                         }
@@ -269,22 +269,23 @@
                                 }
                                 <div class="form-group row">
                                     <label for="startSerialNumber" class="col-md-10 col-form-label h-40 input-label postion-top">
-                                        <span class="title-u">Start Serial Number</span> 
+                                        <span class="title-u">Start Serial Number</span>
                                         <TelerikTextBox @bind-Value="@serialNumberRange.StartSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
                                     </label>
-                                     <div class="col-sm-2"></div>
+                                    <div class="col-sm-2"></div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-1 m-left"><img src="images/line-dash.png"></div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="endSerialNumber" class="col-md-10 col-form-label h-40 input-label postion-bottom">
-                                        <span class="title-u">End Serial Number</span> 
-                                        <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox></label>
+                                        <span class="title-u">End Serial Number</span>
+                                        <TelerikTextBox @bind-Value="@serialNumberRange.EndSerialNumber" Class="form-control numeric" PlaceHolder="Type in a serial number"></TelerikTextBox>
+                                    </label>
                                     <div class="col-sm-2"></div>
                                 </div>
                                 <div class="form-group row" style="margin-top:15px;">
-                               
+
                                     <div class="col-md-12">
                                         <div class="range-add"><TelerikButton Class="SaveButton">+ Add Range</TelerikButton></div>
                                     </div>
@@ -295,10 +296,10 @@
                             @if (ExcelAddPartsToDeviationError != null && ExcelAddPartsToDeviationError.Count() > 0)
                             {
                                 <div class="row">
-                                    <label class="text-danger">Total&nbsp;@ExcelAddPartsToDeviationError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br/><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
+                                    <label class="text-danger">Total&nbsp;@ExcelAddPartsToDeviationError.Count()&nbsp;Serial Number was not listed in Stage.&nbsp;<br /><a href="javascript:void(0)" @onclick="(() => ViewErrorSerialNumberDetail())">Click here for more details</a></label>
                                     @if (IsDisplayRangeTextArea)
                                     {
-                                        string errorSerialNumber = string.Join(", ", ExcelAddPartsToDeviationError.Select(x=>x.SerialNumber));
+                                        string errorSerialNumber = string.Join(", ", ExcelAddPartsToDeviationError.Select(x => x.SerialNumber));
                                         <textarea @bind-value="errorSerialNumber" class="form-control" rows="4" @bind-value:event="oninput" style="width: 56%;margin-left: 12px;margin-bottom: 20px;"></textarea>
                                     }
                                 </div>
@@ -306,22 +307,22 @@
                             <form @onsubmit="OnSubmitExcelFile">
                                 <div class="form-group row">
                                     <div class="uplaod-box">
-                                <span>Select an Excel File to upload...</span>
-                                    <InputFile OnChange="OnInputFileChange" />
+                                        <span>Select an Excel File to upload...</span>
+                                        <InputFile OnChange="OnInputFileChange" accept=".xlsx;.xls" />
                                     </div>
                                 </div>
-                                 <div class="form-group row">
-                                   <div class="col-md-12"><TelerikButton Class="UploadexlButton" Icon="upload">Upload Selected File</TelerikButton></div>
+                                <div class="form-group row">
+                                    <div class="col-md-12"><TelerikButton Class="UploadexlButton" Icon="upload">Upload Excel File</TelerikButton></div>
                                 </div>
                             </form>
 
                         </TabStripTab>
-                </TelerikTabStrip>
-             </div>
-             <div class="col-md-6">
-                 <br/>
-                  <div class="form-group row affects-p">
-                      <h3 class="affect-p">Affected Parts</h3>
+                    </TelerikTabStrip>
+                </div>
+                <div class="col-md-6">
+                    <br />
+                    <div class="form-group row affects-p">
+                        <h3 class="affect-p">Affected Parts</h3>
                         <TelerikGrid Data=@GridParts Sortable="true" Pageable="false" OnDelete="@OnDeleteDeviationPart">
                             <GridColumns>
                                 <GridColumn Field=@nameof(Part.SerialNumber) Title="Serial Number" Filterable="false">
@@ -335,14 +336,14 @@
                             </NoDataTemplate>
                         </TelerikGrid>
                     </div>
-             </div>
-        </div>
-        <br />
-        <div class="row">
-            <TelerikButton Class="SaveButton" OnClick="(()=>HandleValidSubmit())">Save</TelerikButton>
-        </div>
-        <br />
-    </EditForm>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <TelerikButton Class="SaveButton" OnClick="(()=>HandleValidSubmit())">Save</TelerikButton>
+            </div>
+            <br />
+        </EditForm>
     </div>
 }
 
@@ -368,7 +369,7 @@
     public string AddActiveCssClass { get; set; } = "active";
 
     public string AddInActiveCssClass { get; set; }
-    
+
     public bool IsDisplayRangeTextArea = false;
 
     protected override async Task OnInitializedAsync()
@@ -439,13 +440,13 @@
 
         if (AddEditDeviation.ECORequired == true)
         {
-                AddActiveCssClass = "active";
-                AddInActiveCssClass = string.Empty;
+            AddActiveCssClass = "active";
+            AddInActiveCssClass = string.Empty;
         }
-        else if(AddEditDeviation.ECORequired == false)
-        { 
-                AddActiveCssClass = string.Empty;
-                AddInActiveCssClass = "active";
+        else if (AddEditDeviation.ECORequired == false)
+        {
+            AddActiveCssClass = string.Empty;
+            AddInActiveCssClass = "active";
         }
 
         if (AddEditDeviation != null)
@@ -454,13 +455,19 @@
         }
         StateHasChanged();
     }
-    string Message = "No file(s) selected";
-    IReadOnlyList<IBrowserFile> selectedFiles;
+    IBrowserFile selectedFile;
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
-        selectedFiles = e.GetMultipleFiles();
-        Message = $"{selectedFiles.Count} file(s) selected";
+        if (e.File.Name.ToLower().EndsWith(".xls") || e.File.Name.ToLower().EndsWith(".xlsx"))
+        {
+            selectedFile = e.File;
+        }
+        else
+        {
+            selectedFile = null;
+            toastService.ShowError("Please Select Excel File.", "Error");
+        }
         this.StateHasChanged();
     }
 
@@ -472,29 +479,45 @@
             return;
         }
 
-        foreach (var file in selectedFiles)
+        if (selectedFile == null)
         {
-            var path = await BlobService.UploadBlob(file);
-
-            MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
-
-            var errors = await ExcelUploadService.ProcessSerialNumberExcelFile(path, selectedMasterPart);
-            if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
-            {
-                GridParts.AddRange(errors.Parts);
-                GridParts = new List<Part>(GridParts.Distinct().ToList());
-            }
-
-            if (errors != null && errors.AddPartsToDeviationError != null && errors.AddPartsToDeviationError.Count() > 0)
-            {
-                ExcelAddPartsToDeviationError = errors.AddPartsToDeviationError;
-            }
-            else
-            {
-                ExcelAddPartsToDeviationError = null;
-            }
+            toastService.ShowError("Please Select Excel File.", "Error");
+            return;
         }
-        Message = $"{selectedFiles.Count} file(s) uploaded on server";
+
+        MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
+        if (selectedMasterPart == null)
+        {
+            toastService.ShowError("Master Part Not Found.", "Error");
+            return;
+        }
+
+        //foreach (var file in selectedFiles)
+        //{
+        var path = await BlobService.UploadBlob(selectedFile);
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            toastService.ShowError("Error in upload file.", "Error");
+            return;
+        }
+        selectedFile = null;
+        var errors = await ExcelUploadService.ProcessSerialNumberExcelFile(path, selectedMasterPart);
+        if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
+        {
+            GridParts.AddRange(errors.Parts);
+            GridParts = new List<Part>(GridParts.Distinct().ToList());
+        }
+
+        if (errors != null && errors.AddPartsToDeviationError != null && errors.AddPartsToDeviationError.Count() > 0)
+        {
+            ExcelAddPartsToDeviationError = errors.AddPartsToDeviationError;
+        }
+        else
+        {
+            ExcelAddPartsToDeviationError = null;
+        }
+        //}
+
         this.StateHasChanged();
     }
 
@@ -522,13 +545,13 @@
         {
             try
             {
-                if (long.Parse(serialNumberRange.StartSerialNumber) > long.Parse(serialNumberRange.EndSerialNumber) )
+                if (long.Parse(serialNumberRange.StartSerialNumber) > long.Parse(serialNumberRange.EndSerialNumber))
                 {
                     toastService.ShowError("Start serial number lower than end serial number.", "Error");
                     return;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 toastService.ShowError("Please enter valid serial number.", "Error");
                 return;
@@ -536,7 +559,7 @@
 
             MasterPart selectedMasterPart = MasterParts.Where(x => x.MasterPartId == AddEditDeviation.MasterPartId).FirstOrDefault();
 
-            var errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, long.Parse(serialNumberRange.StartSerialNumber),long.Parse(serialNumberRange.EndSerialNumber));
+            var errors = await PartService.AddPartsToDeviationByStartEnd(selectedMasterPart, long.Parse(serialNumberRange.StartSerialNumber), long.Parse(serialNumberRange.EndSerialNumber));
             if (errors != null && errors.Parts != null && errors.Parts.Count() > 0 && GridParts != null)
             {
                 GridParts.AddRange(errors.Parts);
@@ -673,8 +696,8 @@
             AddActiveCssClass = "active";
             AddInActiveCssClass = string.Empty;
         }
-        else if(value == false)
-        { 
+        else if (value == false)
+        {
             AddEditDeviation.ECORequired = false;
             AddActiveCssClass = string.Empty;
             AddInActiveCssClass = "active";
@@ -683,9 +706,9 @@
 
     public async Task btnCancelDeviationOnClick()
     {
-         AddEditDeviation = null;
-         await this.OnInitializedAsync();
-         StateHasChanged();
+        AddEditDeviation = null;
+        await this.OnInitializedAsync();
+        StateHasChanged();
     }
 
     public async Task ViewErrorSerialNumberDetail()

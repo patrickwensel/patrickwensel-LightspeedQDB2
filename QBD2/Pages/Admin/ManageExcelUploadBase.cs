@@ -45,40 +45,39 @@ namespace QBD2.Pages.Admin
                 if (selectedFiles != null)
                 {
                     string subPath = _appSettings.Value.LocalFileUploadPath; // Your code goes here
-
-                    bool exists = System.IO.Directory.Exists(subPath);
-
-                    if (!exists)
-                        System.IO.Directory.CreateDirectory(subPath);
+                    if (!Directory.Exists(subPath))
+                    {
+                        Directory.CreateDirectory(subPath);
+                    }
 
                     foreach (var file in selectedFiles)
                     {
                         if (file.Name.EndsWith(".xls") || file.Name.EndsWith(".xlsx"))
                         {
-                            if (this._appSettings.Value.FileUploadType.ToLower() == FileUploadType.Local.ToString().ToLower())
-                            {
-                                Stream stream = file.OpenReadStream(100000000);//100MB
-                                path = _appSettings.Value.LocalFileUploadPath + file.Name;
-                                FileStream fs = File.Create(path);
-                                await stream.CopyToAsync(fs);
-                                stream.Close();
-                                fs.Close();
+                            //if (this._appSettings.Value.FileUploadType.ToLower() == FileUploadType.Local.ToString().ToLower())
+                            //{
+                            Stream stream = file.OpenReadStream(100000000);//100MB
+                            path = $"{_appSettings.Value.LocalFileUploadPath}{Guid.NewGuid()}-{file.Name}";
+                            FileStream fs = File.Create(path);
+                            await stream.CopyToAsync(fs);
+                            stream.Close();
+                            fs.Close();
 
-                                var errors = await _excelUploadService.ProcessExcelFile(path);
-                                if (errors != null && errors.AddPartsToExcelUploadError != null && errors.AddPartsToExcelUploadError.Count() > 0)
-                                {
-                                    AddPartsToExcelUploadError = errors.AddPartsToExcelUploadError;
-                                }
-                                else
-                                {
-                                    AddPartsToExcelUploadError = null;
-                                    ToastService.ShowSuccess("File Uploaded Successfully", "Success");
-                                }
+                            var errors = await _excelUploadService.ProcessExcelFile(path);
+                            if (errors != null && errors.AddPartsToExcelUploadError != null && errors.AddPartsToExcelUploadError.Count() > 0)
+                            {
+                                AddPartsToExcelUploadError = errors.AddPartsToExcelUploadError;
                             }
                             else
                             {
-
+                                AddPartsToExcelUploadError = null;
+                                ToastService.ShowSuccess("File Uploaded Successfully", "Success");
                             }
+                            //}
+                            //else
+                            //{
+
+                            //}
                         }
                     }
 
@@ -97,7 +96,7 @@ namespace QBD2.Pages.Admin
             }
             finally
             {
-                IsUploading=false;
+                IsUploading = false;
                 this.StateHasChanged();
             }
         }

@@ -58,6 +58,11 @@ namespace QBD2.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            #region WorkOrderStatuses
+            modelBuilder.Entity<WorkOrderStatus>().HasData(new WorkOrderStatus { WorkOrderStatusId = 1, Name = "Pending" });
+            modelBuilder.Entity<WorkOrderStatus>().HasData(new WorkOrderStatus { WorkOrderStatusId = 2, Name = "InProgress" });
+            modelBuilder.Entity<WorkOrderStatus>().HasData(new WorkOrderStatus { WorkOrderStatusId = 3, Name = "Completed" });
+            #endregion
             #region MRBDisposition
 
             modelBuilder.Entity<MRBDisposition>().HasData(new MRBDisposition { MRBDispositionId = 1, Name = "Review" });

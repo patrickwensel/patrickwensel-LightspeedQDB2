@@ -3,7 +3,7 @@
 @using QBD2.Services
 @using QBD2.Entities
 @inject WorkOrderStatusService WorkOrderStatusService
-
+@inject IToastService toastService
 <style>
     .k-dialog-wrapper {
     position: inherit;   
@@ -84,10 +84,16 @@ label.k-form-label {
     async Task DeleteHandler(GridCommandEventArgs args)
     {
         WorkOrderStatus item = (WorkOrderStatus)args.Item;
+        if (item.WorkOrderStatusId == 2 || item.WorkOrderStatusId == 3)
+        {
+            toastService.ShowError("You can't delete InProgress and Completed work order status.", "Error");
+        }
+        else
+        {
+            await WorkOrderStatusService.Delete(item);
 
-        await WorkOrderStatusService.Delete(item);
-
-        await GetGridData();
+            await GetGridData();
+        }
     }
 
     async Task CreateHandler(GridCommandEventArgs args)

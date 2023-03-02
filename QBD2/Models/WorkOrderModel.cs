@@ -21,6 +21,7 @@ namespace QBD2.Models
         public virtual BuildTemplate BuildTemplate { get; set; }
 
         public int Quantity { get; set; }
+        public string PONumber { get; set; }
 
         public string BuildTemplateMasterPartName { get; set; }
 

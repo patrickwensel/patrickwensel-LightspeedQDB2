@@ -129,16 +129,17 @@ namespace QBD2.Services
 
                 if (inspection.Pass)
                 {
-                    //if (objInspectionFailure != null && objInspectionFailure.BuildStationInspectionFailureId > 0)
-                    //{
-                    //    _context.BuildStationInspectionFailures.Remove(objInspectionFailure);
-                    //    await _context.SaveChangesAsync();
-                    //    inspection.BuildStationInspectionFailed.BuildStationInspectionFailureId = 0;
-                    //}
+                    var buildStationInspectionFailures = await _context.BuildStationInspectionFailures.Where(x => x.BuildStationInspectionId == inspection.BuildStationInspectionId).ToListAsync();
+                    if (buildStationInspectionFailures.Count > 0)
+                    {
+                        _context.BuildStationInspectionFailures.RemoveRange(buildStationInspectionFailures);
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 else
                 {
-                    if (inspection.BuildStationInspectionFailedList != null)
+                    var buildStationInspectionFailures = await _context.BuildStationInspectionFailures.Where(x => x.BuildStationInspectionId == inspection.BuildStationInspectionId).ToListAsync();
+                    if (inspection.BuildStationInspectionFailedList != null && inspection.BuildStationInspectionFailedList.Count > 0)
                     {
                         foreach (var BuildInspectionFailed in inspection.BuildStationInspectionFailedList)
                         {
@@ -163,11 +164,50 @@ namespace QBD2.Services
                             await _context.SaveChangesAsync();
                             BuildInspectionFailed.BuildStationInspectionFailureId = objInspectionFailure.BuildStationInspectionFailureId;
                         }
+
+                        var deleteBuildStationInspectionFailures = buildStationInspectionFailures.Where(x => inspection.BuildStationInspectionFailedList.Any(y => y.BuildStationInspectionFailureId == x.BuildStationInspectionFailureId) == false).ToList();
+                        if (deleteBuildStationInspectionFailures.Count > 0)
+                        {
+                            _context.BuildStationInspectionFailures.RemoveRange(deleteBuildStationInspectionFailures);
+                            await _context.SaveChangesAsync();
+                        }
                     }
-                    //await _context.SaveChangesAsync();
-                    //inspection.BuildStationInspectionFailed.BuildStationInspectionFailureId = objInspectionFailure.BuildStationInspectionFailureId;
+                    else
+                    {
+                        _context.BuildStationInspectionFailures.RemoveRange(buildStationInspectionFailures);
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 await _context.SaveChangesAsync();
+
+
+                Entities.BuildStationInspectionHistory buildStationInspectionHistory = new Entities.BuildStationInspectionHistory();
+                buildStationInspectionHistory.Pass = inspection.Pass;
+                buildStationInspectionHistory.GeneralComments = inspection.GeneralComments;
+                buildStationInspectionHistory.PartId = inspection.PartId;
+                buildStationInspectionHistory.BuildStationId = inspection.BuildStationId;
+                buildStationInspectionHistory.WorkOrderId = inspection.WorkOrderId;
+                buildStationInspectionHistory.UpdateDate = DateTime.Now;
+                buildStationInspectionHistory.IsCompleteBuildStation = inspection.IsCompleteBuildStation;
+                _context.BuildStationInspectionHistories.Add(buildStationInspectionHistory);
+                await _context.SaveChangesAsync();
+
+                if (!inspection.Pass)
+                {
+                    if (inspection.BuildStationInspectionFailedList != null && inspection.BuildStationInspectionFailedList.Count > 0)
+                    {
+                        foreach (var BuildInspectionFailed in inspection.BuildStationInspectionFailedList)
+                        {
+                            Entities.BuildStationInspectionFailureHistory buildStationInspectionFailureHistory = new Entities.BuildStationInspectionFailureHistory();
+                            buildStationInspectionFailureHistory.Comment = BuildInspectionFailed.Comment;
+                            buildStationInspectionFailureHistory.BuildStationInspectionHistoryId = buildStationInspectionHistory.BuildStationInspectionHistoryId;
+                            buildStationInspectionFailureHistory.FailureTypeId = BuildInspectionFailed.FailureTypeId;
+                            _context.BuildStationInspectionFailureHistories.Add(buildStationInspectionFailureHistory);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                }
+
                 return true;
             }
             catch

@@ -56,6 +56,9 @@ namespace QBD2.Data
         public DbSet<BuildStationInspectionFailure> BuildStationInspectionFailures { get; set; }
         public DbSet<BuildStationInspection> BuildStationInspections { get; set; }
 
+        public DbSet<BuildStationInspectionFailureHistory> BuildStationInspectionFailureHistories { get; set; }
+        public DbSet<BuildStationInspectionHistory> BuildStationInspectionHistories { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             #region WorkOrderStatuses
@@ -217,7 +220,8 @@ namespace QBD2.Data
             modelBuilder.Entity<InspectionFailure>().Property(m => m.FailureTypeId).IsRequired(false);
             modelBuilder.Entity<InspectionFailure>().Property(m => m.BuildStationFailureCodeId).IsRequired(false);
             modelBuilder.Entity<InspectionFailure>().Property(m => m.Comment).IsRequired(false);
-          //  modelBuilder.Entity<BuildStation>().HasMany(s => s.BuildTemplates).WithOne(c => c.BuildStation).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<WorkOrder>().HasMany(x => x.BuildStationInspectionHistories).WithOne(x => x.WorkOrder).OnDelete(DeleteBehavior.NoAction);
+            //  modelBuilder.Entity<BuildStation>().HasMany(s => s.BuildTemplates).WithOne(c => c.BuildStation).OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
 

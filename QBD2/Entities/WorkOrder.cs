@@ -33,5 +33,7 @@ namespace QBD2.Entities
         public int Quantity { get; set; }
 
         public string? PONumber { get; set; }
+
+        public virtual List<BuildStationInspectionHistory> BuildStationInspectionHistories { get; set; }
     }
 }

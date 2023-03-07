@@ -90,7 +90,7 @@ namespace QBD2.Services
                     dropDownitemsList = _context.FailureTypePrimaries.Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.FailureTypePrimaryId }).ToList();
                     break;
                 case Models.Enum.DropDownType.FailureType:
-                    dropDownitemsList = _context.FailureTypes.Where(p => p.FailureTypePrimaryId == value).Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.FailureTypePrimaryId }).ToList();
+                    dropDownitemsList = _context.FailureTypes.Where(p => p.FailureTypePrimaryId == value).Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.FailureTypeId }).ToList();
                     break;
                 case Models.Enum.DropDownType.Station:
                     dropDownitemsList = _context.Stations.Select(p => new Models.DropDownBind { DropText = p.Name, DropValue = p.StationId }).ToList();

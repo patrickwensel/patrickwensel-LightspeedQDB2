@@ -806,14 +806,12 @@
         PrimaryDDOnChangeHandler();
         dataFailureGrid = new List<Models.BuildStationInspectionFailed>(dataFailureGrid);
         OriginalBuildStationInspection.BuildStationInspectionFailedList = dataFailureGrid;
-
     }
 
     async Task DeleteHandler(GridCommandEventArgs args)
     {
         Models.BuildStationInspectionFailed item = (Models.BuildStationInspectionFailed)args.Item;
-        dataFailureGrid.Remove(item);
-
+        OriginalBuildStationInspection.BuildStationInspectionFailedList.Remove(item);
     }
 
     List<Models.DropDownBind> dataBuildStationFailureCodeDropdown { get; set; }

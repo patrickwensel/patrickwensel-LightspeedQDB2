@@ -399,6 +399,61 @@ namespace QBD2.Services
             return workOrderDropDowns;
         }
 
+        public async Task<UserWorkOrderDetail> GetUserWorkOrderDetailById(int WorkOrderId, int BuildStationId, int PartId)
+        {
+            UserWorkOrderDetail userWorkOrderDetail = new UserWorkOrderDetail();
+            var workOrder = await _context.WorkOrders.Include(x => x.WorkOrderType).Include(x => x.WorkOrderStatus).Include(x => x.WorkOrderPriority)
+                .Where(x => x.WorkOrderId == WorkOrderId)
+                .Select(x => x).FirstOrDefaultAsync();
+            userWorkOrderDetail.IsAllowSave = false;
+
+            if (workOrder != null)
+            {
+                userWorkOrderDetail.Type = workOrder.WorkOrderType.Name;
+                userWorkOrderDetail.Status = workOrder.WorkOrderStatus.Name;
+                userWorkOrderDetail.Priority = workOrder.WorkOrderPriority.Name;
+            }
+
+            var buildStation = await _context.BuildStations.FirstOrDefaultAsync(x => x.BuildStationId == BuildStationId);
+            if (buildStation != null)
+            {
+                userWorkOrderDetail.StationName = buildStation.Name;
+
+                userWorkOrderDetail.Parts = await _context.Parts.Include(x => x.MasterPart)
+                                .Where(x => x.ParentPartId == PartId && x.BuildStationId == BuildStationId)
+                                  .Select(x => new EditPartModel()
+                                  {
+                                      PartId = x.PartId,
+                                      SerialNumber = x.SerialNumber,
+                                      MasterPartId = x.MasterPartId,
+                                      BuildStationId = x.BuildStationId,
+                                      PartNumber = x.MasterPart.PartNumber
+                                  }).ToListAsync();
+
+                var buildStationInspection = await _buildStationInspectionService.GetInspectionByWorkOrderIdAndPartId(WorkOrderId, PartId, BuildStationId);
+                if (buildStationInspection.BuildStationInspectionId <= 0)
+                {
+                    userWorkOrderDetail.IsFoundStation = false;
+                    userWorkOrderDetail.ErrorMessage = "Sation Data not found.";
+                }
+                else
+                {
+                    userWorkOrderDetail.BuildStationInspectionModel = buildStationInspection;
+                    userWorkOrderDetail.IsFoundStation = true;
+                    if (buildStationInspection.Pass)
+                    {
+                        userWorkOrderDetail.IsAllowSave = false;
+                    }
+                    else
+                    {
+                        userWorkOrderDetail.IsAllowSave = true;
+                    }
+                }
+            }
+
+            return userWorkOrderDetail;
+        }
+
         public async Task<UserWorkOrderDetail> GetUserWorkOrderDetail(int WorkOrderId)
         {
             UserWorkOrderDetail userWorkOrderDetail = new UserWorkOrderDetail();

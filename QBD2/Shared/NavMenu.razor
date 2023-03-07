@@ -47,12 +47,7 @@
                         </NavLink>
                     }
 
-                    @if (context.User.IsInRole(RoleType.Admin.ToString()) || context.User.IsInRole(RoleType.WorkOrderAdmin.ToString()))
-                    {
-                        <NavLink class="nav-link" href="manageworkorder">
-                            <i class="fa-light fa-file-circle-check"></i> <span>Manage Work Order</span>
-                        </NavLink>
-                    }
+
 
                     <NavLink class="nav-link" href="inspection">
                         <i class="fa-light fa-magnifying-glass"></i> <span>Inspection</span>
@@ -81,78 +76,84 @@
                         <i class="fa-light fa-arrows-turn-to-dots"></i> <span>Deviations</span>
                     </NavLink>
                     <!--Admin--->
+                    @if (context.User.IsInRole(RoleType.Admin.ToString()) || context.User.IsInRole(RoleType.WorkOrderAdmin.ToString()))
+                    {
+                        <NavLink class="nav-link" href="manageproductfamily">
+                            <i class="fa-light fa-cart-flatbed-boxes"></i> <span>Manage Product Families</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="manageproductfamily">
-                        <i class="fa-light fa-cart-flatbed-boxes"></i> <span>Manage Product Families</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="managestation">
+                            <i class="fa-light fa-people-roof"></i> <span>Manage Stations</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="managestation">
-                        <i class="fa-light fa-people-roof"></i> <span>Manage Stations</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="managemasterpart">
+                            <i class="fa-light fa-gear"></i> <span>Manage Master Parts</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="managemasterpart">
-                        <i class="fa-light fa-gear"></i> <span>Manage Master Parts</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="manageexcelupload">
+                            <i class="fa-light fa-upload"></i> <span>Manage Excel Upload</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="manageexcelupload">
-                        <i class="fa-light fa-upload"></i> <span>Manage Excel Upload</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="managepart">
+                            <i class="fa-light fa-gears"></i> <span>Manage Parts</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="managepart">
-                        <i class="fa-light fa-gears"></i> <span>Manage Parts</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="manageusers">
+                            <i class="fa-light fa-users"></i> <span>Manage Users</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="manageusers">
-                        <i class="fa-light fa-users"></i> <span>Manage Users</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="manageglcode">
+                            <i class="fa-light fa-barcode"></i> <span>Manage GL Codes</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="manageglcode">
-                        <i class="fa-light fa-barcode"></i> <span>Manage GL Codes</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="managefailurecode">
+                            <i class="fa-light fa-file"></i> <span>Manage Failure Codes</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="managefailurecode">
-                        <i class="fa-light fa-file"></i> <span>Manage Failure Codes</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="managepartstatus">
+                            <i class="fa-light fa-align-center"></i> <span>Manage Part Statuses</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="managepartstatus">
-                        <i class="fa-light fa-align-center"></i> <span>Manage Part Statuses</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="managescarcarresolution">
+                            <i class="fa-light fa-braille"></i> <span>Manage Scar Car Resolutions</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="managescarcarresolution">
-                        <i class="fa-light fa-braille"></i> <span>Manage Scar Car Resolutions</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="managescarcarstatus">
+                            <i class="fa-light fa-certificate"></i> <span>Manage Scar Car Statuses</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="managescarcarstatus">
-                        <i class="fa-light fa-certificate"></i> <span>Manage Scar Car Statuses</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="managescarcarpriority">
+                            <i class="fa-light fa-window-restore"></i> <span>Manage Scar Car Priorities</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="managescarcarpriority">
-                        <i class="fa-light fa-window-restore"></i> <span>Manage Scar Car Priorities</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="managescarcarcategory">
+                            <i class="fa-light fa-snowflake"></i> <span>Manage Scar Car Categories</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="managescarcarcategory">
-                        <i class="fa-light fa-snowflake"></i> <span>Manage Scar Car Categories</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="managescarcarproject">
+                            <i class="fa-light fa-bus"></i> <span>Manage Scar Car Projects</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="managescarcarproject">
-                        <i class="fa-light fa-bus"></i> <span>Manage Scar Car Projects</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="managescarcarimpact">
+                            <i class="fa-light fa-car"></i> <span>Manage Scar Car Impacts</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="managescarcarimpact">
-                        <i class="fa-light fa-car"></i> <span>Manage Scar Car Impacts</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="manageworkorder">
+                            <i class="fa-light fa-file-circle-check"></i> <span>Manage Work Order</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="manageworkordertype">
-                        <i class="fa-light fa-krw"></i> <span>Manage Work Order Types</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="manageworkordertype">
+                            <i class="fa-light fa-krw"></i> <span>Manage Work Order Types</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="manageworkorderpriority">
-                        <i class="fa-light fa-indent"></i> <span>Manage Work Order Priorities</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="manageworkorderpriority">
+                            <i class="fa-light fa-indent"></i> <span>Manage Work Order Priorities</span>
+                        </NavLink>
 
-                    <NavLink class="nav-link" href="manageworkorderstatus">
-                        <i class="fa-light fa-arrows-alt"></i> <span>Manage Work Order Statuses</span>
-                    </NavLink>
+                        <NavLink class="nav-link" href="manageworkorderstatus">
+                            <i class="fa-light fa-arrows-alt"></i> <span>Manage Work Order Statuses</span>
+                        </NavLink>
+                    }
 
 
                     @* <NavLink class="nav-link" href="buildtemplatepart">

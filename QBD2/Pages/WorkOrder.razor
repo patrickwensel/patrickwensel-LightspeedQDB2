@@ -387,6 +387,33 @@
         }
     }
 
+    private async Task LoadSameStation(int workOrderId, int buildStationId, int partId)
+    {
+        if (!IsWorking)
+        {
+            IsWorking = true;
+            try
+            {
+                UserWorkOrder.UserWorkOrderDetail = null;
+                var data = await WorkOrderService.GetUserWorkOrderDetailById(workOrderId, buildStationId, partId);
+                if (data.IsFoundStation)
+                {
+                    UserWorkOrder.UserWorkOrderDetail = data;
+                }
+                else
+                {
+                    toastService.ShowError(data.ErrorMessage, "Error");
+                    return;
+                }
+            }
+            finally
+            {
+                IsWorking = false;
+                StateHasChanged();
+            }
+        }
+    }
+
     private async Task FindStation(int workOrderId)
     {
         if (!IsWorking)
@@ -565,7 +592,8 @@
                         if (isUpdated)
                         {
                             await WorkOrderService.SetWorkOrderToCompletedIfAllStationCompleted(UserWorkOrder!.WorkOrderId);
-                            await FindStation(UserWorkOrder!.WorkOrderId);
+                            //await FindStation(UserWorkOrder!.WorkOrderId);
+                            await LoadSameStation(UserWorkOrder!.WorkOrderId, UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.BuildStationId, UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.PartId);
                             toastService.ShowSuccess("Build Station Inspection Saved Successfully.", "Success");
                         }
                         else
@@ -575,13 +603,15 @@
                     }
                     else
                     {
-                        await FindStation(UserWorkOrder!.WorkOrderId);
+                        //await FindStation(UserWorkOrder!.WorkOrderId);
+                        await LoadSameStation(UserWorkOrder!.WorkOrderId, UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.BuildStationId, UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.PartId);
                         toastService.ShowSuccess("Build Station Inspection Saved Successfully.", "Success");
                     }
                 }
                 else
                 {
-                    await FindStation(UserWorkOrder!.WorkOrderId);
+                    //await FindStation(UserWorkOrder!.WorkOrderId);
+                    await LoadSameStation(UserWorkOrder!.WorkOrderId, UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.BuildStationId, UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.PartId);
                     toastService.ShowSuccess("Build Station Inspection Saved Successfully.", "Success");
                 }
             }

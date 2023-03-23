@@ -343,15 +343,15 @@
         }
         UserWorkOrder = null;
         WorkOrderDropDownData = null;
-        var poNumber = await PONumberService.GetPONumberBySerialNumber(SerialNumber);
+        var poNumber = await PONumberService.GetPONumberOrAssemblyNumberBySerialNumber(SerialNumber);
         if (string.IsNullOrWhiteSpace(poNumber))
         {
-            toastService.ShowError("PO number not found.", "Error");
+            toastService.ShowError("PO/Assembly number or not found.", "Error");
             return;
         }
 
         UserWorkOrder = new UserWorkOrder();
-        UserWorkOrder.SerialNumber = SerialNumber;
+        UserWorkOrder.SerialNumber = SerialNumber.Trim();
         UserWorkOrder.PONumber = poNumber.Trim();
 
         WorkOrderDropDownData = await WorkOrderService.GetWorkOrderListByPoNumber(UserWorkOrder.PONumber);
@@ -368,7 +368,7 @@
         {
             UserWorkOrder.WorkOrderId = workoders[0].WorkOrderId;
             WorkOrderNumber = UserWorkOrder.WorkOrderId;
-            await FindStation(UserWorkOrder.WorkOrderId);
+            await FindStation(UserWorkOrder.WorkOrderId, UserWorkOrder.SerialNumber);
         }
     }
 
@@ -378,7 +378,7 @@
         if (UserWorkOrder != null && WorkOrderNumber.HasValue)
         {
             UserWorkOrder.WorkOrderId = WorkOrderNumber.Value;
-            await FindStation(UserWorkOrder.WorkOrderId);
+            await FindStation(UserWorkOrder.WorkOrderId, UserWorkOrder.SerialNumber);
         }
         else
         {
@@ -414,7 +414,7 @@
         }
     }
 
-    private async Task FindStation(int workOrderId)
+    private async Task FindStation(int workOrderId, string serialNumber)
     {
         if (!IsWorking)
         {
@@ -422,7 +422,7 @@
             try
             {
                 UserWorkOrder.UserWorkOrderDetail = null;
-                var data = await WorkOrderService.GetUserWorkOrderDetail(workOrderId);
+                var data = await WorkOrderService.GetUserWorkOrderDetail(workOrderId, serialNumber);
                 if (data.IsFoundStation)
                 {
                     UserWorkOrder.UserWorkOrderDetail = data;
@@ -575,6 +575,7 @@
 
             isSaveInspectionClick = true;
             await WorkOrderService.UpdateWorkOrderPONumber(UserWorkOrder!.WorkOrderId, UserWorkOrder!.PONumber);
+            await WorkOrderService.UpdateMasterPartSerialNumber(UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.PartId, UserWorkOrder!.SerialNumber);
 
             if (UserWorkOrder!.UserWorkOrderDetail.BuildStationInspectionModel.Pass == true)
             {

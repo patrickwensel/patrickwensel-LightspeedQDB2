@@ -27,6 +27,10 @@ namespace QBD2.Data
 
         public virtual DbSet<Porcpls> Porcplss { get; set; }
 
+        public virtual DbSet<Icasen> Icasens { get; set; }
+
+        public virtual DbSet<Icasens> Icasenss { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             
@@ -1801,6 +1805,200 @@ namespace QBD2.Data
                 entity.Property(e => e.Rcplseq)
                     .HasColumnType("decimal(19, 0)")
                     .HasColumnName("RCPLSEQ");
+            });
+
+            modelBuilder.Entity<Icasen>(entity =>
+            {
+                entity.HasKey(e => e.Assmenseq).HasName("ICASEN_KEY_0");
+
+                entity.ToTable("ICASEN");
+
+                entity.Property(e => e.Assmenseq)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ASSMENSEQ");
+                entity.Property(e => e.Audtdate)
+                    .HasColumnType("decimal(9, 0)")
+                    .HasColumnName("AUDTDATE");
+                entity.Property(e => e.Audtorg)
+                    .HasMaxLength(6)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("AUDTORG");
+                entity.Property(e => e.Audttime)
+                    .HasColumnType("decimal(9, 0)")
+                    .HasColumnName("AUDTTIME");
+                entity.Property(e => e.Audtuser)
+                    .HasMaxLength(8)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("AUDTUSER");
+                entity.Property(e => e.Bomno)
+                    .HasMaxLength(6)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("BOMNO");
+                entity.Property(e => e.Cmpmastitm)
+                    .HasMaxLength(24)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("CMPMASTITM");
+                entity.Property(e => e.Compassmtd).HasColumnName("COMPASSMTD");
+                entity.Property(e => e.Datebus)
+                    .HasColumnType("decimal(9, 0)")
+                    .HasColumnName("DATEBUS");
+                entity.Property(e => e.Deleted).HasColumnName("DELETED");
+                entity.Property(e => e.Disasscost)
+                    .HasColumnType("decimal(19, 3)")
+                    .HasColumnName("DISASSCOST");
+                entity.Property(e => e.Docnum)
+                    .HasMaxLength(22)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("DOCNUM");
+                entity.Property(e => e.Docuniq)
+                    .HasColumnType("decimal(19, 0)")
+                    .HasColumnName("DOCUNIQ");
+                entity.Property(e => e.Enteredby)
+                    .HasMaxLength(8)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("ENTEREDBY");
+                entity.Property(e => e.Fiscperiod).HasColumnName("FISCPERIOD");
+                entity.Property(e => e.Fiscyear)
+                    .HasMaxLength(4)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("FISCYEAR");
+                entity.Property(e => e.Fromassnum)
+                    .HasMaxLength(22)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("FROMASSNUM");
+                entity.Property(e => e.Fromassqty)
+                    .HasColumnType("decimal(19, 4)")
+                    .HasColumnName("FROMASSQTY");
+                entity.Property(e => e.Hdrdesc)
+                    .HasMaxLength(60)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("HDRDESC");
+                entity.Property(e => e.Itemno)
+                    .HasMaxLength(24)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("ITEMNO");
+                entity.Property(e => e.Litemcount).HasColumnName("LITEMCOUNT");
+                entity.Property(e => e.Location)
+                    .HasMaxLength(6)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("LOCATION");
+                entity.Property(e => e.Manitemno)
+                    .HasMaxLength(24)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("MANITEMNO");
+                entity.Property(e => e.Mastassnum)
+                    .HasMaxLength(22)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("MASTASSNUM");
+                entity.Property(e => e.Multlevel).HasColumnName("MULTLEVEL");
+                entity.Property(e => e.Multseq).HasColumnName("MULTSEQ");
+                entity.Property(e => e.Needqtystk)
+                    .HasColumnType("decimal(19, 4)")
+                    .HasColumnName("NEEDQTYSTK");
+                entity.Property(e => e.Printed).HasColumnName("PRINTED");
+                entity.Property(e => e.Prnassnum)
+                    .HasMaxLength(22)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("PRNASSNUM");
+                entity.Property(e => e.Prnmultseq).HasColumnName("PRNMULTSEQ");
+                entity.Property(e => e.Quantity)
+                    .HasColumnType("decimal(19, 4)")
+                    .HasColumnName("QUANTITY");
+                entity.Property(e => e.Reference)
+                    .HasMaxLength(60)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("REFERENCE");
+                entity.Property(e => e.Remainassd)
+                    .HasColumnType("decimal(19, 4)")
+                    .HasColumnName("REMAINASSD");
+                entity.Property(e => e.Sitemcount).HasColumnName("SITEMCOUNT");
+                entity.Property(e => e.Status).HasColumnName("STATUS");
+                entity.Property(e => e.Transdate)
+                    .HasColumnType("decimal(9, 0)")
+                    .HasColumnName("TRANSDATE");
+                entity.Property(e => e.Transnum)
+                    .HasColumnType("decimal(19, 0)")
+                    .HasColumnName("TRANSNUM");
+                entity.Property(e => e.Transtype).HasColumnName("TRANSTYPE");
+                entity.Property(e => e.Unit)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("UNIT");
+                entity.Property(e => e.Unitcost)
+                    .HasColumnType("decimal(19, 6)")
+                    .HasColumnName("UNITCOST");
+                entity.Property(e => e.Usedqty)
+                    .HasColumnType("decimal(19, 4)")
+                    .HasColumnName("USEDQTY");
+                entity.Property(e => e.Values).HasColumnName("VALUES");
+            });
+
+            modelBuilder.Entity<Icasens>(entity =>
+            {
+                entity.HasKey(e => new { e.Assmenseq, e.Compid, e.Prncompid, e.Serialnumf }).HasName("ICASENS_KEY_0");
+
+                entity.ToTable("ICASENS");
+
+                entity.Property(e => e.Assmenseq).HasColumnName("ASSMENSEQ");
+                entity.Property(e => e.Compid).HasColumnName("COMPID");
+                entity.Property(e => e.Prncompid).HasColumnName("PRNCOMPID");
+                entity.Property(e => e.Serialnumf)
+                    .HasMaxLength(40)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("SERIALNUMF");
+                entity.Property(e => e.Audtdate)
+                    .HasColumnType("decimal(9, 0)")
+                    .HasColumnName("AUDTDATE");
+                entity.Property(e => e.Audtorg)
+                    .HasMaxLength(6)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("AUDTORG");
+                entity.Property(e => e.Audttime)
+                    .HasColumnType("decimal(9, 0)")
+                    .HasColumnName("AUDTTIME");
+                entity.Property(e => e.Audtuser)
+                    .HasMaxLength(8)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("AUDTUSER");
+                entity.Property(e => e.Bomno)
+                    .HasMaxLength(6)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("BOMNO");
+                entity.Property(e => e.Itemno)
+                    .HasMaxLength(24)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("ITEMNO");
+                entity.Property(e => e.Prnsernumf)
+                    .HasMaxLength(40)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("PRNSERNUMF");
+                entity.Property(e => e.Unit)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasColumnName("UNIT");
             });
 
             OnModelCreatingPartial(modelBuilder);

@@ -392,7 +392,7 @@ namespace QBD2.Services
                     {
                         DisplayName = x.WorkOrderId.ToString(),
                         WorkOrderId = x.WorkOrderId,
-                        PONumber = x.PONumber
+                        PONumber = Convert.ToString(x.PONumber).Trim()
                     }).ToListAsync();
             }
 
@@ -454,7 +454,7 @@ namespace QBD2.Services
             return userWorkOrderDetail;
         }
 
-        public async Task<UserWorkOrderDetail> GetUserWorkOrderDetail(int WorkOrderId)
+        public async Task<UserWorkOrderDetail> GetUserWorkOrderDetail(int WorkOrderId, string serialNumber)
         {
             UserWorkOrderDetail userWorkOrderDetail = new UserWorkOrderDetail();
             var workOrder = await _context.WorkOrders.Include(x => x.WorkOrderType).Include(x => x.WorkOrderStatus).Include(x => x.WorkOrderPriority)
@@ -469,7 +469,7 @@ namespace QBD2.Services
                 userWorkOrderDetail.Priority = workOrder.WorkOrderPriority.Name;
             }
 
-            var workOrderParts = await _context.WorkOrderParts.Where(x => x.WorkOrderId == WorkOrderId).OrderBy(x => x.WorkOrderPartId).ToListAsync();
+            var workOrderParts = await _context.WorkOrderParts.Include(x => x.Part).Where(x => x.WorkOrderId == WorkOrderId).OrderBy(x => x.WorkOrderPartId).ToListAsync();
             if (!workOrderParts.Any())
             {
                 userWorkOrderDetail.IsFoundStation = false;
@@ -491,8 +491,17 @@ namespace QBD2.Services
                     int? BuildStationId = null;
                     var lastBuildTemplateStation = buildTemplateStations.Last();
                     var buildStationInspections = await _context.BuildStationInspections.Where(x => x.WorkOrderId == WorkOrderId).ToListAsync();
-                    foreach (var workOrderPart in workOrderParts)
+
+                    var workOrderPart = workOrderParts.FirstOrDefault(x => Convert.ToString(x.Part.SerialNumber).Trim() == serialNumber.Trim());
+                    if (workOrderPart == null)
                     {
+                        workOrderPart = workOrderParts.FirstOrDefault(x => string.IsNullOrWhiteSpace(x.Part.SerialNumber) == true);
+                    }
+
+                    if (workOrderPart != null)
+                    {
+                        //foreach (var workOrderPart in workOrderParts)
+                        //{
                         foreach (var buildTemplateStation in buildTemplateStations)
                         {
                             var buildStationInspection = buildStationInspections.FirstOrDefault(x => x.PartId == workOrderPart.PartId && x.BuildStationId == buildTemplateStation.BuildStationId);
@@ -514,7 +523,7 @@ namespace QBD2.Services
                         if (PartId.HasValue)
                         {
                             userWorkOrderDetail.IsAllowSave = true;
-                            break;
+                            //break;
                         }
                         else if (workOrderPart.IsCompleteBuildStation == false)
                         {
@@ -522,47 +531,53 @@ namespace QBD2.Services
                             PartId = workOrderPart.PartId;
                             BuildStationId = lastBuildTemplateStation.BuildStationId;
                             userWorkOrderDetail.StationName = lastBuildTemplateStation.BuildStation.Name;
-                            break;
+                            //break;
                         }
-                    }
+                        //}
 
-                    if (!PartId.HasValue && LastCompletedPartId.HasValue)
-                    {
-                        PartId = LastCompletedPartId;
-                        BuildStationId = LastCompletedBuildStationId;
-                    }
-
-                    if (PartId.HasValue)
-                    {
-                        userWorkOrderDetail.Parts = await _context.Parts.Include(x => x.MasterPart)
-                            .Where(x => x.ParentPartId == PartId && x.BuildStationId == BuildStationId)
-                              .Select(x => new EditPartModel()
-                              {
-                                  PartId = x.PartId,
-                                  SerialNumber = x.SerialNumber,
-                                  MasterPartId = x.MasterPartId,
-                                  BuildStationId = x.BuildStationId,
-                                  PartNumber = x.MasterPart.PartNumber
-                              }).ToListAsync();
-
-                        var buildStationInspection = await _buildStationInspectionService.GetInspectionByWorkOrderIdAndPartId(WorkOrderId, PartId!.Value, BuildStationId!.Value);
-                        if (buildStationInspection.BuildStationInspectionId <= 0)
+                        if (!PartId.HasValue && LastCompletedPartId.HasValue)
                         {
-                            buildStationInspection.Pass = true;
-                            buildStationInspection.GeneralComments = string.Empty;
-                            buildStationInspection.PartId = PartId.Value;
-
-                            buildStationInspection.WorkOrderId = WorkOrderId;
-                            buildStationInspection.BuildStationId = BuildStationId.Value;
-                            buildStationInspection.BuildStationInspectionFailed = new Models.BuildStationInspectionFailed();
+                            PartId = LastCompletedPartId;
+                            BuildStationId = LastCompletedBuildStationId;
                         }
-                        userWorkOrderDetail.BuildStationInspectionModel = buildStationInspection;
-                        userWorkOrderDetail.IsFoundStation = true;
+
+                        if (PartId.HasValue)
+                        {
+                            userWorkOrderDetail.Parts = await _context.Parts.Include(x => x.MasterPart)
+                                .Where(x => x.ParentPartId == PartId && x.BuildStationId == BuildStationId)
+                                  .Select(x => new EditPartModel()
+                                  {
+                                      PartId = x.PartId,
+                                      SerialNumber = x.SerialNumber,
+                                      MasterPartId = x.MasterPartId,
+                                      BuildStationId = x.BuildStationId,
+                                      PartNumber = x.MasterPart.PartNumber
+                                  }).ToListAsync();
+
+                            var buildStationInspection = await _buildStationInspectionService.GetInspectionByWorkOrderIdAndPartId(WorkOrderId, PartId!.Value, BuildStationId!.Value);
+                            if (buildStationInspection.BuildStationInspectionId <= 0)
+                            {
+                                buildStationInspection.Pass = true;
+                                buildStationInspection.GeneralComments = string.Empty;
+                                buildStationInspection.PartId = PartId.Value;
+
+                                buildStationInspection.WorkOrderId = WorkOrderId;
+                                buildStationInspection.BuildStationId = BuildStationId.Value;
+                                buildStationInspection.BuildStationInspectionFailed = new Models.BuildStationInspectionFailed();
+                            }
+                            userWorkOrderDetail.BuildStationInspectionModel = buildStationInspection;
+                            userWorkOrderDetail.IsFoundStation = true;
+                        }
+                        else
+                        {
+                            userWorkOrderDetail.IsFoundStation = false;
+                            userWorkOrderDetail.ErrorMessage = "Station not found for this work order.";
+                        }
                     }
                     else
                     {
                         userWorkOrderDetail.IsFoundStation = false;
-                        userWorkOrderDetail.ErrorMessage = "Station not found for this work order.";
+                        userWorkOrderDetail.ErrorMessage = "Part not found for serial number.";
                     }
                 }
             }
@@ -577,6 +592,17 @@ namespace QBD2.Services
             {
                 workOrder.PONumber = PONumber;
                 _context.Entry(workOrder).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdateMasterPartSerialNumber(int partId, string serialNumber)
+        {
+            var part = await _context.Parts.FindAsync(partId);
+            if (part != null)
+            {
+                part.SerialNumber = serialNumber.Trim();
+                _context.Entry(part).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
         }

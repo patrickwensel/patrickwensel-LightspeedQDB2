@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QBD2.Data;
 using QBD2.Models;
+using System.Data;
 
 namespace QBD2.Services
 {
@@ -15,7 +16,7 @@ namespace QBD2.Services
 
         public async Task<List<DropDownBindString>> GetPONumberList()
         {
-            var data = await _sage300Context.Porcph1s.Where(x => string.IsNullOrWhiteSpace(x.Ponumber) == false)
+            var dataPo = await _sage300Context.Porcph1s.Where(x => string.IsNullOrWhiteSpace(x.Ponumber) == false)
                 .Select(i => new DropDownBindString
                 {
                     DropText = i.Ponumber.Trim(),
@@ -23,15 +24,27 @@ namespace QBD2.Services
                 })
                 .Distinct().ToListAsync();
 
-            data = data.OrderBy(x => x.DropText).ToList();
+            var dataAssembly = await _sage300Context.Icasens.Where(x => string.IsNullOrWhiteSpace(x.Docnum) == false)
+               .Select(i => new DropDownBindString
+               {
+                   DropText = i.Docnum.Trim(),
+                   DropValue = i.Docnum.Trim()
+               })
+               .Distinct().ToListAsync();
+
+            dataPo = dataPo.OrderBy(x => x.DropText).ToList();
+            dataAssembly = dataAssembly.OrderBy(x => x.DropText).ToList();
+
+            List<DropDownBindString> data = new List<DropDownBindString>(dataPo);
+            data.AddRange(dataAssembly);
+            data = data.GroupBy(i => i.DropText).Select(i => i.FirstOrDefault()).ToList();
 
             return data;
-
         }
 
         public async Task<List<DropDownBindString>> GetSerialNumberList()
         {
-            var data = await _sage300Context.Porcplss.Where(x => string.IsNullOrWhiteSpace(x.Serialnumf) == false)
+            var dataPo = await _sage300Context.Porcplss.Where(x => string.IsNullOrWhiteSpace(x.Serialnumf) == false)
                 .Select(i => new DropDownBindString
                 {
                     DropText = i.Serialnumf.Trim(),
@@ -39,13 +52,26 @@ namespace QBD2.Services
                 })
                 .Distinct().ToListAsync();
 
-            data = data.OrderBy(x => x.DropText).ToList();
+            var dataAssembly = await _sage300Context.Icasenss.Where(x => string.IsNullOrWhiteSpace(x.Serialnumf) == false)
+                .Select(i => new DropDownBindString
+                {
+                    DropText = i.Serialnumf.Trim(),
+                    DropValue = i.Serialnumf.Trim()
+                })
+                .Distinct().ToListAsync();
+
+            dataPo = dataPo.OrderBy(x => x.DropText).ToList();
+            dataAssembly = dataAssembly.OrderBy(x => x.DropText).ToList();
+
+            List<DropDownBindString> data = new List<DropDownBindString>(dataPo);
+            data.AddRange(dataAssembly);
+            data = data.GroupBy(i => i.DropText).Select(i => i.FirstOrDefault()).ToList();
 
             return data;
 
         }
 
-        public async Task<string?> GetPONumberBySerialNumber(string serialNumber)
+        public async Task<string?> GetPONumberOrAssemblyNumberBySerialNumber(string serialNumber)
         {
             string? poNumber = string.Empty;
             if (!string.IsNullOrWhiteSpace(serialNumber))
@@ -55,6 +81,14 @@ namespace QBD2.Services
                                   join Porcplss in _sage300Context.Porcplss on Porcph1s.Rcphseq equals Porcplss.Rcphseq
                                   where Porcplss.Serialnumf.Trim() == serialNumber.Trim()
                                   select Porcph1s.Ponumber).FirstOrDefaultAsync();
+
+                if (string.IsNullOrWhiteSpace(poNumber))
+                {
+                    poNumber = await (from Icasenss in _sage300Context.Icasenss
+                                                join Icasens in _sage300Context.Icasens on Icasenss.Assmenseq equals Icasens.Assmenseq
+                                                where Icasenss.Serialnumf.Trim() == serialNumber.Trim()
+                                                select Icasens.Docnum).FirstOrDefaultAsync();
+                }
             }
 
             return poNumber;
